@@ -93,11 +93,17 @@ export default function Header({ transparent = false }: { transparent?: boolean 
           <Logo />
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+        {/* Desktop nav — from xl, not lg. With the full "Parents Travel
+            Assist" label the row (logo + six links + phone + Login + Get
+            Quote) needs ~1,175px; lg's 944px content box can't hold it, and
+            squeezing it there wrapped every label onto two lines. Between lg
+            and xl the drawer carries the links and the phone number stays in
+            the bar. `whitespace-nowrap` makes any future overflow visible as
+            overflow instead of a silently wrapped, double-height header. */}
+        <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
           {NAV_LINKS.map((link) => {
             const className = cn(
-              "rounded-full px-3 py-2 t-label-2 tracking-[0.2px] transition-colors duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+              "whitespace-nowrap rounded-full px-2.5 py-2 t-label-2 tracking-[0.2px] transition-colors duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
               onImage
                 ? "text-text-on-dark/85 hover:bg-neutral-000/10 hover:text-text-on-dark focus-visible:ring-neutral-000 focus-visible:ring-offset-primary-900"
                 : "text-neutral-600 hover:bg-primary-050 hover:text-primary-800 focus-visible:ring-primary-500 focus-visible:ring-offset-neutral-000"
@@ -127,12 +133,10 @@ export default function Header({ transparent = false }: { transparent?: boolean 
           <a
             href={`tel:${BUSINESS.phone}`}
             className={cn(
-              /* Was `xl:inline-flex` — the differentiator phone number
-                 disappeared between 1024px (lg:, where the nav itself
-                 appears) and 1280px (xl:), a real gap where nav shows but
-                 the number doesn't. Matched to the nav's own breakpoint so
-                 it's a first-class header item everywhere the nav is. */
-              "hidden items-center gap-2 rounded-full px-3 py-2 t-label-2 transition-colors duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:inline-flex",
+              /* Shown from lg — before the desktop nav, which now starts at
+                 xl — so the number, this agency's differentiator, is in the
+                 bar at every laptop width, with or without the nav beside it. */
+              "hidden items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 t-label-2 transition-colors duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:inline-flex",
               onImage
                 ? "text-text-on-dark hover:bg-neutral-000/10 focus-visible:ring-neutral-000 focus-visible:ring-offset-primary-900"
                 : "text-primary-800 hover:bg-primary-050 focus-visible:ring-primary-500 focus-visible:ring-offset-neutral-000"
@@ -152,7 +156,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
           <a
             href={PORTAL_LOGIN_URL}
             className={cn(
-              "hidden items-center gap-1.5 rounded-full border px-[15px] py-[9.5px] t-label-2 tracking-[0.2px] transition-colors duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:inline-flex",
+              "hidden items-center gap-1.5 whitespace-nowrap rounded-full border px-[15px] py-[9.5px] t-label-2 tracking-[0.2px] transition-colors duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:inline-flex",
               onImage
                 ? "border-text-on-dark/40 text-text-on-dark hover:bg-neutral-000/10 focus-visible:ring-neutral-000 focus-visible:ring-offset-primary-900"
                 : "border-primary-800 text-primary-800 hover:bg-primary-050 focus-visible:ring-primary-500 focus-visible:ring-offset-neutral-000"
@@ -164,7 +168,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
 
           <a
             href={PORTAL_LOGIN_URL}
-            className="hidden items-center rounded-full bg-accent-500 px-[17px] py-[10.5px] t-label-2 tracking-[0.2px] text-text-on-dark shadow-e1 transition-all duration-300 ease-out hover:bg-accent-600 hover:shadow-e2 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 sm:inline-flex sm:px-[21px] lg:px-[25px]"
+            className="hidden items-center whitespace-nowrap rounded-full bg-accent-500 px-[17px] py-[10.5px] t-label-2 tracking-[0.2px] text-text-on-dark shadow-e1 transition-all duration-300 ease-out hover:bg-accent-600 hover:shadow-e2 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 sm:inline-flex sm:px-[21px] lg:px-[25px]"
           >
             {t("cta.getQuote")}
           </a>
@@ -174,7 +178,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
             type="button"
             onClick={() => setOpen((v) => !v)}
             className={cn(
-              "inline-flex h-11 w-11 items-center justify-center rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 lg:hidden",
+              "inline-flex h-11 w-11 items-center justify-center rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 xl:hidden",
               onImage
                 ? "text-text-on-dark hover:bg-neutral-000/10 focus-visible:ring-neutral-000"
                 : "text-primary-800 hover:bg-primary-050 focus-visible:ring-primary-500"
@@ -201,7 +205,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
               transition={{ duration: 0.2, ease: "easeOut" }}
               onClick={() => setOpen(false)}
               aria-hidden="true"
-              className="fixed inset-0 bg-primary-900/60 lg:hidden z-backdrop"
+              className="fixed inset-0 bg-primary-900/60 xl:hidden z-backdrop"
             />
 
             {/* Slide-in panel */}
@@ -219,7 +223,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
                   ? { duration: 0.15 }
                   : { type: "spring", stiffness: 320, damping: 34 }
               }
-              className="fixed inset-y-0 right-0 flex w-[min(20rem,82vw)] flex-col overflow-y-auto overscroll-contain bg-neutral-000 shadow-e3 lg:hidden z-drawer"
+              className="fixed inset-y-0 right-0 flex w-[min(20rem,82vw)] flex-col overflow-y-auto overscroll-contain bg-neutral-000 shadow-e3 xl:hidden z-drawer"
             >
               {/* Drawer header */}
               <div className="flex h-16 shrink-0 items-center justify-between border-b border-primary-100 px-6">

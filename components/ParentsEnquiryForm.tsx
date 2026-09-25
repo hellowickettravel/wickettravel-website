@@ -205,12 +205,33 @@ function Err({ id, message }: { id: string; message: string }) {
   );
 }
 
-export default function ParentsEnquiryForm() {
+/** Journey fields a caller may pre-fill — e.g. the Parents Travel Assist match
+ *  finder hands over the route and date the visitor already searched, so they
+ *  never type the same thing twice. Everything else stays the visitor's own. */
+export type EnquiryPrefill = Partial<
+  Pick<FormState, "from_location" | "to_location" | "travel_date" | "airline">
+>;
+
+export default function ParentsEnquiryForm({
+  initialRole = "requester",
+  initialValues,
+}: {
+  initialRole?: EnquiryType;
+  initialValues?: EnquiryPrefill;
+} = {}) {
   const uid = useId();
   const id = (name: string) => `pt-${uid}-${name}`;
 
-  const [role, setRole] = useState<EnquiryType>("requester");
-  const [data, setData] = useState<FormState>(EMPTY);
+  const [role, setRole] = useState<EnquiryType>(initialRole);
+  const [data, setData] = useState<FormState>(() => {
+    const next = { ...EMPTY };
+    // Only real strings — an `undefined` would otherwise blank a field to a
+    // non-string and break every `.trim()` below.
+    for (const [key, value] of Object.entries(initialValues ?? {})) {
+      if (typeof value === "string") next[key as keyof EnquiryPrefill] = value;
+    }
+    return next;
+  });
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);

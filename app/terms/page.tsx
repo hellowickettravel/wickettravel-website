@@ -104,7 +104,7 @@ const sections: LegalSection[] = [
           fare, seat or price is guaranteed.
         </P>
         <P>
-          Some enquiries (for example, our Dubai visa or Assist Family
+          Some enquiries (for example, our Dubai visa or Parents Travel Assist
           forms) are handled as assisted, human-reviewed requests rather than
           instant bookings — our team will contact you to complete the
           process.

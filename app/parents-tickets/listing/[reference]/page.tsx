@@ -6,8 +6,8 @@ import ListingDetail from "@/components/ListingDetail";
 
 /**
  * One listing's own page — reached by tapping any card on the main
- * /parents-tickets carousels or either full list page
- * (components/AssistFamilyCarousels.tsx, components/ParentsBoard.tsx). There
+ * either full list page
+ * (components/ParentsBoard.tsx). There
  * is no per-listing API, so the actual lookup happens client-side in
  * ListingDetail against the same public feed every other surface reads; this
  * server file only supplies the shell, metadata and breadcrumb.
@@ -18,9 +18,9 @@ import ListingDetail from "@/components/ListingDetail";
  * to the two evergreen, indexable list pages linked from here.
  */
 export const metadata: Metadata = {
-  title: "Listing | Assist Family",
+  title: "Listing | Parents Travel Assist",
   description:
-    "One open Assist Family request or offer, in full — every introduction still made through Wicket Travel, never a direct contact detail.",
+    "One open Parents Travel Assist request or offer, in full — every introduction still made through Wicket Travel, never a direct contact detail.",
   robots: { index: false, follow: true },
 };
 
@@ -41,7 +41,7 @@ export default async function ListingDetailPage({
           lead="Contact details are never published — ask us for the introduction."
           breadcrumbs={[
             { label: "Home", href: "/" },
-            { label: "Assist Family", href: "/parents-tickets" },
+            { label: "Parents Travel Assist", href: "/parents-tickets" },
             { label: decoded },
           ]}
         />

@@ -7,25 +7,25 @@ import { OG_BASE, SITE_URL, TWITTER_BASE } from "@/lib/seo";
 
 /**
  * Full list of everyone currently offering to help — the mirror of
- * /parents-tickets/requests, reached from the travellers' carousel's "More"
- * link (components/AssistFamilyCarousels.tsx) on the main /parents-tickets
- * page. Same board component, locked to the other side.
+ * /parents-tickets/requests, reading the live feed. Same board component,
+ * locked to the other side. (The main /parents-tickets page now shows its own
+ * sample board — see lib/travelAssist.ts — and no longer links here.)
  */
 export const metadata: Metadata = {
   title: "Travellers Offering to Help",
   description:
-    "Every open Assist Family offer right now — travellers already booked on a route who are happy to keep an elderly passenger company.",
+    "Every open Parents Travel Assist offer right now — travellers already booked on a route who are happy to keep an elderly passenger company.",
   alternates: { canonical: "/parents-tickets/offers" },
   openGraph: {
     ...OG_BASE,
     url: `${SITE_URL}/parents-tickets/offers`,
-    title: "Travellers Offering to Help | Assist Family",
+    title: "Travellers Offering to Help | Parents Travel Assist",
     description:
       "Every open offer right now, shortened for privacy — recognise a family who needs your route?",
   },
   twitter: {
     ...TWITTER_BASE,
-    title: "Travellers Offering to Help | Assist Family",
+    title: "Travellers Offering to Help | Parents Travel Assist",
     description:
       "Every open offer right now, shortened for privacy — recognise a family who needs your route?",
   },
@@ -42,7 +42,7 @@ const jsonLd = {
         {
           "@type": "ListItem",
           position: 2,
-          name: "Assist Family",
+          name: "Parents Travel Assist",
           item: `${SITE_URL}/parents-tickets`,
         },
         {
@@ -72,7 +72,7 @@ export default function AssistFamilyOffersPage() {
           lead="Every open offer right now. Contact details are never published — ask us for the introduction."
           breadcrumbs={[
             { label: "Home", href: "/" },
-            { label: "Assist Family", href: "/parents-tickets" },
+            { label: "Parents Travel Assist", href: "/parents-tickets" },
             { label: "Offers" },
           ]}
         />

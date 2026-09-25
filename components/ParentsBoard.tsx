@@ -23,14 +23,11 @@ import { useParentBoard } from "@/lib/useParentBoard";
  * The full, filterable community board — every open request or offer, in one
  * place. This used to be the main /parents-tickets page's live-listings
  * section; it now lives on the two dedicated list pages
- * (/parents-tickets/requests, /parents-tickets/offers) instead, reached via
- * the "More" link on each homepage-style carousel
- * (components/AssistFamilyCarousels.tsx) — the main page shows a taste of
- * what's open, this page shows all of it.
+ * (/parents-tickets/requests, /parents-tickets/offers) instead.
  *
  * Reads the real, already-anonymised public feed through the same-origin relay
  * at /api/parent-ticket/public (via lib/useParentBoard, shared with the
- * carousels and the detail page). The upstream payload never carries contact
+ * detail page). The upstream payload never carries contact
  * details, so nothing here can leak one: the card's only call to action is to
  * ask our team for the introduction, quoting the entry's reference.
  */
