@@ -233,6 +233,107 @@ Verified visually: carousels render real live entries with the correct
 background per route, both list pages, and the detail page in both its
 "found" and "no longer available" states.
 
+## 2026-09-25 — Parents Travel Assist: full page rebuild
+
+Client direction: rename the service, replace the whole /parents-tickets page
+with something visual (not text-heavy), built around a search widget and a
+two-sided board, pushing visitors toward booking tickets with Wicket Travel.
+
+**Rename:** "Assist Family" → **"Parents Travel Assist"** everywhere it is a
+visible label (nav in all 5 languages, page, sub-pages, ParentsBanner aria
+label, Privacy/Terms, llms.txt). URL, file names and the `/api/parent-ticket`
+contract unchanged, for the same reasons recorded in the 2026-09-10 entry.
+
+**Header fix this forced:** the longer nav label made the header need
+~1,175px, so between 1024–1279px every label wrapped onto two lines. The
+desktop nav now starts at `xl` (1280px); below that the drawer carries the
+links and the phone number stays in the bar from `lg`. All header labels are
+`whitespace-nowrap` so a future overflow can't hide as a wrapped header.
+
+**New page** (`app/parents-tickets/page.tsx`, `components/travel-assist/*`,
+data in `lib/travelAssist.ts`) — every old section removed:
+1. Full-bleed photo hero (Pexels #35444544, Tafsin Naeem, free Pexels licence:
+   a younger man steadying an older woman in a sari onto an escalator). The
+   frame is portrait, so from `lg` it bleeds off the right edge with the navy
+   field feathered into it; below `lg` it fills the hero. Mirrors for RTL.
+2. Match finder — its own widget, not the flight search: mode (need a
+   companion / can help), from (India first), to (UK first), date, number of
+   parents, popular corridor chips. It filters the board below.
+3. Two-sided board — families vs helpers, boarding-pass cards, "N possible
+   matches" computed from route + date ±3 days + capacity, tabs below `lg`.
+4. How it works (4 steps) + the ticket hook: "Book their tickets with us —
+   we'll pair them on the same flight" → /flights and phone.
+5. Verified by Wicket Travel — passport, same flight, phone, coordinator.
+6. Real Trustpilot reviews (quoted verbatim, names shortened).
+7. Closing CTA — post the trip / book flights / offer to help.
+The real intake is the existing `ParentsEnquiryForm` (live `/api/parent-ticket`
+relay) in a dialog, now pre-filled with the route/date the visitor chose
+(new optional `initialRole` / `initialValues` props, backward compatible).
+Old `#post-to-the-board` links still open it.
+
+**⚠️ Decisions needed:**
+- **Sample board.** Listings are illustrative and labelled as such on the page.
+  Switching to the live feed is a data swap — see the header of
+  `lib/travelAssist.ts`. `/parents-tickets/requests` and `/offers` still show
+  the live feed but are no longer linked from the main page.
+- **Verification promises are now copy.** The page says both sides' passport,
+  booking and phone are checked and a coordinator introduces them. Operations
+  must actually do this before launch (the old page said explicitly it was not
+  a DBS check — that line is gone at the client's request).
+- **Trustpilot numbers don't match.** The real profile
+  (trustpilot.com/review/wickettravel.com, checked today) is **4.5 from 17
+  reviews**; `lib/seo.ts` publishes **4.8 from 12,480** site-wide (homepage
+  badge, hero proof row, JSON-LD `aggregateRating`). This page uses only the
+  real figure. The site-wide claim should be corrected — misleading review
+  figures are a CMA/DMCC Act risk, and Google can act on inflated
+  `aggregateRating` markup.
+
+Build clean (26/26 routes), zero lint errors in app/components/lib. Checked at
+1440 / 1024 / 768 / 390 and in RTL; finder, corridor chips, empty states,
+listing → dialog prefill, hero hash buttons and legacy hash all exercised in a
+real browser with no console errors.
+
+## 2026-09-25 (round 2) — Parents Travel Assist v2, after client review
+
+Client feedback on round 1: messy spacing, broken on phones, hero photo read
+as a mall not an airport, search fields oversized and not date-driven, board
+was text without photos. Researched the direct competitors first
+(TravelSakha, MatchMyFlight, My Desi Travel Companion, NRI TravelBuddy,
+Juurnee): mostly text-only; the useful patterns taken were MatchMyFlight's
+route/date browsing and verification badges, and BlaBlaCar-style
+route + date search with photo-led results.
+
+**What changed**
+- **Hero:** real Delhi T3 photo (Air India tails through the terminal glass;
+  Unsplash, Ankur Khandelwal, Unsplash licence) + a "match" visual on the right
+  (a parents' photo card and a helper's card, "Matched · same flight").
+  The duplicate hero buttons are gone — the search tabs are the CTA.
+- **Search bar:** one slim row on desktop (From · To · Travel date ·
+  Flexibility ±0/3/7 · Language · Help needed / I can help with · Search), a
+  2-column grid on phones. Mode tabs sit on the hero above it.
+- **"Who's flying when" day strip:** next 21 days, each tile shows how many
+  families and how many helpers fly that day under the current filters; tap
+  a day to filter the board.
+- **Board:** photo-led cards (licensed Pexels portraits of Indian parents and
+  younger travellers), verified badge, date, route, one line, help tags,
+  "N on the same route", CTA. Face-stack column headers. 3 per side + "Show all".
+- **How it works:** four photo steps (swipe row on phones) + the booking hook.
+- **Trust:** verification badges + real Trustpilot reviews in one section.
+- **Closing:** split card with the Delhi T3 mudra-hands wall (Unsplash,
+  Zoshua Colah).
+- **Phone layout bug fixed at the root:** implicit grid tracks were sizing to
+  the cards' single-line text and pushing past the screen edge; every grid on
+  the page now uses explicit `grid-cols-1`/minmax tracks. Checked 320–1440px:
+  no element overflows.
+
+**Photo note:** no free-licence photo exists of elderly Indian parents inside
+an airport (checked Pexels, Unsplash, Openverse). The hero pairs a real Indian
+airport with real photos of Indian parents instead. If the client wants one
+photograph showing both, a paid stock image (Shutterstock/Adobe Stock/iStock,
+~£10–30) drops straight into `public/parents-travel-assist/hero-delhi-t3.jpg`.
+Sample-board portraits are stock photos standing in for members; replace with
+real members' photos (or initials) when the live feed goes in.
+
 ## 💡 Recommended next
 
 1. **Review everything live** — this is the natural next step before more

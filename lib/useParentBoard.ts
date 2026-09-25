@@ -5,7 +5,7 @@ import { type Entry, parseEntry, type ParsedEntry } from "@/lib/parents";
 
 /**
  * Shared fetch/parse for the live `/api/parent-ticket/public` feed — extracted
- * from components/ParentsBoard.tsx so the homepage-style carousels, the two
+ * from components/ParentsBoard.tsx so the two
  * full list pages and the per-listing detail page all hit the same relay the
  * same way, instead of four independent copies of this effect drifting apart.
  * Nothing is mocked: an empty or failed feed is a real state, not a reason to

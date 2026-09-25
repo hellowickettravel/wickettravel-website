@@ -64,7 +64,7 @@ export default function ParentsBanner() {
               <a
                 href={`tel:${PHONE_TEL}`}
                 className="inline-flex items-center gap-3 rounded-full bg-accent-500 px-8 py-4 t-label-1 text-text-on-dark shadow-e2 shadow-accent-500/30 transition-colors hover:bg-accent-600 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-500"
-                aria-label={`Call us about Assist Family on ${PHONE_DISPLAY}`}
+                aria-label={`Call us about Parents Travel Assist on ${PHONE_DISPLAY}`}
               >
                 <PhoneCall className="h-5 w-5" aria-hidden="true" />
                 {PHONE_DISPLAY}

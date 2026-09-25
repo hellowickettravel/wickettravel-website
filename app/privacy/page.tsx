@@ -95,7 +95,7 @@ const sections: LegalSection[] = [
             upload (e.g. passport scans).
           </li>
           <li>
-            <strong className="text-primary-800">Assist Family enquiries</strong> — details you
+            <strong className="text-primary-800">Parents Travel Assist enquiries</strong> — details you
             submit when asking us to help find a flight for a visiting parent
             or family member, and the contact details of the person raising
             the enquiry.
@@ -126,7 +126,7 @@ const sections: LegalSection[] = [
         <P>We use your personal data to:</P>
         <Ul>
           <li>Find fares, process enquiries and complete flight bookings on your behalf.</li>
-          <li>Respond to contact form, visa and Assist Family enquiries.</li>
+          <li>Respond to contact form, visa and Parents Travel Assist enquiries.</li>
           <li>Communicate with you about your booking, including changes made by an airline.</li>
           <li>Provide customer support by phone, WhatsApp and email.</li>
           <li>Improve our website and services, and keep our systems secure.</li>
