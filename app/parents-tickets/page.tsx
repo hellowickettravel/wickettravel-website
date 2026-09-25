@@ -4,8 +4,7 @@ import Footer from "@/components/Footer";
 import AssistHero from "@/components/travel-assist/AssistHero";
 import AssistExperience from "@/components/travel-assist/AssistExperience";
 import AssistJourney from "@/components/travel-assist/AssistJourney";
-import AssistVerified from "@/components/travel-assist/AssistVerified";
-import AssistReviews from "@/components/travel-assist/AssistReviews";
+import AssistTrust from "@/components/travel-assist/AssistTrust";
 import AssistClosing from "@/components/travel-assist/AssistClosing";
 import {
   AREA_SERVED_UK,
@@ -21,9 +20,10 @@ import {
  *
  * Its own page with its own identity, not a variant of the flight pages:
  *
- *   hero (photo)  →  match finder + two-sided board  →  how it works + the
- *   "book their tickets with us" hook  →  verification  →  real Trustpilot
- *   reviews  →  closing call to action
+ *   hero (Delhi T3 photo + match visual)  →  date-first search bar  →
+ *   "who's flying when" day strip  →  two-sided photo board  →  how it works
+ *   (photo steps) + the "book their tickets with us" hook  →  trust (checks +
+ *   real Trustpilot reviews)  →  closing call to action
  *
  * The board shows sample listings for now (lib/travelAssist.ts explains how
  * to switch it to the live /api/parent-ticket/public feed). The one real
@@ -119,8 +119,7 @@ export default function ParentsTravelAssistPage() {
         <AssistHero />
         <AssistExperience />
         <AssistJourney />
-        <AssistVerified />
-        <AssistReviews />
+        <AssistTrust />
         <AssistClosing />
       </main>
       <Footer />

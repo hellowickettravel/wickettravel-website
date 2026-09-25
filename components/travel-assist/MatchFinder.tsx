@@ -1,99 +1,86 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
-import {
-  ArrowLeftRight,
-  CalendarDays,
-  ChevronDown,
-  HandHeart,
-  HeartHandshake,
-  Minus,
-  PlaneLanding,
-  PlaneTakeoff,
-  Plus,
-  Search,
-  X,
-} from "lucide-react";
+import { type ReactNode } from "react";
+import { ArrowLeftRight, ChevronDown, HandHeart, HeartHandshake, Search, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import {
+  HELP_TYPES,
   INDIA_AIRPORTS,
-  POPULAR_CORRIDORS,
+  LANGUAGES,
   UK_AIRPORTS,
   cityOf,
   type AirportOption,
+  type HelpKey,
 } from "@/lib/travelAssist";
 import { isoDate, offsetOf, shortDate, useToday } from "@/components/travel-assist/dates";
 
 export type Mode = "requester" | "traveller";
-export type Query = { from: string; to: string; date: string; count: number };
+export type Flex = 0 | 3 | 7;
+export type Query = {
+  from: string;
+  to: string;
+  date: string;
+  flex: Flex;
+  language: string;
+  help: HelpKey | "";
+};
 
-export const EMPTY_QUERY: Query = { from: "", to: "", date: "", count: 1 };
+export const EMPTY_QUERY: Query = { from: "", to: "", date: "", flex: 3, language: "", help: "" };
 
-const MODES: { key: Mode; label: string; short: string; icon: typeof HandHeart }[] = [
-  {
-    key: "requester",
-    label: "My parents need a companion",
-    short: "Find a companion",
-    icon: HeartHandshake,
-  },
-  {
-    key: "traveller",
-    label: "I’m flying and can help",
-    short: "Offer to help",
-    icon: HandHeart,
-  },
+export const MODES: { key: Mode; label: string; short: string; icon: typeof HandHeart }[] = [
+  { key: "requester", label: "My parents need a companion", short: "Need a companion", icon: HeartHandshake },
+  { key: "traveller", label: "I’m flying and can help", short: "I can help", icon: HandHeart },
 ];
 
-/* ── Field shell ─────────────────────────────────────────────────────────
-   One look for every field: a tinted tile with a small overline label and a
-   large value. The real control (a native <select> or date input) sits over
-   the whole tile, invisible, so phones get their own picker — the fastest,
-   most familiar control on a mid-range Android — while the tile keeps this
-   page's own typography. */
-function FieldTile({
+/* ── One field of the bar ──────────────────────────────────────────────
+   A small bold label over the current value, with the real control — a
+   native <select> or date input — stretched invisibly over the whole cell,
+   so phones get their own picker and the bar keeps one compact look. */
+function Cell({
   label,
-  icon: Icon,
+  value,
+  placeholder,
   children,
   className,
+  chevron = true,
 }: {
   label: string;
-  icon: typeof PlaneTakeoff;
+  value: string;
+  placeholder: string;
   children: ReactNode;
   className?: string;
+  chevron?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "group relative flex min-h-[72px] items-center gap-3 rounded-md bg-primary-050 px-4 py-3 ring-1 ring-transparent transition-colors hover:bg-primary-100/60 focus-within:bg-neutral-000 focus-within:ring-2 focus-within:ring-primary-700",
+        "relative min-w-0 rounded-md bg-primary-050/60 px-4 py-2.5 transition-colors hover:bg-primary-050 focus-within:bg-primary-050 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-700 lg:bg-transparent",
         className
       )}
     >
-      <Icon className="h-5 w-5 shrink-0 text-primary-500" aria-hidden="true" />
-      <div className="min-w-0 flex-1">
-        <span className="block t-overline text-text-secondary">{label}</span>
-        {children}
-      </div>
+      <span className="block t-label-3 text-primary-800">{label}</span>
+      <span
+        className={cn(
+          "mt-0.5 block truncate pr-5 t-body-sm",
+          value ? "text-primary-800" : "text-text-secondary"
+        )}
+      >
+        {value || placeholder}
+      </span>
+      {chevron && (
+        <ChevronDown
+          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-300"
+          aria-hidden="true"
+        />
+      )}
+      {children}
     </div>
   );
 }
 
-function AirportField({
-  label,
-  icon,
-  value,
-  onChange,
-  anyLabel,
-  first,
-}: {
-  label: string;
-  icon: typeof PlaneTakeoff;
-  value: string;
-  onChange: (code: string) => void;
-  anyLabel: string;
-  /** Which country's airports to list first. */
-  first: "india" | "uk";
-}) {
-  const id = useId();
+const overlay = "absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0";
+
+function AirportOptions({ first }: { first: "india" | "uk" }) {
   const groups: [string, AirportOption[]][] =
     first === "india"
       ? [
@@ -104,139 +91,26 @@ function AirportField({
           ["United Kingdom", UK_AIRPORTS],
           ["India", INDIA_AIRPORTS],
         ];
-
   return (
-    <FieldTile label={label} icon={icon}>
-      <span className="mt-0.5 flex items-baseline gap-2 pr-5">
-        <span className={cn("truncate t-label-1", value ? "text-primary-800" : "text-text-secondary")}>
-          {value ? cityOf(value) : anyLabel}
-        </span>
-        {value && <span className="t-code shrink-0 text-primary-500">{value}</span>}
-      </span>
-      <ChevronDown
-        className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500"
-        aria-hidden="true"
-      />
-      <select
-        id={id}
-        aria-label={label}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
-      >
-        <option value="">{anyLabel}</option>
-        {groups.map(([name, list]) => (
-          <optgroup key={name} label={name}>
-            {list.map((a) => (
-              <option key={a.code} value={a.code}>
-                {a.city} — {a.name} ({a.code})
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
-    </FieldTile>
-  );
-}
-
-function DateField({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (iso: string) => void;
-}) {
-  const today = useToday();
-  const min = today === null ? undefined : isoDate(today, 0);
-  const display =
-    value && today !== null ? shortDate(today, offsetOf(today, value)) : "Any date";
-
-  return (
-    <FieldTile label="Travel date" icon={CalendarDays}>
-      <span
-        className={cn(
-          "mt-0.5 block truncate pr-6 t-label-1",
-          value ? "text-primary-800" : "text-text-secondary"
-        )}
-      >
-        {display}
-      </span>
-      <input
-        type="date"
-        aria-label="Travel date"
-        min={min}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        // Open the picker on any click, not only on the (hidden) calendar glyph.
-        onClick={(e) => e.currentTarget.showPicker?.()}
-        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-      />
-      {value && (
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          aria-label="Clear travel date"
-          className="absolute right-2 top-1/2 z-raised grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
-        >
-          <X className="h-4 w-4" aria-hidden="true" />
-        </button>
-      )}
-    </FieldTile>
-  );
-}
-
-function CountField({
-  mode,
-  value,
-  onChange,
-}: {
-  mode: Mode;
-  value: number;
-  onChange: (n: number) => void;
-}) {
-  const label = mode === "requester" ? "Parents flying" : "I can accompany";
-  const unit = value === 1 ? "person" : "people";
-  const btn =
-    "grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-000 text-primary-800 ring-1 ring-primary-100 transition-colors hover:ring-primary-300 disabled:cursor-not-allowed disabled:text-neutral-400 disabled:hover:ring-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700";
-
-  return (
-    <div className="flex min-h-[72px] items-center justify-between gap-3 rounded-md bg-primary-050 px-4 py-3">
-      <div className="min-w-0">
-        <span className="block t-overline text-text-secondary">{label}</span>
-        <span className="mt-0.5 block t-label-1 text-primary-800" aria-live="polite">
-          {value} {unit}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          className={btn}
-          onClick={() => onChange(value - 1)}
-          disabled={value <= 1}
-          aria-label={`${label}: fewer`}
-        >
-          <Minus className="h-4 w-4" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          className={btn}
-          onClick={() => onChange(value + 1)}
-          disabled={value >= 4}
-          aria-label={`${label}: more`}
-        >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-        </button>
-      </div>
-    </div>
+    <>
+      {groups.map(([name, list]) => (
+        <optgroup key={name} label={name}>
+          {list.map((a) => (
+            <option key={a.code} value={a.code}>
+              {a.city} — {a.name} ({a.code})
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </>
   );
 }
 
 /**
- * The Parents Travel Assist match finder. Deliberately not the homepage flight
- * widget: there is no cabin, no return leg and no fare — what matters here is
- * which way the help runs (the two modes), the route, roughly when, and how
- * many parents are flying. Submitting filters the board below rather than
- * leaving the page.
+ * The Parents Travel Assist search bar — built around *when*: route, date and
+ * how flexible, plus the two things that make a good pairing (a shared
+ * language, the kind of help). One slim row on desktop, a tidy two-column
+ * grid on phones. Searching filters the board and the date strip below.
  */
 export default function MatchFinder({
   mode,
@@ -244,25 +118,27 @@ export default function MatchFinder({
   query,
   onQueryChange,
   onSubmit,
-  onCorridor,
 }: {
   mode: Mode;
   onModeChange: (mode: Mode) => void;
   query: Query;
   onQueryChange: (query: Query) => void;
   onSubmit: () => void;
-  onCorridor: (from: string, to: string) => void;
 }) {
+  const today = useToday();
   const set = (patch: Partial<Query>) => onQueryChange({ ...query, ...patch });
+  const dateText =
+    query.date && today !== null ? shortDate(today, offsetOf(today, query.date)) : "";
+  const helpText = HELP_TYPES.find((h) => h.key === query.help)?.label ?? "";
+  const helpLabel = mode === "requester" ? "Help needed" : "I can help with";
+
+  // Hairline between cells on the desktop row only.
+  const divider = "lg:border-l lg:border-neutral-200";
 
   return (
-    <div className="overflow-hidden rounded-lg bg-neutral-000 shadow-e3 ring-1 ring-primary-900/5">
-      {/* Which way the help runs */}
-      <div
-        role="radiogroup"
-        aria-label="What are you looking for?"
-        className="grid grid-cols-2 border-b border-primary-100"
-      >
+    <div>
+      {/* Which way the help runs — tabs sitting on the hero. */}
+      <div role="radiogroup" aria-label="What are you looking for?" className="flex gap-2">
         {MODES.map(({ key, label, short, icon: Icon }) => {
           const active = mode === key;
           return (
@@ -273,104 +149,141 @@ export default function MatchFinder({
               aria-checked={active}
               onClick={() => onModeChange(key)}
               className={cn(
-                "relative flex items-center justify-center gap-2 px-3 py-4 t-label-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-700 sm:py-5",
+                "inline-flex items-center gap-2 rounded-full px-4 py-2.5 t-label-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 sm:px-5",
                 active
-                  ? "bg-neutral-000 text-primary-800"
-                  : "bg-primary-050/60 text-text-secondary hover:bg-primary-050 hover:text-primary-800"
+                  ? "bg-neutral-000 text-primary-800 shadow-e2"
+                  : "bg-primary-900/40 text-text-on-dark ring-1 ring-neutral-000/30 hover:bg-primary-900/60"
               )}
             >
               <Icon
-                className={cn("h-5 w-5 shrink-0", active ? "text-accent-500" : "text-primary-300")}
+                className={cn("h-4 w-4 shrink-0", active ? "text-accent-500" : "text-accent-400")}
                 aria-hidden="true"
               />
               <span className="sm:hidden">{short}</span>
               <span className="hidden sm:inline">{label}</span>
-              {active && (
-                <span className="absolute inset-x-6 bottom-0 h-[3px] rounded-t-full bg-accent-500" aria-hidden="true" />
-              )}
             </button>
           );
         })}
       </div>
 
       <form
-        className="p-4 sm:p-6"
         onSubmit={(e) => {
           e.preventDefault();
           onSubmit();
         }}
+        className="mt-3 rounded-lg bg-neutral-000 p-2 shadow-e3 ring-1 ring-primary-900/5"
       >
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
-          {/* From + To share a wrapper so the swap button can sit on their seam. */}
-          <div className="relative grid gap-3 sm:grid-cols-2 lg:col-span-2">
-            <AirportField
-              label="Flying from"
-              icon={PlaneTakeoff}
-              value={query.from}
-              onChange={(from) => set({ from })}
-              anyLabel="Any airport in India"
-              first="india"
-            />
-            <AirportField
-              label="Flying to"
-              icon={PlaneLanding}
-              value={query.to}
-              onChange={(to) => set({ to })}
-              anyLabel="Any UK airport"
-              first="uk"
-            />
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-[1.2fr_1.2fr_1fr_0.85fr_1fr_1.15fr_auto] lg:items-center lg:gap-0">
+          <Cell
+            label="From"
+            value={query.from ? `${cityOf(query.from)} (${query.from})` : ""}
+            placeholder="Any Indian airport"
+          >
+            <select aria-label="Flying from" value={query.from} onChange={(e) => set({ from: e.target.value })} className={overlay}>
+              <option value="">Any Indian airport</option>
+              <AirportOptions first="india" />
+            </select>
+          </Cell>
+
+          <div className={cn("relative", divider)}>
             <button
               type="button"
               onClick={() => set({ from: query.to, to: query.from })}
               aria-label="Swap departure and arrival airports"
-              className="absolute right-12 top-1/2 z-raised grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-neutral-000 text-accent-600 shadow-e2 ring-1 ring-primary-100 transition-transform hover:rotate-180 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
+              className="absolute -left-4 top-1/2 z-raised hidden h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-neutral-000 text-primary-500 shadow-e1 ring-1 ring-neutral-200 transition-colors hover:text-accent-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 lg:grid"
             >
-              <ArrowLeftRight className="h-4 w-4 rotate-90 sm:rotate-0" aria-hidden="true" />
+              <ArrowLeftRight className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
+            <Cell
+              label="To"
+              value={query.to ? `${cityOf(query.to)} (${query.to})` : ""}
+              placeholder="Any UK airport"
+              className="lg:pl-6"
+            >
+              <select aria-label="Flying to" value={query.to} onChange={(e) => set({ to: e.target.value })} className={overlay}>
+                <option value="">Any UK airport</option>
+                <AirportOptions first="uk" />
+              </select>
+            </Cell>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:col-span-2">
-            <DateField value={query.date} onChange={(date) => set({ date })} />
-            <CountField mode={mode} value={query.count} onChange={(count) => set({ count })} />
+          <div className={divider}>
+            <Cell label="Travel date" value={dateText} placeholder="Any date" chevron={!query.date}>
+              <input
+                type="date"
+                aria-label="Travel date"
+                min={today === null ? undefined : isoDate(today, 0)}
+                value={query.date}
+                onChange={(e) => set({ date: e.target.value })}
+                onClick={(e) => e.currentTarget.showPicker?.()}
+                className={overlay}
+              />
+              {query.date && (
+                <button
+                  type="button"
+                  onClick={() => set({ date: "" })}
+                  aria-label="Clear travel date"
+                  className="absolute right-2 top-1/2 z-raised grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full bg-neutral-000 text-primary-500 ring-1 ring-neutral-200 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                >
+                  <X className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              )}
+            </Cell>
+          </div>
+
+          <div className={divider}>
+            <Cell label="Flexibility" value={query.flex === 0 ? "Exact date" : `± ${query.flex} days`} placeholder="">
+              <select
+                aria-label="Date flexibility"
+                value={query.flex}
+                onChange={(e) => set({ flex: Number(e.target.value) as Flex })}
+                className={overlay}
+              >
+                <option value={0}>Exact date</option>
+                <option value={3}>± 3 days</option>
+                <option value={7}>± 7 days</option>
+              </select>
+            </Cell>
+          </div>
+
+          <div className={divider}>
+            <Cell label="Language" value={query.language} placeholder="Any language">
+              <select aria-label="Language" value={query.language} onChange={(e) => set({ language: e.target.value })} className={overlay}>
+                <option value="">Any language</option>
+                {LANGUAGES.map((l) => (
+                  <option key={l} value={l}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+            </Cell>
+          </div>
+
+          <div className={divider}>
+            <Cell label={helpLabel} value={helpText} placeholder="Any help">
+              <select
+                aria-label={helpLabel}
+                value={query.help}
+                onChange={(e) => set({ help: e.target.value as HelpKey | "" })}
+                className={overlay}
+              >
+                <option value="">Any help</option>
+                {HELP_TYPES.map((h) => (
+                  <option key={h.key} value={h.key}>
+                    {h.label}
+                  </option>
+                ))}
+              </select>
+            </Cell>
           </div>
 
           <button
             type="submit"
-            className="inline-flex min-h-[56px] items-center justify-center gap-2 rounded-md bg-accent-500 px-7 t-button text-text-on-dark shadow-e2 shadow-accent-500/25 transition-colors hover:bg-accent-600 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2 lg:min-h-[72px]"
+            className="col-span-2 inline-flex h-12 items-center justify-center gap-2 rounded-md bg-accent-500 px-6 t-button text-text-on-dark transition-colors hover:bg-accent-600 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2 lg:col-span-1 lg:ml-2 lg:h-14"
           >
             <Search className="h-5 w-5" aria-hidden="true" />
-            {mode === "requester" ? "Find companions" : "Find families"}
+            Search
           </button>
-        </div>
-
-        {/* One-tap corridors */}
-        <div className="mt-5 flex flex-wrap items-center gap-2">
-          <span className="mr-1 t-label-3 text-text-secondary">Popular routes</span>
-          {POPULAR_CORRIDORS.map(({ from, to }) => {
-            const active = query.from === from && query.to === to;
-            return (
-              <button
-                key={`${from}-${to}`}
-                type="button"
-                onClick={() => onCorridor(from, to)}
-                aria-pressed={active}
-                aria-label={`${cityOf(from)} to ${cityOf(to)}`}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 t-code ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700",
-                  active
-                    ? "bg-primary-800 text-text-on-dark ring-primary-800"
-                    : "bg-neutral-000 text-primary-800 ring-primary-100 hover:bg-primary-050 hover:ring-primary-200"
-                )}
-              >
-                {from}
-                <PlaneTakeoff
-                  className={cn("h-3.5 w-3.5", active ? "text-accent-400" : "text-accent-500")}
-                  aria-hidden="true"
-                />
-                {to}
-              </button>
-            );
-          })}
         </div>
       </form>
     </div>

@@ -293,6 +293,47 @@ Build clean (26/26 routes), zero lint errors in app/components/lib. Checked at
 listing → dialog prefill, hero hash buttons and legacy hash all exercised in a
 real browser with no console errors.
 
+## 2026-09-25 (round 2) — Parents Travel Assist v2, after client review
+
+Client feedback on round 1: messy spacing, broken on phones, hero photo read
+as a mall not an airport, search fields oversized and not date-driven, board
+was text without photos. Researched the direct competitors first
+(TravelSakha, MatchMyFlight, My Desi Travel Companion, NRI TravelBuddy,
+Juurnee): mostly text-only; the useful patterns taken were MatchMyFlight's
+route/date browsing and verification badges, and BlaBlaCar-style
+route + date search with photo-led results.
+
+**What changed**
+- **Hero:** real Delhi T3 photo (Air India tails through the terminal glass;
+  Unsplash, Ankur Khandelwal, Unsplash licence) + a "match" visual on the right
+  (a parents' photo card and a helper's card, "Matched · same flight").
+  The duplicate hero buttons are gone — the search tabs are the CTA.
+- **Search bar:** one slim row on desktop (From · To · Travel date ·
+  Flexibility ±0/3/7 · Language · Help needed / I can help with · Search), a
+  2-column grid on phones. Mode tabs sit on the hero above it.
+- **"Who's flying when" day strip:** next 21 days, each tile shows how many
+  families and how many helpers fly that day under the current filters; tap
+  a day to filter the board.
+- **Board:** photo-led cards (licensed Pexels portraits of Indian parents and
+  younger travellers), verified badge, date, route, one line, help tags,
+  "N on the same route", CTA. Face-stack column headers. 3 per side + "Show all".
+- **How it works:** four photo steps (swipe row on phones) + the booking hook.
+- **Trust:** verification badges + real Trustpilot reviews in one section.
+- **Closing:** split card with the Delhi T3 mudra-hands wall (Unsplash,
+  Zoshua Colah).
+- **Phone layout bug fixed at the root:** implicit grid tracks were sizing to
+  the cards' single-line text and pushing past the screen edge; every grid on
+  the page now uses explicit `grid-cols-1`/minmax tracks. Checked 320–1440px:
+  no element overflows.
+
+**Photo note:** no free-licence photo exists of elderly Indian parents inside
+an airport (checked Pexels, Unsplash, Openverse). The hero pairs a real Indian
+airport with real photos of Indian parents instead. If the client wants one
+photograph showing both, a paid stock image (Shutterstock/Adobe Stock/iStock,
+~£10–30) drops straight into `public/parents-travel-assist/hero-delhi-t3.jpg`.
+Sample-board portraits are stock photos standing in for members; replace with
+real members' photos (or initials) when the live feed goes in.
+
 ## 💡 Recommended next
 
 1. **Review everything live** — this is the natural next step before more
