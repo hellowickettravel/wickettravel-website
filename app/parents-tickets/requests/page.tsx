@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
-import ParentsBoard from "@/components/ParentsBoard";
+import AssistFamilyBoard from "@/components/AssistFamilyBoard";
 import { OG_BASE, SITE_URL, TWITTER_BASE } from "@/lib/seo";
 
 /**
  * Full list of everyone currently asking for a companion — reached from the
- * "More" link on the requesters' carousel (components/AssistFamilyCarousels.tsx)
- * on the main /parents-tickets page. Same live feed, same component
- * (components/ParentsBoard.tsx) the main page used to show inline, just
- * locked to one side and given its own crawlable URL.
+ * "See every request" link under the families column on the main
+ * /parents-tickets board. Same feed and the same component
+ * (components/AssistFamilyBoard.tsx), pinned to one side so the page is its
+ * own filter, with its own crawlable URL. Search, the date/airport/language
+ * filters and the sort all still work here; only the two-column split and the
+ * departures rail are dropped, since a single-sided page has nothing to face
+ * and the rail belongs to the board proper.
  */
 export const metadata: Metadata = {
   title: "Families Asking for a Companion",
@@ -79,7 +82,7 @@ export default function AssistFamilyRequestsPage() {
         />
         <section className="section bg-neutral-000">
           <div className="container-page">
-            <ParentsBoard lockFilter="requester" />
+            <AssistFamilyBoard lockSide="requester" showRail={false} />
           </div>
         </section>
       </main>

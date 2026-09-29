@@ -49,9 +49,9 @@ export const ROLES = [
 export type EnquiryType = (typeof ROLES)[number]["key"];
 
 /**
- * Shared board-entry parsing, extracted from components/ParentsBoard.tsx so
- * the carousels, the full list pages and the detail page all read the same
- * live `/api/parent-ticket/public` payload the same defensive way instead of
+ * Shared board-entry parsing, so the board (components/AssistFamilyBoard.tsx),
+ * the two full list pages and the detail page all read the same live
+ * `/api/parent-ticket/public` payload the same defensive way instead of
  * three copies of the same field-picking logic drifting apart. The upstream
  * shape is not contractually frozen beyond `{ ok, count, entries }`, so every
  * field is read defensively — a missing, null or renamed key drops quietly
@@ -107,11 +107,18 @@ export type ParsedEntry = {
   raw: Entry;
   type: EnquiryType | undefined;
   isTraveller: boolean;
+  /** True only for the worked examples in lib/parentsSample.ts. */
+  isSample: boolean;
   reference: string | undefined;
   name: string | undefined;
   from: string | undefined;
   to: string | undefined;
+  /** Human-formatted travel date, e.g. "4 Oct 2026". */
   date: string | undefined;
+  /** The same date, unformatted, so the board can sort and bucket on it. */
+  dateISO: string | undefined;
+  /** When the entry was posted, unformatted — drives the "2h ago" stamp. */
+  postedISO: string | undefined;
   airline: string | undefined;
   languages: string | undefined;
   body: string | undefined;
@@ -131,11 +138,14 @@ export function parseEntry(entry: Entry): ParsedEntry {
     raw: entry,
     type,
     isTraveller,
+    isSample: entry.is_sample === true,
     reference: pick(entry, "reference", "ref", "id"),
     name: pick(entry, "display_name", "name"),
     from: pick(entry, "from_location", "from", "origin"),
     to: pick(entry, "to_location", "to", "destination"),
     date: formatEntryDate(pick(entry, "travel_date", "date")),
+    dateISO: pick(entry, "travel_date", "date"),
+    postedISO: pick(entry, "created_at", "createdAt", "posted_at"),
     airline: pick(entry, "airline"),
     languages: pick(entry, "languages", "languages_spoken"),
     body: pick(
@@ -205,4 +215,160 @@ export function destinationImage(...locations: (string | undefined)[]): string {
     if (hit) return hit.src;
   }
   return FALLBACK_IMAGE;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BOARD PRESENTATION HELPERS
+   Shared by the board, the "departing soon" strip and the detail page so
+   an avatar, a relative day or a "posted 3h ago" stamp is derived exactly
+   once and can't disagree between two surfaces.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Avatars are drawn, never photographed. The feed is anonymised down to a
+ * first name and a last initial, so there is no real face to show and a
+ * stock portrait would imply we had one — these are initials on a tinted
+ * disc, picked deterministically from the name so the same poster always
+ * gets the same colour on every surface.
+ *
+ * All six pairs are brand ramps (Primary / Accent / Sand / semantic
+ * surfaces), and every one clears 4.5:1 on its own surface.
+ */
+const AVATAR_TONES = [
+  "bg-primary-050 text-primary-700 ring-primary-100",
+  "bg-accent-100 text-accent-700 ring-accent-200",
+  "bg-success-surface text-success ring-success/20",
+  "bg-info-surface text-info ring-info/20",
+  "bg-sand-500 text-primary-800 ring-sand-600",
+  "bg-warning-surface text-accent-700 ring-warning/25",
+] as const;
+
+/** Stable, non-cryptographic hash — only ever used to choose a colour. */
+function hashString(value: string): number {
+  let h = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    h = (h << 5) - h + value.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+
+export function avatarTone(seed: string | undefined): string {
+  return AVATAR_TONES[hashString(seed ?? "anon") % AVATAR_TONES.length];
+}
+
+/** "Priya S." → "PS"; a single word → its first two letters; nothing → "··". */
+export function initialsOf(name: string | undefined): string {
+  if (!name) return "··";
+  const parts = name
+    .replace(/[^\p{L}\p{N}\s.'-]/gu, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  if (parts.length === 0) return "··";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/** Midnight-anchored day difference, so "today" means the calendar day. */
+export function daysUntil(iso: string | undefined, now = new Date()): number | undefined {
+  if (!iso) return undefined;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return undefined;
+  const a = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const b = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((a - b) / 86_400_000);
+}
+
+/** The urgency word a WhatsApp group would actually use. */
+export function departureLabel(
+  iso: string | undefined,
+  now = new Date()
+): { text: string; tone: "today" | "soon" | "later" | "past" } | undefined {
+  const diff = daysUntil(iso, now);
+  if (diff === undefined) return undefined;
+  if (diff < 0) return { text: "Departed", tone: "past" };
+  if (diff === 0) return { text: "Flying today", tone: "today" };
+  if (diff === 1) return { text: "Tomorrow", tone: "today" };
+  if (diff <= 7) return { text: `In ${diff} days`, tone: "soon" };
+  return { text: `In ${diff} days`, tone: "later" };
+}
+
+/** "3h ago" / "2d ago" — the stamp that makes a feed feel alive. */
+export function postedAgo(iso: string | undefined, now = new Date()): string | undefined {
+  if (!iso) return undefined;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return undefined;
+  const mins = Math.max(0, Math.round((now.getTime() - d.getTime()) / 60_000));
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return `${Math.round(days / 30)}mo ago`;
+}
+
+/**
+ * Everything on a card that a visitor might plausibly type into the search
+ * box, flattened into one lowercased haystack. Deliberately includes the
+ * reference so someone can paste the code they were given and land on their
+ * own entry.
+ */
+export function searchHaystack(e: ParsedEntry): string {
+  return [
+    e.name,
+    e.from,
+    e.to,
+    e.airline,
+    e.languages,
+    e.body,
+    e.relationship,
+    e.mobility,
+    e.reference,
+    e.date,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+/**
+ * Split a free-text place into a code and a name. Posters and the live feed
+ * disagree about this field: the portal stores bare IATA codes ("HYD"),
+ * while the form lets someone type "London Heathrow (LHR)". Both have to
+ * render as the same big-code / small-name pair on a card, so:
+ *
+ *   "London Heathrow (LHR)" → { code: "LHR", name: "London Heathrow" }
+ *   "HYD"                   → { code: "HYD", name: undefined }
+ *   "Kochi"                 → { code: undefined, name: "Kochi" }
+ *
+ * Nothing is invented: a place with no code in it simply doesn't get one,
+ * and the card falls back to showing the name at code size.
+ */
+export function splitPlace(value: string | undefined): {
+  code: string | undefined;
+  name: string | undefined;
+} {
+  if (!value) return { code: undefined, name: undefined };
+  const trimmed = value.trim();
+
+  const bracketed = trimmed.match(/^(.*?)\s*\(([A-Za-z]{3})\)\s*$/);
+  if (bracketed) {
+    return {
+      code: bracketed[2].toUpperCase(),
+      name: bracketed[1].trim() || undefined,
+    };
+  }
+
+  if (/^[A-Za-z]{3}$/.test(trimmed)) {
+    return { code: trimmed.toUpperCase(), name: undefined };
+  }
+
+  return { code: undefined, name: trimmed };
+}
+
+/** The label a filter dropdown should show for a place: code if there is one. */
+export function placeKey(value: string | undefined): string | undefined {
+  const { code, name } = splitPlace(value);
+  return code ?? name;
 }

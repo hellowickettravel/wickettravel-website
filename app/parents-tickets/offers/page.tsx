@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
-import ParentsBoard from "@/components/ParentsBoard";
+import AssistFamilyBoard from "@/components/AssistFamilyBoard";
 import { OG_BASE, SITE_URL, TWITTER_BASE } from "@/lib/seo";
 
 /**
  * Full list of everyone currently offering to help — the mirror of
- * /parents-tickets/requests, reached from the travellers' carousel's "More"
- * link (components/AssistFamilyCarousels.tsx) on the main /parents-tickets
- * page. Same board component, locked to the other side.
+ * /parents-tickets/requests, reached from the "See every offer" link under
+ * the travellers column on the main /parents-tickets board. Same component
+ * (components/AssistFamilyBoard.tsx), pinned to the other side.
  */
 export const metadata: Metadata = {
   title: "Travellers Offering to Help",
@@ -78,7 +78,7 @@ export default function AssistFamilyOffersPage() {
         />
         <section className="section bg-neutral-000">
           <div className="container-page">
-            <ParentsBoard lockFilter="traveller" />
+            <AssistFamilyBoard lockSide="traveller" showRail={false} />
           </div>
         </section>
       </main>

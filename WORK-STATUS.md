@@ -233,6 +233,85 @@ Verified visually: carousels render real live entries with the correct
 background per route, both list pages, and the detail page in both its
 "found" and "no longer available" states.
 
+## 2026-09-29 — Assist Family rebuilt as a real board (search, filters, two-sided feed)
+
+Client feedback: the page doesn't work as a platform — nobody reads it, and
+the audience it's meant for is already running this service by hand in
+WhatsApp groups ("who is travelling today, which date"). Rebuilt around that.
+
+**Root cause found first, and it matters:** the portal relay's upstream,
+`wicket-travel-portal.vercel.app/api/parent-ticket/public`, returns **404
+DEPLOYMENT_NOT_FOUND**. Every board surface — carousels, both list pages,
+the detail page — was therefore rendering an error panel or an empty state.
+The page wasn't just badly ordered; it was showing nothing at all.
+
+**What replaced what:**
+- `components/ParentsBoard.tsx` and `components/AssistFamilyCarousels.tsx`
+  are **deleted**, both superseded by `components/AssistFamilyBoard.tsx`.
+- New board: free-text search (route, airline, language, notes, reference),
+  from/to/when/language filters built from the entries actually present,
+  three sort orders, a side segmented control with live counts, removable
+  filter chips, and a zero-results state that offers a way forward.
+- **Two facing columns** — families on one side, travellers on the other —
+  rather than one merged list, so which half you're in is readable at a
+  glance and an imbalance on a route is visible.
+- **Departures rail** ("Flying in the next 7 days") pinned above the board:
+  avatars of everyone departing soon; tapping one filters the board to that
+  person's exact route. This is the WhatsApp group's opening question, made
+  into a control.
+- Cards redesigned: initials avatar, boarding-pass route (IATA code large,
+  city under it), urgency-toned date chip ("Flying today" / "Tomorrow"),
+  airline and language chips, posted-ago stamp, amount, one CTA.
+  **Avatars are initials on a tinted disc, never photographs** — the feed is
+  anonymised to a first name and last initial, so there is no real face and a
+  stock portrait would imply otherwise.
+
+**Placeholder content, and how it stays honest.** With the upstream dead, a
+board that renders nothing teaches a first-time visitor the service is dead.
+`lib/parentsSample.ts` supplies 16 worked examples (8 per side, dates built
+relative to "now" so they never go stale) that render **only** when the live
+feed errors or returns zero entries. They are not passed off as real: every
+reference is `WT-DEMO-…`, every card carries an "Example" tag, a banner above
+the results says plainly that these are examples and why, and the detail page
+tags them too. One real entry from the relay and none of it renders.
+`lib/useParentBoard.ts` now reports `source: "live" | "sample"`, and keeps
+`feedError` so the detail page can still say "we couldn't reach the board"
+rather than "this listing was withdrawn" — not interchangeable when someone
+is checking on their own mother's flight.
+
+**Made to read as an app, not an article.** Second pass on client feedback
+("app type vibe ho, na ke content ka mess"):
+- **Stats strip** above the board — flying today/tomorrow, families asking,
+  travellers offering, routes covered. All four are counted off the entries
+  in hand; no invented "average response time" nobody measures.
+- **"How it works" is now a control, not an essay**
+  (`components/AssistFamilyHowItWorks.tsx`): pick your side, get three short
+  steps on a connector line. It replaces two side-by-side cards of prose that
+  carried a ~70-word privacy notice each — every visitor is on exactly one
+  side, so half those words were never for the person reading them. The
+  privacy promise survives as three chips; the long-form answers on vetting,
+  money and privacy stay in the FAQ, where someone who wants them looks.
+- **Form sidebar** cut from three paragraphs to two chip lists (shown /
+  never shown, the latter struck through) plus one line on how contact
+  actually happens.
+
+**Page re-ordered** to the sequence a visitor's questions actually arrive in:
+board → why a board and not a group chat → how it works (two lanes) → the
+form → trust/money/privacy FAQ. The listings used to be last, past
+everything; they are the product, so they now sit directly under the hero.
+New FAQ entry answers "why not just use a WhatsApp group?" head-on.
+
+**Unchanged on purpose:** the `/parents-tickets` URL, the `/api/parent-ticket`
+contract, the enquiry form, and the privacy guarantee — which is still stated
+in three separate places. No contact detail is rendered anywhere, because the
+feed carries none.
+
+**Still outstanding (not a code fix):** the portal deployment behind
+`/api/parent-ticket/public` needs restoring, or the relay repointing at
+wherever it moved. Until then the board shows examples rather than real
+posts, and the write endpoint `/api/parent-ticket` is very likely 404ing too
+— worth verifying before the client sends traffic at the form.
+
 ## 💡 Recommended next
 
 1. **Review everything live** — this is the natural next step before more
