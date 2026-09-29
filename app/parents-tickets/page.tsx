@@ -193,7 +193,8 @@ export default function ParentsTicketsPage() {
       <Header />
       <main className="flex-1">
         {/* ── The app: hero search, filters, results, help rail ─────── */}
-        <AssistFamilyApp aside={<AssistFamilyRail />} />
+        <AssistFamilyApp />
+        <AssistFamilyRail />
 
         {/* ── The form ─────────────────────────────────────────────────── */}
         <section
