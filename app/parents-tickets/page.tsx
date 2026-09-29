@@ -1,24 +1,18 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  BadgeCheck,
-  ChevronRight,
   Eye,
   EyeOff,
-  HandHeart,
   Handshake,
   MessageCircle,
   PhoneCall,
   Plus,
-  Search,
-  ShieldCheck,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import AssistFamilyBoard from "@/components/AssistFamilyBoard";
-import AssistFamilyHowItWorks from "@/components/AssistFamilyHowItWorks";
+import AssistFamilyApp from "@/components/AssistFamilyApp";
+import AssistFamilyRail from "@/components/AssistFamilyRail";
 import ParentsEnquiryForm from "@/components/ParentsEnquiryForm";
 import { Reveal } from "@/components/motion-primitives";
 import {
@@ -53,7 +47,7 @@ import { WHATSAPP_URL } from "@/lib/links";
  * The live listings are the product, so they are the hero's neighbour, not
  * its footnote. Everything about the board itself — the search, the two
  * facing columns, the departures rail, and what happens when the feed is
- * empty — lives in components/AssistFamilyBoard.tsx.
+ * empty — lives in components/AssistFamilyApp.tsx.
  *
  * The one thing this page has to get right is the privacy mechanic, so it is
  * stated in three separate places rather than once: in both "how it works"
@@ -198,227 +192,8 @@ export default function ParentsTicketsPage() {
       />
       <Header />
       <main className="flex-1">
-        {/* ── Hero ─────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden bg-primary-800 py-12 sm:py-16">
-          {/* Photograph as a full-bleed backdrop rather than a cropped inset:
-              the picture is the emotional argument for the whole page, and at
-              10% it never competes with the type in front of it. */}
-          <div aria-hidden="true" className="absolute inset-0">
-            <Image
-              src="/support/airport-companion.jpg"
-              alt=""
-              fill
-              sizes="100vw"
-              className="object-cover opacity-10"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-900 via-primary-900/85 to-primary-800/70" />
-          </div>
-
-          <div className="container-page relative">
-            <nav aria-label="Breadcrumb" className="hero-rise">
-              <ol className="flex flex-wrap items-center gap-2 t-label-3 text-primary-200">
-                <li>
-                  <Link
-                    href="/"
-                    className="rounded-xs transition-colors hover:text-text-on-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400"
-                  >
-                    Home
-                  </Link>
-                </li>
-                <li className="flex items-center gap-2">
-                  <ChevronRight
-                    className="h-3.5 w-3.5 text-primary-500"
-                    aria-hidden="true"
-                  />
-                  <span aria-current="page" className="text-text-on-dark">
-                    Assist Family
-                  </span>
-                </li>
-              </ol>
-            </nav>
-
-            <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end lg:gap-16">
-              <div>
-                <p className="hero-rise t-overline text-accent-400">
-                  The Assist Family board
-                </p>
-                <h1 className="hero-rise hero-rise-2 t-h1 mt-3 max-w-2xl text-balance text-text-on-dark">
-                  Someone is already flying your route. Find them.
-                </h1>
-                <p className="hero-rise hero-rise-3 t-body-lg mt-4 max-w-xl text-pretty text-primary-100">
-                  Families whose elderly relative is flying alone post the
-                  journey. Travellers already booked on that route post the
-                  flight. A coordinator here reads both and makes the
-                  introduction — no contact detail is ever published.
-                </p>
-
-                <div className="hero-rise hero-rise-4 mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <a
-                    href="#board"
-                    className="inline-flex items-center justify-center gap-3 rounded-sm bg-accent-500 px-8 py-4 t-button text-text-on-dark shadow-e2 transition-colors hover:bg-accent-600 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 focus-visible:ring-offset-primary-900"
-                  >
-                    <Search className="h-5 w-5" aria-hidden="true" />
-                    Search the board
-                  </a>
-                  <a
-                    href="#post-to-the-board"
-                    className="inline-flex items-center justify-center gap-2 rounded-sm border border-neutral-000/25 bg-neutral-000/5 px-8 py-4 t-button text-text-on-dark transition-colors hover:bg-neutral-000/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-000/60 focus-visible:ring-offset-2 focus-visible:ring-offset-primary-900"
-                  >
-                    Post your journey
-                    <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                  </a>
-                </div>
-              </div>
-
-              {/* Three promises, as a stack rather than a row of badges — on a
-                  page about handing over a parent, these are the copy, not
-                  decoration. */}
-              <ul className="hero-rise hero-rise-4 space-y-3">
-                {[
-                  {
-                    icon: ShieldCheck,
-                    title: "Contact details never published",
-                    body: "First name and last initial only. Nobody can message you off a card.",
-                  },
-                  {
-                    icon: BadgeCheck,
-                    title: "Every post read by a person",
-                    body: "A coordinator confirms the traveller is really booked on that flight.",
-                  },
-                  {
-                    icon: HandHeart,
-                    title: "Free to post, no cut taken",
-                    body: "Any amount is set by you and paid directly between the two of you.",
-                  },
-                ].map((item) => (
-                  <li
-                    key={item.title}
-                    className="flex gap-3 rounded-md border border-neutral-000/15 bg-neutral-000/5 px-4 py-3"
-                  >
-                    <item.icon
-                      className="mt-0.5 h-4 w-4 shrink-0 text-accent-400"
-                      aria-hidden="true"
-                    />
-                    <span>
-                      <span className="block t-label-2 text-text-on-dark">
-                        {item.title}
-                      </span>
-                      <span className="mt-0.5 block t-caption text-primary-200">
-                        {item.body}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* ── The board — first, because it is the product ─────────────── */}
-        <section
-          id="board"
-          aria-labelledby="parents-board-heading"
-          className="section scroll-mt-16 bg-neutral-000"
-        >
-          <div className="container-page">
-            <div className="flex flex-wrap items-end justify-between gap-6">
-              <div className="max-w-2xl">
-                <h2
-                  id="parents-board-heading"
-                  className="t-h2 text-primary-800"
-                >
-                  Who&rsquo;s flying, and when
-                </h2>
-                <p className="t-body mt-3 text-text-secondary">
-                  {/* No "on the left / on the right": the two columns stack
-                      below xl, where that would be a lie. */}
-                  Search by airport, date, airline or language — families
-                  asking on one side, travellers already booked on the other.
-                  Recognise your own flight? Ask us for the introduction.
-                </p>
-              </div>
-              <a
-                href="#post-to-the-board"
-                className="btn btn-primary shrink-0 px-6"
-              >
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                Add your journey
-              </a>
-            </div>
-
-            <div className="mt-8">
-              <AssistFamilyBoard showColumnLinks />
-            </div>
-          </div>
-        </section>
-
-        {/* ── Why a board and not a group chat ─────────────────────────── */}
-        <section
-          aria-labelledby="parents-why-heading"
-          className="bg-primary-800 py-12 md:py-16"
-        >
-          <div className="container-page grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <div className="max-w-2xl">
-              <p className="t-overline text-accent-400">Why this exists</p>
-              <h2
-                id="parents-why-heading"
-                className="t-h3 mt-3 text-text-on-dark"
-              >
-                It&rsquo;s the WhatsApp group, without the parts that go wrong
-              </h2>
-              <p className="t-body mt-4 text-primary-100">
-                Families have been arranging this by hand for years — someone
-                posts &ldquo;flying Thursday, anyone need help?&rdquo; and
-                hopes the right person is still scrolling. Here the post stays
-                searchable by route and date until it&rsquo;s matched, everyone
-                on the board sees it rather than one chat, and not a single
-                phone number is on display.
-              </p>
-            </div>
-            <ul className="grid gap-3 sm:grid-cols-3 lg:w-[30rem]">
-              {[
-                { icon: Search, text: "Searchable by route and date, not buried in a scroll" },
-                { icon: EyeOff, text: "No phone numbers on show, to anyone, ever" },
-                { icon: BadgeCheck, text: "A coordinator checks the flight is real" },
-              ].map((item) => (
-                <li
-                  key={item.text}
-                  className="rounded-md border border-neutral-000/15 bg-neutral-000/5 p-4"
-                >
-                  <item.icon
-                    className="h-5 w-5 text-accent-400"
-                    aria-hidden="true"
-                  />
-                  <p className="t-body-sm mt-3 text-primary-100">{item.text}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* ── How it works — two lanes ─────────────────────────────────── */}
-        <section
-          id="how-it-works"
-          aria-labelledby="parents-how-heading"
-          className="section scroll-mt-16 bg-sand-500"
-        >
-          <div className="container-page">
-            <Reveal className="section-lead text-center">
-              <h2 id="parents-how-heading" className="t-h2 text-primary-800">
-                Two sides, one board
-              </h2>
-              <p className="t-body mt-4 text-text-on-sand">
-                Families post the journey they need covered. Travellers post the
-                one they are already taking. Our team is what joins the two —
-                and the only thing that ever exchanges a contact detail.
-              </p>
-            </Reveal>
-
-            <div className="mt-12">
-              <AssistFamilyHowItWorks />
-            </div>
-          </div>
-        </section>
+        {/* ── The app: hero search, filters, results, help rail ─────── */}
+        <AssistFamilyApp aside={<AssistFamilyRail />} />
 
         {/* ── The form ─────────────────────────────────────────────────── */}
         <section

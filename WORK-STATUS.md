@@ -295,6 +295,39 @@ is checking on their own mother's flight.
   never shown, the latter struck through) plus one line on how contact
   actually happens.
 
+**Third pass — rebuilt to a supplied structural reference.** The client sent
+a mockup of the layout they wanted, and the board was restructured onto it:
+
+- **Hero + search widget** — light panel, photograph feathered in from the
+  right (md and up; on a phone it sat behind the lead paragraph however hard
+  the scrim worked), an editorial-serif "Real people. Real help." accent, and
+  one From / To / Travel date control. Fields apply as you set them; the
+  Search button is the affordance that jumps you to the results.
+- **Three columns** (`components/AssistFamilyApp.tsx`): filter rail left,
+  results centre, help rail right (`components/AssistFamilyRail.tsx`, server-
+  rendered and passed in as a prop so three standing explanations don't
+  inflate the client bundle). Both rails stick and scroll internally.
+- **Tabs, not facing columns** — "Families looking for help" /
+  "Travellers available to help", counts on the tabs. At this centre-column
+  width a split view halved the room each row had, and a visitor is only ever
+  shopping one side.
+- **Rows, not cards** — avatar, name, departure airport, route line, date
+  chip, airline, two-line description, a facts row and one action.
+- `AssistFamilyBoard.tsx` and `AssistFamilyHowItWorks.tsx` deleted; the two
+  list pages now render the same app with `lockSide` and `showHero={false}`,
+  so there is one implementation rather than two drifting card designs.
+
+**What the reference asked for that the data cannot support**, and what went
+there instead — the mockup showed a "Verified only" toggle, "Verified parent"
+badges, "Responds within 2 hrs" and "N mutual routes". We issue no
+verification, measure no response time and compute no mutual routes, so none
+of them appear. The filter rail carries real fields instead (travel date,
+from, to, airline, support needed, language spoken — every option collected
+from the entries actually on the board), and the row's facts line carries
+relationship, age, support need, languages and posted-ago. The mockup's photo
+avatars are initials for the same reason: the feed is anonymised to a first
+name and a last initial, so there is no face to show.
+
 **Page re-ordered** to the sequence a visitor's questions actually arrive in:
 board → why a board and not a group chat → how it works (two lanes) → the
 form → trust/money/privacy FAQ. The listings used to be last, past

@@ -7,7 +7,7 @@ import ListingDetail from "@/components/ListingDetail";
 /**
  * One listing's own page — reached from "Ask for an introduction" on any
  * board card, on the main /parents-tickets page or either full list page
- * (components/AssistFamilyBoard.tsx). There
+ * (components/AssistFamilyApp.tsx). There
  * is no per-listing API, so the actual lookup happens client-side in
  * ListingDetail against the same public feed every other surface reads; this
  * server file only supplies the shell, metadata and breadcrumb.

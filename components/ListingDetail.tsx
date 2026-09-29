@@ -25,7 +25,7 @@ import { useParentBoard } from "@/lib/useParentBoard";
  * app/parents-tickets/listing/[reference]/page.tsx. Client-side because
  * there is no per-listing API — the only source of truth is the same live,
  * already-anonymised `/api/parent-ticket/public` feed every other board
- * surface reads (components/AssistFamilyBoard.tsx) — so this fetches the
+ * surface reads (components/AssistFamilyApp.tsx) — so this fetches the
  * whole feed via the shared hook and finds the one entry whose reference
  * matches the URL.
  *

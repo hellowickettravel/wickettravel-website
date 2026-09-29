@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
-import AssistFamilyBoard from "@/components/AssistFamilyBoard";
+import AssistFamilyApp from "@/components/AssistFamilyApp";
+import AssistFamilyRail from "@/components/AssistFamilyRail";
 import { OG_BASE, SITE_URL, TWITTER_BASE } from "@/lib/seo";
 
 /**
  * Full list of everyone currently asking for a companion — reached from the
  * "See every request" link under the families column on the main
  * /parents-tickets board. Same feed and the same component
- * (components/AssistFamilyBoard.tsx), pinned to one side so the page is its
+ * (components/AssistFamilyApp.tsx), pinned to one side so the page is its
  * own filter, with its own crawlable URL. Search, the date/airport/language
  * filters and the sort all still work here; only the two-column split and the
  * departures rail are dropped, since a single-sided page has nothing to face
@@ -80,11 +81,11 @@ export default function AssistFamilyRequestsPage() {
             { label: "Requests" },
           ]}
         />
-        <section className="section bg-neutral-000">
-          <div className="container-page">
-            <AssistFamilyBoard lockSide="requester" showRail={false} />
-          </div>
-        </section>
+        <AssistFamilyApp
+          lockSide="requester"
+          showHero={false}
+          aside={<AssistFamilyRail />}
+        />
       </main>
       <Footer />
     </>
