@@ -81,11 +81,8 @@ export default function AssistFamilyRequestsPage() {
             { label: "Requests" },
           ]}
         />
-        <AssistFamilyApp
-          lockSide="requester"
-          showHero={false}
-          aside={<AssistFamilyRail />}
-        />
+        <AssistFamilyApp lockSide="requester" showHero={false} />
+        <AssistFamilyRail />
       </main>
       <Footer />
     </>

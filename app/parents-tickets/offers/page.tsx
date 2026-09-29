@@ -77,11 +77,8 @@ export default function AssistFamilyOffersPage() {
             { label: "Offers" },
           ]}
         />
-        <AssistFamilyApp
-          lockSide="traveller"
-          showHero={false}
-          aside={<AssistFamilyRail />}
-        />
+        <AssistFamilyApp lockSide="traveller" showHero={false} />
+        <AssistFamilyRail />
       </main>
       <Footer />
     </>

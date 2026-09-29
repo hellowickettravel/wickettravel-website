@@ -328,6 +328,35 @@ relationship, age, support need, languages and posted-ago. The mockup's photo
 avatars are initials for the same reason: the feed is anonymised to a first
 name and a last initial, so there is no face to show.
 
+**Fourth pass — second structural reference.** The client sent a tighter
+mockup: search bar across the top, narrow filter rail, and the two sides of
+the board as *facing columns* rather than tabs, closed by one dark CTA band.
+Rebuilt onto it:
+
+- **Facing columns** — "Parents / Passengers · Looking for help" and
+  "Travellers · Available to help", each a bordered card with a tinted
+  header (icon tile, title, subtitle, count chip) and rows divided by hairlines.
+  Below `lg` there is no room for two, so a segmented control picks one.
+- **Denser rows** — 36px initials avatar, name, departure city, a single
+  date → destination line, two-line description, then two chips, the amount
+  and one button all on one line. Chips are capped at **two**: a third is
+  what tipped the chips and the button onto separate lines and stopped the
+  row scanning as one thing.
+- **Short chip labels.** The form's mobility options are sentences ("None —
+  just company and reassurance"), which is right beside a radio and wrong in
+  a chip, so they render as "Company only", "Walking aid", "Wheelchair help".
+  Languages collapse to "Telugu +2". The stored values are untouched, so
+  filtering still matches the feed.
+- **Search bar** gains a swap button between From and To.
+- **Dark CTA band** under the columns ("Can't find someone?"), which also
+  carries the no-results message so the board never trails off.
+- The right rail became a **three-card strip below the board**
+  (`components/AssistFamilyRail.tsx`): how it works, your safety matters,
+  not on the board yet. Still server-rendered, so it costs the board's
+  client bundle nothing.
+- A locked list page no longer renders the other column at all — it was
+  building eight rows of DOM behind `display:none`.
+
 **Page re-ordered** to the sequence a visitor's questions actually arrive in:
 board → why a board and not a group chat → how it works (two lanes) → the
 form → trust/money/privacy FAQ. The listings used to be last, past
