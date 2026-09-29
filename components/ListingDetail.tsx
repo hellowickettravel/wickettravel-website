@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   AlertTriangle,
   CalendarDays,
+  Info,
   HandHeart,
   Languages,
   Loader2,
@@ -24,14 +25,21 @@ import { useParentBoard } from "@/lib/useParentBoard";
  * app/parents-tickets/listing/[reference]/page.tsx. Client-side because
  * there is no per-listing API — the only source of truth is the same live,
  * already-anonymised `/api/parent-ticket/public` feed every other board
- * surface reads (components/AssistFamilyCarousels.tsx,
- * components/ParentsBoard.tsx) — so this fetches the whole feed via the
- * shared hook and finds the one entry whose reference matches the URL.
+ * surface reads (components/AssistFamilyApp.tsx) — so this fetches the
+ * whole feed via the shared hook and finds the one entry whose reference
+ * matches the URL.
  *
  * An entry that has since been matched, expired or withdrawn simply won't be
  * in that feed any more. That is treated as a normal, expected state ("no
  * longer available" — see NotFound below), not an error, since the
  * alternative would be inventing a reason a real integration can't know.
+ *
+ * When the relay itself is down the hook stands the board's worked examples
+ * in for it (see lib/useParentBoard.ts). This page honours that but does not
+ * hide it: a sample listing is banner-tagged as an example, and a reference
+ * that isn't found while the feed is failing says so rather than claiming the
+ * listing was withdrawn — the two are not interchangeable when someone is
+ * checking on their own mother's flight.
  */
 export default function ListingDetail({ reference }: { reference: string }) {
   const { state, entries } = useParentBoard(50);
@@ -46,36 +54,15 @@ export default function ListingDetail({ reference }: { reference: string }) {
     );
   }
 
-  if (state.status === "error") {
-    return (
-      <div className="card mx-auto max-w-xl p-8 text-center" role="alert">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-warning-surface">
-          <AlertTriangle className="h-6 w-6 text-warning" aria-hidden="true" />
-        </span>
-        <h2 className="t-h4 mt-6 text-primary-800">
-          {state.kind === "rate_limited"
-            ? "Too many requests just now"
-            : "We couldn’t load this listing"}
-        </h2>
-        <p className="t-body-sm mx-auto mt-3 max-w-sm text-text-secondary">
-          Call us, quoting the reference below, and we&rsquo;ll look it up
-          directly.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <a href={`tel:${BUSINESS.phone}`} className="btn btn-secondary">
-            Call {BUSINESS.phoneDisplay}
-          </a>
-        </div>
-      </div>
-    );
-  }
+  const feedError = state.status === "ready" ? state.feedError : undefined;
 
   if (!entry) {
-    return <NotFound />;
+    return <NotFound feedError={feedError} />;
   }
 
   const {
     isTraveller,
+    isSample,
     name,
     from,
     to,
@@ -116,7 +103,7 @@ export default function ListingDetail({ reference }: { reference: string }) {
           alt=""
           fill
           sizes="768px"
-          priority
+          preload
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 via-primary-900/20 to-transparent" />
@@ -139,6 +126,20 @@ export default function ListingDetail({ reference }: { reference: string }) {
           <p className="mt-3 t-h3 text-text-on-dark">{route}</p>
         </div>
       </div>
+
+      {isSample && (
+        <p className="mt-6 flex items-start gap-3 rounded-md border border-warning/30 bg-warning-surface px-4 py-3 t-body-sm text-text-secondary">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent-700" aria-hidden="true" />
+          <span>
+            <span className="t-label-2 block text-primary-800">
+              This is an example listing
+            </span>
+            It shows what a real entry looks like while the live board is
+            quiet. Nobody is waiting on this one — post your own and it
+            appears here once a coordinator approves it.
+          </span>
+        </p>
+      )}
 
       <div className="card mt-6 p-6 sm:p-8">
         {name && <p className="t-label-1 text-primary-800">{name}</p>}
@@ -225,17 +226,37 @@ export default function ListingDetail({ reference }: { reference: string }) {
   );
 }
 
-function NotFound() {
+function NotFound({ feedError }: { feedError?: "rate_limited" | "generic" }) {
   return (
     <div className="card mx-auto max-w-xl p-8 text-center">
-      <h2 className="t-h4 text-primary-800">
-        This listing is no longer available
-      </h2>
-      <p className="t-body-sm mx-auto mt-3 max-w-sm text-text-secondary">
-        It may have already been matched, expired, or been withdrawn by
-        whoever posted it. Have a look at what&rsquo;s open now, or call us
-        directly.
-      </p>
+      {feedError ? (
+        <>
+          <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-warning-surface">
+            <AlertTriangle className="h-6 w-6 text-warning" aria-hidden="true" />
+          </span>
+          <h2 className="t-h4 mt-6 text-primary-800">
+            {feedError === "rate_limited"
+              ? "Too many requests just now"
+              : "We couldn’t reach the board"}
+          </h2>
+          <p className="t-body-sm mx-auto mt-3 max-w-sm text-text-secondary">
+            This listing may well still be open — we just can’t read the board
+            to confirm it. Call us quoting the reference and we’ll look it up
+            directly.
+          </p>
+        </>
+      ) : (
+        <>
+          <h2 className="t-h4 text-primary-800">
+            This listing is no longer available
+          </h2>
+          <p className="t-body-sm mx-auto mt-3 max-w-sm text-text-secondary">
+            It may have already been matched, expired, or been withdrawn by
+            whoever posted it. Have a look at what&rsquo;s open now, or call us
+            directly.
+          </p>
+        </>
+      )}
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         <Link href="/parents-tickets/requests" className="btn btn-outline">
           See requests
