@@ -261,7 +261,7 @@ export function boardTone(index: number, offset = 0) {
   return TONES[(index + offset) % TONES.length];
 }
 
-/** "Priya S." → "PS"; a single word → its first two letters; nothing → "··". */
+/** "Emily C." → "EC"; a single word → its first two letters; nothing → "··". */
 export function initialsOf(name: string | undefined): string {
   if (!name) return "··";
   const parts = name
