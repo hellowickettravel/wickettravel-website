@@ -8,13 +8,19 @@ import {
   ArrowRightLeft,
   CalendarDays,
   Check,
+  ChevronDown,
+  ChevronRight,
+  Clock3,
   HandHeart,
-  Info,
-  Loader2,
+  Headset,
+  Languages,
+  LockKeyhole,
   MapPin,
   MessageCircle,
   PenLine,
   Plane,
+  PlaneLanding,
+  PlaneTakeoff,
   Search,
   SlidersHorizontal,
   Users,
@@ -108,7 +114,7 @@ function shortLanguages(value: string): string {
 }
 
 const selectClass =
-  "h-10 w-full cursor-pointer rounded-sm border border-neutral-300 bg-neutral-000 px-3 font-sans text-[14px] leading-[20px] text-text-primary focus-visible:border-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700";
+  "h-11 w-full cursor-pointer rounded-md border border-primary-100/80 bg-primary-050/50 px-3 font-sans text-[14px] font-bold leading-[20px] text-primary-800 transition-colors hover:border-primary-300 focus-visible:border-primary-700 focus-visible:bg-neutral-000 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700/15";
 
 /* ── Row ───────────────────────────────────────────────────────────────── */
 
@@ -131,12 +137,14 @@ const selectClass =
  * repeated the column's own header on every row and was the loudest element
  * for no information. That slot now carries the departure countdown, which
  * differs per row and is what makes a listing urgent. The side is still
- * legible from the column header, the accent bar, and the action's wording.
+ * legible from the column panel's tint and header, and the action's wording.
  *
- * Hover moves only transform, opacity and colour (PRODUCT.md: "transform/
- * opacity motion only"), and the whole row is the link — the visible button
- * stretches over the card via a pseudo-element, so the click target is the
- * full row while the focus ring stays on one real anchor.
+ * Each row is its own soft card on its column's tinted panel: the client
+ * read the old hairline rows as "a drawing without colour". Hover lifts the
+ * card (transform) and fades in a deeper shadow (opacity), per PRODUCT.md's
+ * "transform/opacity motion only". The whole card is the link — the visible
+ * button stretches over it via a pseudo-element, so the click target is the
+ * full card while the focus ring stays on one real anchor.
  */
 function Row({ entry }: { entry: ParsedEntry }) {
   const {
@@ -187,26 +195,19 @@ function Row({ entry }: { entry: ParsedEntry }) {
   return (
     <article
       className={cn(
-        "group relative isolate px-4 py-4 transition-colors duration-200",
-        "hover:bg-primary-050/50 focus-within:bg-primary-050/50",
-        "focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-700"
+        "group relative isolate rounded-md bg-neutral-000 p-4 shadow-e1 ring-1 ring-primary-900/[0.06] sm:p-5",
+        // The lift is a transform and the deeper shadow a pre-painted layer
+        // that only fades in: nothing on hover repaints (PRODUCT.md).
+        "transition-transform duration-200 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-md before:opacity-0 before:shadow-e2 before:transition-opacity before:duration-200 before:content-[''] hover:before:opacity-100",
+        "focus-within:ring-2 focus-within:ring-primary-700"
       )}
     >
-      {/* Depth without a shadow on every row: a bar that grows out of the
-          left edge on hover. Pure transform, so it costs no repaint. */}
-      <span
-        aria-hidden="true"
-        className={cn(
-          "absolute inset-y-0 left-0 w-[3px] origin-top scale-y-0 transition-transform duration-200 ease-out group-hover:scale-y-100 group-focus-within:scale-y-100",
-          isTraveller ? "bg-primary-800" : "bg-accent-500"
-        )}
-      />
-
       <div className="flex gap-3.5">
         <span
           aria-hidden="true"
           className={cn(
-            "grid h-11 w-11 shrink-0 place-items-center rounded-full font-sans text-[14px] font-extrabold ring-2 transition-transform duration-200 group-hover:-translate-y-0.5 group-focus-within:-translate-y-0.5",
+            "grid h-11 w-11 shrink-0 place-items-center rounded-full font-sans text-[14px] font-extrabold ring-2",
             avatarTone(name)
           )}
         >
@@ -232,7 +233,7 @@ function Row({ entry }: { entry: ParsedEntry }) {
                   // White on Accent 500 is 3.37:1 and Accent 700 on Accent
                   // 050 is 4.30:1 — both under the floor at 12px. Accent 700
                   // against white, either way round, is 4.66:1.
-                  depart.tone === "today" && "bg-accent-700 text-neutral-000 shadow-e1",
+                  depart.tone === "today" && "bg-accent-700 text-neutral-000",
                   depart.tone === "soon" &&
                     "bg-neutral-000 text-accent-700 ring-1 ring-accent-200",
                   depart.tone === "later" && "bg-primary-050 text-primary-700",
@@ -267,63 +268,62 @@ function Row({ entry }: { entry: ParsedEntry }) {
 
           {/* ── 3. What ────────────────────────────────────────────── */}
           {body && (
-            <p className="t-body-sm mt-2.5 line-clamp-2 text-text-secondary">
+            <p className="t-body-sm mt-3 line-clamp-2 text-text-secondary">
               {body}
             </p>
           )}
 
           <ul className="mt-3 flex flex-wrap gap-1.5">
             {careChip && (
-              <li className="inline-flex items-center gap-1 rounded-sm bg-primary-050 px-2 py-1 t-caption font-bold text-primary-700 ring-1 ring-primary-100">
-                <HandHeart className="h-3 w-3 shrink-0" aria-hidden="true" />
+              <li className="inline-flex items-center gap-1 rounded-full bg-accent-050 px-2.5 py-1 t-caption font-bold text-primary-800 ring-1 ring-accent-100">
+                <HandHeart className="h-3 w-3 shrink-0 text-accent-700" aria-hidden="true" />
                 {careChip}
               </li>
             )}
-            {/* The chips have the row's full width now that the price and
-                action sit on their own line, so a third fits. */}
             {plainChips.slice(0, careChip ? 2 : 3).map((tag) => (
               <li
                 key={tag}
-                className="rounded-sm bg-neutral-100 px-2 py-1 t-caption text-text-secondary"
+                className="rounded-full bg-primary-050 px-2.5 py-1 t-caption text-primary-700"
               >
                 {tag}
               </li>
             ))}
           </ul>
-
-          <div className="mt-3 flex items-center justify-end gap-3 border-t border-neutral-200 pt-3">
-              {amount !== undefined && (
-                <span className="t-caption text-text-secondary">
-                  {amount > 0 ? (
-                    <>
-                      {isTraveller ? "Asking " : "Offering "}
-                      <span className="t-label-1 text-primary-800">£{amount}</span>
-                    </>
-                  ) : (
-                    <span className="t-label-3 text-success">No charge</span>
-                  )}
-                </span>
-              )}
-              {href && (
-                <Link
-                  href={href}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-sm border px-3 py-2 font-sans text-[12px] font-bold leading-[16px] transition-colors duration-200",
-                    "after:absolute after:inset-0 after:content-[''] focus-visible:outline-none",
-                    isTraveller
-                      ? "border-primary-800 text-primary-800 group-hover:bg-primary-800 group-hover:text-neutral-000 group-focus-within:bg-primary-800 group-focus-within:text-neutral-000"
-                      : "border-accent-700 text-accent-700 group-hover:bg-accent-700 group-hover:text-neutral-000 group-focus-within:bg-accent-700 group-focus-within:text-neutral-000"
-                  )}
-                >
-                  {isTraveller ? "Ask for a match" : "View details"}
-                  <ArrowRight
-                    className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-within:translate-x-0.5"
-                    aria-hidden="true"
-                  />
-              </Link>
-            )}
-          </div>
         </div>
+      </div>
+
+      {/* Price left, action right, on a soft footer that spans the card. */}
+      <div className="-mx-4 -mb-4 mt-4 flex items-center justify-between gap-3 rounded-b-md border-t border-primary-900/[0.06] bg-neutral-050 px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
+        <span className="t-caption text-text-secondary">
+          {amount === undefined ? (
+            "Amount agreed with us"
+          ) : amount > 0 ? (
+            <>
+              {isTraveller ? "Asking " : "Offering "}
+              <span className="t-label-1 text-primary-800">£{amount}</span>
+            </>
+          ) : (
+            <span className="t-label-3 text-success">No charge</span>
+          )}
+        </span>
+        {href && (
+          <Link
+            href={href}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 font-sans text-[12px] font-bold leading-[16px] transition-colors duration-200",
+              "after:absolute after:inset-0 after:rounded-md after:content-[''] focus-visible:outline-none",
+              isTraveller
+                ? "border-primary-800 bg-neutral-000 text-primary-800 group-hover:bg-primary-800 group-hover:text-neutral-000 group-focus-within:bg-primary-800 group-focus-within:text-neutral-000"
+                : "border-accent-700 bg-neutral-000 text-accent-700 group-hover:bg-accent-700 group-hover:text-neutral-000 group-focus-within:bg-accent-700 group-focus-within:text-neutral-000"
+            )}
+          >
+            {isTraveller ? "Ask for a match" : "View details"}
+            <ArrowRight
+              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-within:translate-x-0.5"
+              aria-hidden="true"
+            />
+          </Link>
+        )}
       </div>
     </article>
   );
@@ -350,49 +350,45 @@ function BoardColumn({
   empty: string;
   className?: string;
 }) {
+  const warm = tone === "requester";
   return (
     <section
       aria-label={title}
+      // Each side is a tinted panel its cards sit on — warm for families,
+      // cool navy for travellers — so the two halves of the board read as
+      // two places at a glance, without a coloured rule doing the work.
       className={cn(
-        "min-w-0 overflow-hidden rounded-md border border-neutral-300 bg-neutral-000 shadow-e1",
+        "min-w-0 rounded-lg p-2.5 ring-1 sm:p-3",
+        warm ? "bg-accent-050 ring-accent-100" : "bg-primary-050 ring-primary-100",
         className
       )}
     >
-      {/* A 2px rule in the side's own colour, so the two columns are
-          distinguishable at a glance from across the page. */}
-      <header
-        className={cn(
-          "flex items-center justify-between gap-3 border-b-2 bg-neutral-050 px-4 py-3.5",
-          tone === "traveller" ? "border-primary-800" : "border-accent-500"
-        )}
-      >
+      <header className="flex items-center justify-between gap-3 px-1.5 pb-3.5 pt-1.5">
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={cn(
-              "grid h-9 w-9 shrink-0 place-items-center rounded-sm shadow-e1 ring-1",
-              tone === "traveller"
-                ? "bg-primary-800 text-neutral-000 ring-primary-800"
-                : "bg-accent-500 text-neutral-000 ring-accent-500"
+              "grid h-10 w-10 shrink-0 place-items-center rounded-full text-neutral-000 shadow-e1",
+              warm ? "bg-accent-500" : "bg-primary-800"
             )}
           >
-            <Icon className="h-4 w-4" aria-hidden="true" />
+            <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            <h3 className="t-label-1 truncate text-primary-800">{title}</h3>
+            <h3 className="font-sans text-[17px] font-bold leading-[22px] text-primary-800 sm:text-[20px] sm:leading-[24px]">{title}</h3>
             <p className="t-caption truncate text-text-secondary">{subtitle}</p>
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-neutral-000 px-3 py-1 t-label-3 text-primary-800 shadow-e1 ring-1 ring-neutral-300">
+        <span className="shrink-0 rounded-full bg-neutral-000 px-3 py-1 t-label-3 text-primary-800 shadow-e1">
           {countLabel}
         </span>
       </header>
 
       {rows.length === 0 ? (
-        <p className="px-4 py-10 text-center t-body-sm text-text-secondary">
+        <p className="rounded-md bg-neutral-000/70 px-5 py-10 text-center t-body-sm text-text-secondary">
           {empty}
         </p>
       ) : (
-        <ul className="divide-y divide-neutral-200">
+        <ul className="space-y-2.5">
           {rows.map((entry, i) => (
             <li key={entry.reference ?? `row-${i}`}>
               <Row entry={entry} />
@@ -423,25 +419,41 @@ function CheckGroup({
 }) {
   if (options.length === 0) return null;
   return (
-    <fieldset className="border-t border-neutral-200 pt-4">
+    <fieldset>
       <legend className="flex items-center gap-1.5 t-label-2 text-primary-800">
         <Icon className="h-3.5 w-3.5 shrink-0 text-accent-500" aria-hidden="true" />
         {title}
       </legend>
-      <ul className="mt-3 space-y-2">
-        {options.map((option) => (
-          <li key={option}>
-            <label className="-mx-1.5 flex cursor-pointer items-start gap-2 rounded-xs px-1.5 py-1 t-caption text-text-secondary transition-colors hover:bg-primary-050 hover:text-primary-800">
-              <input
-                type="checkbox"
-                checked={selected.includes(option)}
-                onChange={() => onToggle(option)}
-                className="mt-px h-3.5 w-3.5 shrink-0 cursor-pointer accent-accent-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
-              />
-              <span>{format ? format(option) : option}</span>
-            </label>
-          </li>
-        ))}
+      {/* Chips, not a checkbox column: the options are short and the
+          visitor is tapping, often on a phone. Each is still a real
+          checkbox, visually hidden, so keyboard and screen reader get
+          native semantics. */}
+      <ul className="mt-3 flex flex-wrap gap-1.5">
+        {options.map((option) => {
+          const on = selected.includes(option);
+          return (
+            <li key={option}>
+              <label
+                className={cn(
+                  "inline-flex min-h-[32px] cursor-pointer select-none items-center gap-1 rounded-full px-3 py-1.5 t-caption transition-colors duration-150",
+                  "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary-700 has-[:focus-visible]:ring-offset-1",
+                  on
+                    ? "bg-primary-800 font-bold text-neutral-000"
+                    : "bg-neutral-050 text-text-secondary ring-1 ring-neutral-200 hover:bg-primary-050 hover:text-primary-800 hover:ring-primary-100"
+                )}
+              >
+                <input
+                  type="checkbox"
+                  checked={on}
+                  onChange={() => onToggle(option)}
+                  className="sr-only"
+                />
+                {on && <Check className="h-3 w-3 shrink-0" aria-hidden="true" />}
+                {format ? format(option) : option}
+              </label>
+            </li>
+          );
+        })}
       </ul>
     </fieldset>
   );
@@ -608,60 +620,102 @@ export default function AssistFamilyApp({
   );
 
   const label = (text: string, Icon: typeof MapPin) => (
-    <span className="flex items-center gap-1.5 t-label-3 text-text-secondary">
+    <span className="flex items-center gap-1.5 t-label-2 text-primary-800">
       <Icon className="h-3.5 w-3.5 shrink-0 text-accent-500" aria-hidden="true" />
       {text}
     </span>
   );
 
   /* ── Search bar ──────────────────────────────────────────────────── */
+
+  /** One field of the search: the same tinted "well" the flight search on
+   *  the homepage uses (components/FlightSearch.tsx), with a native select
+   *  laid over it so it stays a real, accessible control. */
+  const well = (
+    text: string,
+    Icon: typeof MapPin,
+    control: React.ReactNode
+  ) => (
+    <label className="group relative flex min-h-[58px] w-full cursor-pointer items-center gap-3 rounded-md border border-primary-100/80 bg-primary-050/50 pl-4 pr-10 transition-colors duration-200 hover:border-primary-300 focus-within:border-primary-700 focus-within:bg-neutral-000 focus-within:ring-2 focus-within:ring-primary-700/15">
+      <Icon className="h-[18px] w-[18px] shrink-0 text-accent-500" aria-hidden="true" />
+      <span className="flex min-w-0 flex-1 flex-col py-2">
+        <span className="t-caption font-bold text-text-secondary">{text}</span>
+        {control}
+      </span>
+      <ChevronDown
+        className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary transition-transform duration-200 group-focus-within:rotate-180"
+        aria-hidden="true"
+      />
+    </label>
+  );
+
+  const wellSelect =
+    "w-full cursor-pointer appearance-none truncate bg-transparent pr-1 font-sans text-[16px] font-bold leading-[22px] text-primary-800 focus:outline-none disabled:cursor-wait";
+
   const searchBar = (
-    <div className="rounded-md border border-neutral-300 bg-neutral-000 p-3 shadow-e3">
-      <div className="grid gap-3 lg:grid-cols-[1fr_auto_1fr_1fr_auto] lg:items-end">
-        <label className="block">
-          {label("From", MapPin)}
-          <div className="mt-1.5">
-            {placeSelect(from, setFrom, options.from, "Any airport")}
-          </div>
-        </label>
+    <div className="rounded-lg bg-neutral-000 p-4 shadow-e3 ring-1 ring-primary-900/[0.06] sm:p-5">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center">
+        {well(
+          "Flying from",
+          PlaneTakeoff,
+          <select
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            className={wellSelect}
+            disabled={loading}
+          >
+            <option value="">Any airport</option>
+            {options.from.map((o) => (
+              <option key={o} value={o}>{o}</option>
+            ))}
+          </select>
+        )}
 
         <button
           type="button"
           onClick={swap}
           disabled={!from && !to}
           aria-label="Swap the two airports"
-          className="hidden h-10 w-10 shrink-0 place-items-center self-end rounded-full border border-neutral-300 text-text-secondary transition-colors hover:border-primary-200 hover:bg-primary-050 hover:text-primary-800 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 lg:grid"
+          className="hidden h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-000 text-accent-600 shadow-e1 ring-1 ring-neutral-300 transition-[transform,color] duration-200 hover:rotate-180 hover:text-accent-700 disabled:opacity-40 disabled:hover:rotate-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 motion-reduce:hover:rotate-0 lg:grid"
         >
           <ArrowRightLeft className="h-4 w-4" aria-hidden="true" />
         </button>
 
-        <label className="block">
-          {label("To", MapPin)}
-          <div className="mt-1.5">
-            {placeSelect(to, setTo, options.to, "Anywhere")}
-          </div>
-        </label>
+        {well(
+          "Flying to",
+          PlaneLanding,
+          <select
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            className={wellSelect}
+            disabled={loading}
+          >
+            <option value="">Anywhere</option>
+            {options.to.map((o) => (
+              <option key={o} value={o}>{o}</option>
+            ))}
+          </select>
+        )}
 
-        <label className="block">
-          {label("Travel date", CalendarDays)}
+        {well(
+          "When",
+          CalendarDays,
           <select
             value={when}
             onChange={(e) => setWhen(e.target.value as When)}
-            className={cn(selectClass, "mt-1.5")}
+            className={wellSelect}
           >
             {WHEN_OPTIONS.map((o) => (
-              <option key={o.key} value={o.key}>
-                {o.label}
-              </option>
+              <option key={o.key} value={o.key}>{o.label}</option>
             ))}
           </select>
-        </label>
+        )}
 
         <a
           href="#results"
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-sm bg-primary-800 px-7 font-sans text-[14px] font-bold leading-[20px] text-neutral-000 transition-colors hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+          className="btn btn-primary h-[58px] rounded-md px-8 shadow-e2 transition-transform duration-200 hover:-translate-y-px motion-reduce:hover:translate-y-0"
         >
-          <Search className="h-4 w-4" aria-hidden="true" />
+          <Search className="h-[18px] w-[18px]" aria-hidden="true" />
           Search
         </a>
       </div>
@@ -669,47 +723,57 @@ export default function AssistFamilyApp({
   );
 
   /* ── Filter rail ─────────────────────────────────────────────────── */
+  /* Route and date live in the search above the board. Repeating them here
+     put two sets of controls on one piece of state, so the rail only
+     carries them on the two list pages, which have no hero search. */
   const filters = (
-    <div className="rounded-md border border-neutral-300 bg-neutral-000 p-4 shadow-e1">
+    <div className="rounded-lg bg-neutral-000 p-5 shadow-e1 ring-1 ring-primary-900/[0.06]">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="t-label-1 text-primary-800">Filters</h2>
+        <h2 className="flex items-center gap-2 t-label-1 text-primary-800">
+          <SlidersHorizontal className="h-4 w-4 text-accent-500" aria-hidden="true" />
+          Refine
+        </h2>
         <button
           type="button"
           onClick={clearAll}
           disabled={activeCount === 0}
-          className="rounded-xs t-caption text-text-secondary transition-colors hover:text-primary-800 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+          className="rounded-full px-2 py-1 t-caption font-bold text-accent-700 transition-colors hover:bg-accent-050 disabled:font-normal disabled:text-text-secondary disabled:opacity-60 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
         >
-          Clear all
+          Clear all{activeCount > 0 ? ` (${activeCount})` : ""}
         </button>
       </div>
 
-      <div className="mt-4 space-y-3.5">
-        <label className="block">
-          {label("Travel date", CalendarDays)}
-          <select
-            value={when}
-            onChange={(e) => setWhen(e.target.value as When)}
-            className={cn(selectClass, "mt-1.5 text-[13px]")}
-          >
-            {WHEN_OPTIONS.map((o) => (
-              <option key={o.key} value={o.key}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          {label("From", MapPin)}
-          <div className="mt-1.5">
-            {placeSelect(from, setFrom, options.from, "Any airport")}
-          </div>
-        </label>
-        <label className="block">
-          {label("To", MapPin)}
-          <div className="mt-1.5">
-            {placeSelect(to, setTo, options.to, "Anywhere")}
-          </div>
-        </label>
+      <div className="mt-5 space-y-4">
+        {!showHero && (
+          <>
+            <label className="block">
+              {label("Travel date", CalendarDays)}
+              <select
+                value={when}
+                onChange={(e) => setWhen(e.target.value as When)}
+                className={cn(selectClass, "mt-1.5")}
+              >
+                {WHEN_OPTIONS.map((o) => (
+                  <option key={o.key} value={o.key}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              {label("From", MapPin)}
+              <div className="mt-1.5">
+                {placeSelect(from, setFrom, options.from, "Any airport")}
+              </div>
+            </label>
+            <label className="block">
+              {label("To", MapPin)}
+              <div className="mt-1.5">
+                {placeSelect(to, setTo, options.to, "Anywhere")}
+              </div>
+            </label>
+          </>
+        )}
         <label className="block">
           {label("Airline", Plane)}
           <div className="mt-1.5">
@@ -718,7 +782,7 @@ export default function AssistFamilyApp({
         </label>
       </div>
 
-      <div className="mt-5 space-y-5">
+      <div className="mt-6 space-y-6 border-t border-neutral-200 pt-5">
         <CheckGroup
           title="Assistance needed"
           icon={HandHeart}
@@ -729,7 +793,7 @@ export default function AssistFamilyApp({
         />
         <CheckGroup
           title="Language spoken"
-          icon={Users}
+          icon={Languages}
           options={options.languages}
           selected={langs}
           onToggle={toggle(langs, setLangs)}
@@ -772,53 +836,99 @@ export default function AssistFamilyApp({
   return (
     <>
       {showHero && (
-        <section className="relative overflow-hidden bg-primary-050">
-          {/* Photograph from md up only: on a phone the panel is barely wider
-              than the headline, so the picture lands behind the lead however
-              hard the scrim works. */}
-          <div aria-hidden="true" className="absolute inset-y-0 right-0 hidden w-1/2 md:block">
+        /* The site's one hero language (see /flights, /visa): a full-bleed
+           photograph under two navy scrims, white type. This used to be a
+           white-washed photo on a pale panel, the only page that looked
+           like that. The bottom padding leaves room for the search card,
+           which overlaps the hero's lower edge from the section below. */
+        <section className="relative isolate overflow-hidden pb-24 pt-10 sm:pb-28 sm:pt-14 lg:pb-32 lg:pt-16">
+          <div aria-hidden="true" className="absolute inset-0 -z-10">
             <Image
               src="/support/airport-companion.jpg"
               alt=""
               fill
-              sizes="50vw"
-              className="object-cover"
+              priority
+              sizes="100vw"
+              className="object-cover object-[70%_35%]"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-050 via-primary-050/75 to-primary-050/10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-900/95 from-20% via-primary-900/80 via-60% to-primary-900/40" />
+            <div className="absolute inset-0 bg-gradient-to-b from-primary-900/60 via-transparent via-45% to-primary-900/70" />
           </div>
 
-          <div className="container-page relative pb-8 pt-10 sm:pt-14">
-            <div className="flex flex-wrap items-start gap-x-8 gap-y-2">
-              <h1 className="hero-rise t-h1 max-w-xl text-balance text-primary-800">
+          <div className="container-page relative">
+            <nav aria-label="Breadcrumb" className="hero-rise">
+              <ol className="flex flex-wrap items-center gap-2 t-label-3 text-primary-200">
+                <li>
+                  <Link
+                    href="/"
+                    className="rounded-xs transition-colors hover:text-text-on-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400"
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li className="flex items-center gap-2">
+                  <ChevronRight className="h-3.5 w-3.5 text-primary-300" aria-hidden="true" />
+                  <span aria-current="page" className="text-text-on-dark">
+                    Assist Family
+                  </span>
+                </li>
+              </ol>
+            </nav>
+
+            <div className="mt-6 flex flex-wrap items-end gap-x-8 gap-y-2">
+              <h1 className="hero-rise t-h1 max-w-2xl text-balance text-text-on-dark">
                 Find a traveller who can help
               </h1>
-              <p className="hero-rise hero-rise-2 hidden -rotate-2 t-editorial-3 italic leading-snug text-accent-600 lg:block">
-                Real people.
-                <br />
-                Real help.
+              <p className="hero-rise hero-rise-2 hidden -rotate-2 pb-1 t-editorial-3 italic leading-snug text-accent-400 lg:block">
+                Real people. Real help.
               </p>
             </div>
-            <p className="hero-rise hero-rise-2 t-body mt-3 max-w-xl text-pretty text-text-secondary">
+            <p className="hero-rise hero-rise-2 t-body-lg mt-4 max-w-xl text-pretty text-primary-100">
               Parents and passengers connect with travellers flying the same
               route and date. A coordinator here makes every introduction —
               contact details are never published.
             </p>
 
-            <div className="hero-rise hero-rise-3 mt-7">{searchBar}</div>
+            <ul className="hero-rise hero-rise-3 mt-6 flex flex-wrap gap-2.5">
+              {[
+                { icon: Headset, text: "Every introduction made by our team" },
+                { icon: LockKeyhole, text: "Contact details never published" },
+                { icon: Clock3, text: "Free to post, takes two minutes" },
+              ].map(({ icon: Icon, text }) => (
+                <li
+                  key={text}
+                  className="inline-flex items-center gap-2 rounded-full border border-neutral-000/10 bg-neutral-000/5 px-3.5 py-1.5 t-label-3 text-primary-100"
+                >
+                  <Icon className="h-3.5 w-3.5 text-accent-400" aria-hidden="true" />
+                  {text}
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       )}
 
-      <section id="board" className="scroll-mt-16 bg-neutral-050 py-8 md:py-10">
+      <section
+        id="board"
+        className={cn(
+          "scroll-mt-16 bg-neutral-050 pb-12 md:pb-16",
+          showHero ? "pt-0" : "pt-8 md:pt-10"
+        )}
+      >
         <div className="container-page">
-          <div className="grid gap-5 lg:grid-cols-[208px_minmax(0,1fr)] lg:gap-6">
+          {showHero && (
+            <div className="hero-rise hero-rise-3 relative -mt-16 mb-8 sm:-mt-20 md:mb-10">
+              {searchBar}
+            </div>
+          )}
+          <div className="grid gap-6 lg:grid-cols-[264px_minmax(0,1fr)] lg:gap-8">
             {/* Filter rail — a disclosure on mobile, always open from lg. */}
             <div className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:pr-1">
               <button
                 type="button"
                 onClick={() => setFiltersOpen((v) => !v)}
                 aria-expanded={filtersOpen}
-                className="flex w-full items-center justify-between gap-3 rounded-md border border-neutral-300 bg-neutral-000 px-4 py-3 t-label-2 text-primary-800 lg:hidden"
+                className="flex min-h-[48px] w-full items-center justify-between gap-3 rounded-lg bg-neutral-000 px-4 py-3 t-label-2 text-primary-800 shadow-e1 ring-1 ring-primary-900/[0.06] lg:hidden"
               >
                 <span className="flex items-center gap-2">
                   <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
@@ -843,7 +953,7 @@ export default function AssistFamilyApp({
                   searches the rows, and the rail narrows them. */}
               <div className="relative">
                 <Search
-                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary"
+                  className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-accent-500"
                   aria-hidden="true"
                 />
                 <input
@@ -851,8 +961,8 @@ export default function AssistFamilyApp({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   aria-label="Search the board"
-                  placeholder="Search a name, route, airline or reference…"
-                  className="input h-10 py-0 pl-10 pr-9 text-[14px]"
+                  placeholder="Search a name, route or reference…"
+                  className="input h-12 rounded-lg border-transparent py-0 pl-11 pr-10 text-[15px] shadow-e1 ring-1 ring-primary-900/[0.06] focus-visible:border-primary-700"
                 />
                 {query && (
                   <button
@@ -871,7 +981,7 @@ export default function AssistFamilyApp({
                 <div
                   role="group"
                   aria-label="Which side of the board"
-                  className="mt-3 grid grid-cols-2 gap-1 rounded-sm bg-neutral-100 p-1 lg:hidden"
+                  className="mt-4 grid grid-cols-2 gap-1 rounded-full bg-primary-050 p-1 ring-1 ring-primary-100 lg:hidden"
                 >
                   {(
                     [
@@ -885,7 +995,7 @@ export default function AssistFamilyApp({
                       onClick={() => setMobileSide(t.key)}
                       aria-pressed={mobileSide === t.key}
                       className={cn(
-                        "inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-xs px-2 t-label-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700",
+                        "inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-2 t-label-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700",
                         mobileSide === t.key
                           ? "bg-neutral-000 text-primary-800 shadow-e1"
                           : "text-text-secondary"
@@ -901,11 +1011,10 @@ export default function AssistFamilyApp({
               {/* Shown whatever the feed returns. A visitor who can't see
                   their route shouldn't read that as "nobody can help": the
                   board is only one of the places we look. */}
-              <div className="mt-3 flex items-start gap-3 rounded-md border border-primary-100 bg-primary-050 px-4 py-3">
-                <Info
-                  className="mt-0.5 h-4 w-4 shrink-0 text-primary-700"
-                  aria-hidden="true"
-                />
+              <div className="mt-4 flex items-start gap-3.5 rounded-lg bg-neutral-000 px-4 py-3.5 shadow-e1 ring-1 ring-primary-900/[0.06]">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-050 ring-1 ring-accent-100">
+                  <MessageCircle className="h-4 w-4 text-accent-700" aria-hidden="true" />
+                </span>
                 <div className="min-w-0">
                   <p className="t-label-2 text-primary-800">
                     Don’t see your route? Don’t worry.
@@ -936,29 +1045,34 @@ export default function AssistFamilyApp({
                   <p className="sr-only" role="status">
                     Loading the board…
                   </p>
-                  {[0, 1].map((col) => (
+                  {(lockSide ? [lockSide] : (["requester", "traveller"] as const)).map((col) => (
                     <div
                       key={col}
-                      className="overflow-hidden rounded-md border border-neutral-300 bg-neutral-000"
+                      className={cn(
+                        "rounded-lg p-3 ring-1",
+                        col === "requester" ? "bg-accent-050 ring-accent-100" : "bg-primary-050 ring-primary-100",
+                        !lockSide && col !== mobileSide && "hidden lg:block"
+                      )}
                       aria-hidden="true"
                     >
-                      <div className="h-[61px] border-b border-neutral-200 bg-neutral-050" />
-                      {[0, 1, 2].map((i) => (
-                        <div key={i} className="flex animate-pulse gap-3 px-4 py-4">
-                          <div className="h-9 w-9 shrink-0 rounded-full bg-neutral-100" />
-                          <div className="flex-1 space-y-2">
-                            <div className="h-3.5 w-32 rounded-xs bg-neutral-100" />
-                            <div className="h-3 w-24 rounded-xs bg-neutral-100" />
-                            <div className="h-3 w-full rounded-xs bg-neutral-100" />
+                      <div className="flex items-center gap-3 px-1.5 pb-3.5 pt-1.5">
+                        <div className="h-10 w-10 rounded-full bg-neutral-000/80" />
+                        <div className="h-4 w-40 rounded-full bg-neutral-000/80" />
+                      </div>
+                      <div className="space-y-2.5">
+                        {[0, 1, 2].map((i) => (
+                          <div key={i} className="flex animate-pulse gap-3.5 rounded-md bg-neutral-000 p-5 shadow-e1">
+                            <div className="h-11 w-11 shrink-0 rounded-full bg-neutral-100" />
+                            <div className="flex-1 space-y-2.5">
+                              <div className="h-3.5 w-32 rounded-full bg-neutral-100" />
+                              <div className="h-4 w-44 rounded-full bg-neutral-100" />
+                              <div className="h-3 w-full rounded-full bg-neutral-100" />
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   ))}
-                  <p className="flex items-center justify-center gap-2 t-body-sm text-text-secondary lg:col-span-2">
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                    Loading the board…
-                  </p>
                 </div>
               ) : (
                 <div className={cn("mt-4 grid items-start gap-5", columnGrid)}>
@@ -969,7 +1083,7 @@ export default function AssistFamilyApp({
 
               {/* The way out of "nobody is on my route" is to post, so the
                   board closes on one dark band rather than trailing off. */}
-              <div className="mt-5 flex flex-col items-center gap-4 rounded-md bg-primary-800 px-5 py-5 shadow-e2 sm:flex-row sm:justify-between sm:px-6">
+              <div className="mt-6 flex flex-col items-center gap-4 rounded-lg bg-primary-800 px-5 py-5 shadow-e2 sm:flex-row sm:justify-between sm:px-7 sm:py-6">
                 <div className="flex items-center gap-3">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-000/10">
                     <Users className="h-5 w-5 text-accent-400" aria-hidden="true" />
