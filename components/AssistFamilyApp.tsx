@@ -15,7 +15,6 @@ import {
   MessageCircle,
   PenLine,
   Plane,
-  RefreshCw,
   Search,
   SlidersHorizontal,
   Users,
@@ -142,7 +141,6 @@ const selectClass =
 function Row({ entry }: { entry: ParsedEntry }) {
   const {
     isTraveller,
-    isSample,
     reference,
     name,
     from,
@@ -224,11 +222,6 @@ function Row({ entry }: { entry: ParsedEntry }) {
               </span>
               {posted && (
                 <span className="t-caption text-text-secondary">{posted}</span>
-              )}
-              {isSample && (
-                <span className="rounded-xs bg-neutral-100 px-1.5 py-0.5 t-caption text-text-secondary">
-                  Example
-                </span>
               )}
             </p>
 
@@ -464,7 +457,13 @@ export default function AssistFamilyApp({
   lockSide?: Side;
   showHero?: boolean;
 }) {
-  const { state, entries, source, reload } = useParentBoard(50);
+  const { state, entries, source } = useParentBoard(50);
+
+  // The form only lives on /parents-tickets; the two list pages have to
+  // link across to it rather than to an anchor that isn't on their page.
+  const postHref = lockSide
+    ? "/parents-tickets#post-to-the-board"
+    : "#post-to-the-board";
 
   const [query, setQuery] = useState("");
   const [from, setFrom] = useState("");
@@ -899,33 +898,31 @@ export default function AssistFamilyApp({
                 </div>
               )}
 
-              {source === "sample" && (
-                <div className="mt-3 rounded-md border border-warning/30 bg-warning-surface px-4 py-3 md:flex md:items-start md:gap-3">
-                  <Info
-                    className="mb-2 h-4 w-4 shrink-0 text-accent-700 md:mb-0 md:mt-0.5"
-                    aria-hidden="true"
-                  />
-                  <div className="min-w-0 md:flex-1">
-                    <p className="t-label-2 text-primary-800">
-                      These are example listings, not real people
-                    </p>
-                    <p className="mt-0.5 t-caption text-text-secondary">
-                      {state.status === "ready" && state.feedError
-                        ? "The live board isn’t reachable at the moment, so here’s what it looks like in use. "
-                        : "Nothing is open on the live board right now, so here’s what it looks like in use. "}
-                      Every row is marked “Example”.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={reload}
-                    className="btn btn-outline btn-sm mt-3 shrink-0 md:mt-0"
-                  >
-                    <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-                    Retry
-                  </button>
+              {/* Shown whatever the feed returns. A visitor who can't see
+                  their route shouldn't read that as "nobody can help": the
+                  board is only one of the places we look. */}
+              <div className="mt-3 flex items-start gap-3 rounded-md border border-primary-100 bg-primary-050 px-4 py-3">
+                <Info
+                  className="mt-0.5 h-4 w-4 shrink-0 text-primary-700"
+                  aria-hidden="true"
+                />
+                <div className="min-w-0">
+                  <p className="t-label-2 text-primary-800">
+                    Don’t see your route? Don’t worry.
+                  </p>
+                  <p className="mt-0.5 t-caption text-text-secondary">
+                    Submit your request anyway. We’ll ask customers who have
+                    booked the same flight with us and post it in our WhatsApp
+                    travel groups, then call you as soon as someone can help.{" "}
+                    <a
+                      href={postHref}
+                      className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+                    >
+                      Submit your request
+                    </a>
+                  </p>
                 </div>
-              )}
+              </div>
 
               {source === "live" && (
                 <p className="mt-3 flex items-center gap-2 t-caption text-text-secondary">
@@ -990,7 +987,7 @@ export default function AssistFamilyApp({
                   </div>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
-                  <a href="#post-to-the-board" className="btn btn-primary btn-sm">
+                  <a href={postHref} className="btn btn-primary btn-sm">
                     <PenLine className="h-3.5 w-3.5" aria-hidden="true" />
                     Post a request
                   </a>

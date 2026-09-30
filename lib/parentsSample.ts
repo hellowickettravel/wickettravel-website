@@ -9,15 +9,16 @@
  * first-time visitor that nobody is here, and they leave.
  *
  * So when — and only when — the live feed returns nothing usable, the board
- * falls back to these worked examples so a visitor can see what the platform
- * is and how it behaves. They are NOT passed off as real people:
+ * falls back to these entries so a visitor can see what the platform is and
+ * how it behaves.
  *
- *   • every reference is prefixed `WT-DEMO-`, which no live reference uses;
- *   • every row carries `is_sample: true`, and the card renders an "Example"
- *     tag off it;
- *   • the board shows a banner above the results saying these are examples
- *     and the live board is quiet, with a real CTA to post;
- *   • the moment the relay returns even one real entry, none of this renders.
+ *   • references use the same `WTDC-` shape as the rest of the board (client
+ *     feedback, 2026-09-30: a `DEMO` prefix and an "Example" tag read as
+ *     untrustworthy, so neither is rendered any more);
+ *   • every row still carries `is_sample: true` internally, so code can tell
+ *     them apart from live rows, but nothing on screen is keyed off it;
+ *   • the moment the relay returns even one real entry, none of this renders,
+ *     so the real fix for this file is a working relay, not more placeholders.
  *
  * Nothing here is billed, contactable or linked to a real person: the names
  * are invented in the same shortened shape the real feed publishes (first
@@ -64,7 +65,7 @@ type Seed = {
 
 const REQUESTERS: Seed[] = [
   {
-    ref: "WT-DEMO-4182",
+    ref: "WTDC-1429",
     name: "Priya S.",
     from: "London Heathrow (LHR)",
     to: "Hyderabad (HYD)",
@@ -79,7 +80,7 @@ const REQUESTERS: Seed[] = [
     mobility: "Walking aid / slow on their feet",
   },
   {
-    ref: "WT-DEMO-4177",
+    ref: "WTDC-2817",
     name: "Imran K.",
     from: "Manchester (MAN)",
     to: "Dubai (DXB)",
@@ -94,7 +95,7 @@ const REQUESTERS: Seed[] = [
     mobility: "Wheelchair assistance",
   },
   {
-    ref: "WT-DEMO-4169",
+    ref: "WTDC-3604",
     name: "Aisha R.",
     from: "London Gatwick (LGW)",
     to: "Delhi (DEL)",
@@ -109,7 +110,7 @@ const REQUESTERS: Seed[] = [
     mobility: "None — just company and reassurance",
   },
   {
-    ref: "WT-DEMO-4160",
+    ref: "WTDC-1952",
     name: "Daniel O.",
     from: "Birmingham (BHX)",
     to: "Mumbai (BOM)",
@@ -124,7 +125,7 @@ const REQUESTERS: Seed[] = [
     mobility: "Visual impairment",
   },
   {
-    ref: "WT-DEMO-4151",
+    ref: "WTDC-4376",
     name: "Sana M.",
     from: "London Heathrow (LHR)",
     to: "Bangalore (BLR)",
@@ -139,7 +140,7 @@ const REQUESTERS: Seed[] = [
     mobility: "None — just company and reassurance",
   },
   {
-    ref: "WT-DEMO-4143",
+    ref: "WTDC-2261",
     name: "Yusuf A.",
     from: "Edinburgh (EDI)",
     to: "Abu Dhabi (AUH)",
@@ -154,7 +155,7 @@ const REQUESTERS: Seed[] = [
     mobility: "Hearing impairment",
   },
   {
-    ref: "WT-DEMO-4138",
+    ref: "WTDC-3138",
     name: "Meera P.",
     from: "London Luton (LTN)",
     to: "Kochi (COK)",
@@ -169,7 +170,7 @@ const REQUESTERS: Seed[] = [
     mobility: "Walking aid / slow on their feet",
   },
   {
-    ref: "WT-DEMO-4129",
+    ref: "WTDC-1785",
     name: "Harjit S.",
     from: "Manchester (MAN)",
     to: "Delhi (DEL)",
@@ -187,7 +188,7 @@ const REQUESTERS: Seed[] = [
 
 const TRAVELLERS: Seed[] = [
   {
-    ref: "WT-DEMO-4185",
+    ref: "WTDC-4520",
     name: "Nadia H.",
     from: "London Heathrow (LHR)",
     to: "Dubai (DXB)",
@@ -200,7 +201,7 @@ const TRAVELLERS: Seed[] = [
     capacity: 2,
   },
   {
-    ref: "WT-DEMO-4180",
+    ref: "WTDC-2694",
     name: "Rahul V.",
     from: "London Heathrow (LHR)",
     to: "Hyderabad (HYD)",
@@ -213,7 +214,7 @@ const TRAVELLERS: Seed[] = [
     capacity: 1,
   },
   {
-    ref: "WT-DEMO-4174",
+    ref: "WTDC-1307",
     name: "Fatima B.",
     from: "Manchester (MAN)",
     to: "Islamabad (ISB)",
@@ -226,7 +227,7 @@ const TRAVELLERS: Seed[] = [
     capacity: 2,
   },
   {
-    ref: "WT-DEMO-4166",
+    ref: "WTDC-3871",
     name: "James T.",
     from: "London Gatwick (LGW)",
     to: "Delhi (DEL)",
@@ -239,7 +240,7 @@ const TRAVELLERS: Seed[] = [
     capacity: 1,
   },
   {
-    ref: "WT-DEMO-4158",
+    ref: "WTDC-2048",
     name: "Anjali D.",
     from: "Birmingham (BHX)",
     to: "Mumbai (BOM)",
@@ -252,7 +253,7 @@ const TRAVELLERS: Seed[] = [
     capacity: 1,
   },
   {
-    ref: "WT-DEMO-4149",
+    ref: "WTDC-4613",
     name: "Omar S.",
     from: "London Heathrow (LHR)",
     to: "Abu Dhabi (AUH)",
@@ -265,7 +266,7 @@ const TRAVELLERS: Seed[] = [
     capacity: 3,
   },
   {
-    ref: "WT-DEMO-4141",
+    ref: "WTDC-1596",
     name: "Grace N.",
     from: "Edinburgh (EDI)",
     to: "London Heathrow (LHR)",
@@ -278,7 +279,7 @@ const TRAVELLERS: Seed[] = [
     capacity: 2,
   },
   {
-    ref: "WT-DEMO-4132",
+    ref: "WTDC-3325",
     name: "Bilal Q.",
     from: "Manchester (MAN)",
     to: "Lahore (LHE)",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, useSyncExternalStore } from "react";
 import {
   AlertCircle,
   CheckCircle2,
@@ -12,6 +12,12 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { MOBILITY_NEEDS, RELATIONSHIPS, ROLES, type EnquiryType } from "@/lib/parents";
+import {
+  buildShareMessage,
+  buildShareUrl,
+  readSharedDetails,
+} from "@/lib/parentsShare";
+import ShareToWhatsApp from "@/components/ShareToWhatsApp";
 
 /**
  * Parents Tickets — the real dual-role enquiry form.
@@ -28,6 +34,12 @@ import { MOBILITY_NEEDS, RELATIONSHIPS, ROLES, type EnquiryType } from "@/lib/pa
  * `consent_public` is the only thing that can ever put an entry on the public
  * board, so it is opt-in, unticked, and spelled out in full next to the box —
  * never a pre-ticked convenience.
+ *
+ * After a successful post the success screen offers the post back to the
+ * poster as a ready-written WhatsApp message (components/ShareToWhatsApp.tsx).
+ * And the other way round: someone who opens a shared request and taps
+ * "I can help" lands here with `?role=traveller&from=…&to=…&date=…&ref=…`,
+ * and the form starts on the helper side with that flight filled in.
  */
 
 const ENDPOINT = "/api/parent-ticket";
@@ -126,8 +138,8 @@ function validate(role: EnquiryType, data: FormState): Errors {
     range(
       "parents_capacity",
       1,
-      99,
-      "Enter how many people you could accompany (1–99)."
+      20,
+      "Enter how many people you could accompany (1–20)."
     );
     range("assistance_fee", 0, 100, "Enter an amount between £0 and £100.");
   } else {
@@ -191,6 +203,28 @@ function readFieldErrors(value: unknown): Errors {
   return out;
 }
 
+const noopSubscribe = () => () => {};
+
+/**
+ * `?role=traveller&from=…&to=…&date=…&airline=…&ref=…` → the fields to fill
+ * in. Only ever fills empty fields, and only on the helper side.
+ */
+function readHelperPrefill(search: string): Partial<FormState> | undefined {
+  const params = new URLSearchParams(search);
+  if (params.get("role") !== "traveller") return undefined;
+  const shared = readSharedDetails(params);
+  if (!shared) return {};
+  const ref = params.get("ref")?.trim().slice(0, 40);
+  const out: Partial<FormState> = {
+    from_location: shared.from,
+    to_location: shared.to,
+  };
+  if (shared.date) out.travel_date = shared.date;
+  if (shared.airline) out.airline = shared.airline;
+  if (ref && /^[\w-]+$/.test(ref)) out.notes = `Offering to help with request ${ref}.`;
+  return out;
+}
+
 /* ── Field primitives — the site's .input / label pairing, nothing new ──── */
 
 const labelClass = "t-label-2 text-primary-800";
@@ -218,7 +252,33 @@ export default function ParentsEnquiryForm() {
   const [done, setDone] = useState<{
     reference: string | null;
     consented: boolean;
+    shareUrl: string;
+    shareMessage: string;
   } | null>(null);
+
+  // Arriving from a shared request's "I can help" button: start on the helper
+  // side with that flight already filled in. The server render and hydration
+  // see no query string, then the client's real one arrives and is applied
+  // once, during render (React's "adjusting state when a prop changes").
+  const search = useSyncExternalStore(
+    noopSubscribe,
+    () => window.location.search,
+    () => ""
+  );
+  const [appliedSearch, setAppliedSearch] = useState("");
+  if (search !== appliedSearch) {
+    setAppliedSearch(search);
+    const prefill = readHelperPrefill(search);
+    if (prefill) {
+      setRole("traveller");
+      setData((d) => ({
+        ...d,
+        ...Object.fromEntries(
+          Object.entries(prefill).filter(([k]) => !d[k as Field])
+        ),
+      }));
+    }
+  }
 
   const set = (key: Field, value: string) => {
     setData((d) => ({ ...d, [key]: value }));
@@ -300,7 +360,25 @@ export default function ParentsEnquiryForm() {
         typeof body.reference === "string" && body.reference.trim()
           ? body.reference.trim()
           : null;
-      setDone({ reference, consented: consent });
+      const details = {
+        type: role,
+        from: data.from_location.trim(),
+        to: data.to_location.trim(),
+        date: data.travel_date || undefined,
+        airline: data.airline.trim() || undefined,
+      };
+      const shareUrl = buildShareUrl(window.location.origin, reference, details);
+      setDone({
+        reference,
+        consented: consent,
+        shareUrl,
+        shareMessage: buildShareMessage({
+          details,
+          reference,
+          relationship: data.relationship || undefined,
+          url: shareUrl,
+        }),
+      });
     } catch {
       // Network failure or an aborted request — nothing typed is cleared, so
       // retrying costs the visitor nothing.
@@ -344,8 +422,23 @@ export default function ParentsEnquiryForm() {
         <p className="t-body-sm mx-auto mt-4 max-w-md rounded-md bg-primary-050 px-4 py-3 text-primary-800">
           {done.consented
             ? "You asked to appear on the community board, so once our team has reviewed your post a shortened version will show there — first name and last initial, the route, date and airline, and your amount. Your phone number, email address, surname and notes are not part of it, and nobody can contact you off a listing."
-            : "You did not tick the community-board box, so nothing about this post will be published. It stays between you and our team."}
+            : "You did not tick the community-board box, so nothing about this post will be published on the board. It stays between you and our team, unless you choose to share it below."}
         </p>
+        {role === "traveller" ? (
+          <ShareToWhatsApp
+            className="mx-auto mt-8 max-w-xl"
+            initialMessage={done.shareMessage}
+            url={done.shareUrl}
+            title="Let families know you're on this flight"
+            lead="Families usually find help through someone they already know. Send this to your community groups. The link opens your offer on our site, and anyone who needs you asks our team for an introduction."
+          />
+        ) : (
+          <ShareToWhatsApp
+            className="mx-auto mt-8 max-w-xl"
+            initialMessage={done.shareMessage}
+            url={done.shareUrl}
+          />
+        )}
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button type="button" onClick={reset} className="btn btn-outline">
             Post another
@@ -639,7 +732,7 @@ export default function ParentsEnquiryForm() {
                 type="number"
                 inputMode="numeric"
                 min={1}
-                max={99}
+                max={20}
                 step={1}
                 className="input mt-2"
                 value={data.parents_capacity}

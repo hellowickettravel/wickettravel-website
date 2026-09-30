@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useSyncExternalStore } from "react";
 import {
   AlertTriangle,
   CalendarDays,
-  Info,
+  Clock,
   HandHeart,
   Languages,
   Loader2,
@@ -15,10 +16,19 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { BUSINESS } from "@/lib/seo";
+import { BUSINESS, SITE_URL } from "@/lib/seo";
 import { WHATSAPP_URL } from "@/lib/links";
-import { destinationImage } from "@/lib/parents";
+import { destinationImage, formatEntryDate, type ParsedEntry } from "@/lib/parents";
+import {
+  buildHelpHref,
+  buildShareMessage,
+  buildShareUrl,
+  formatShareDate,
+  toIsoDay,
+  type SharedDetails,
+} from "@/lib/parentsShare";
 import { useParentBoard } from "@/lib/useParentBoard";
+import ShareToWhatsApp from "@/components/ShareToWhatsApp";
 
 /**
  * Per-listing detail content, rendered inside
@@ -34,16 +44,100 @@ import { useParentBoard } from "@/lib/useParentBoard";
  * longer available" — see NotFound below), not an error, since the
  * alternative would be inventing a reason a real integration can't know.
  *
- * When the relay itself is down the hook stands the board's worked examples
- * in for it (see lib/useParentBoard.ts). This page honours that but does not
- * hide it: a sample listing is banner-tagged as an example, and a reference
- * that isn't found while the feed is failing says so rather than claiming the
- * listing was withdrawn — the two are not interchangeable when someone is
- * checking on their own mother's flight.
+ * A link shared into WhatsApp (lib/parentsShare.ts) also carries the flight
+ * itself, because a new post isn't on the board until a coordinator approves
+ * it. So the order is: the board's row if the reference is on it, else the
+ * shared details, else "no longer available". A reference that isn't found
+ * while the feed is failing says so rather than claiming the listing was
+ * withdrawn — the two are not interchangeable when someone is checking on
+ * their own mother's flight.
+ *
+ * Every listing ends with a share panel, so anyone who lands here can pass
+ * it on to their own groups, and a family's request has a one-tap "I'm on
+ * this flight" that opens the form on the helper side, already filled in.
  */
-export default function ListingDetail({ reference }: { reference: string }) {
+/* The share link is built from the page's own origin so preview deployments
+   share themselves; the server render (and hydration) use the live site. */
+const noopSubscribe = () => () => {};
+function useOrigin(): string {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => window.location.origin,
+    () => SITE_URL
+  );
+}
+
+/** Everything the listing view renders, from either source. */
+type View = {
+  isTraveller: boolean;
+  reference: string | undefined;
+  details: SharedDetails;
+  name?: string;
+  dateLabel?: string;
+  languages?: string;
+  body?: string;
+  extra: string[];
+  capacity?: number;
+  amount?: number;
+  /** Came from a shared link and isn't on the public board (yet). */
+  pending: boolean;
+};
+
+function fromEntry(entry: ParsedEntry, reference: string): View {
+  const extra: string[] = [];
+  if (entry.relationship) extra.push(entry.relationship);
+  if (entry.parentAge !== undefined) extra.push(`Age ${entry.parentAge}`);
+  if (entry.mobility) extra.push(entry.mobility);
+  return {
+    isTraveller: entry.isTraveller,
+    reference,
+    details: {
+      type: entry.isTraveller ? "traveller" : "requester",
+      from: entry.from ?? "",
+      to: entry.to ?? "",
+      date: toIsoDay(entry.dateISO),
+      airline: entry.airline,
+    },
+    name: entry.name,
+    dateLabel: entry.date,
+    languages: entry.languages,
+    body: entry.body,
+    extra,
+    capacity: entry.capacity,
+    amount: entry.amount,
+    pending: false,
+  };
+}
+
+function fromShared(shared: SharedDetails, reference: string | undefined): View {
+  return {
+    isTraveller: shared.type === "traveller",
+    reference,
+    details: shared,
+    dateLabel: formatShareDate(shared.date) ?? formatEntryDate(shared.date),
+    extra: [],
+    pending: true,
+  };
+}
+
+export default function ListingDetail({
+  reference,
+  shared,
+}: {
+  /** Undefined when a shared link was made without a portal reference. */
+  reference?: string;
+  shared?: SharedDetails;
+}) {
   const { state, entries } = useParentBoard(50);
-  const entry = entries.find((e) => e.reference === reference);
+  const entry = reference
+    ? entries.find((e) => e.reference === reference)
+    : undefined;
+
+  // The board's own row wins; a shared link's details stand in until the
+  // post is on the board, and are shown straight away rather than behind a
+  // spinner, since the board may never have it.
+  if (entry) return <ListingView view={fromEntry(entry, reference!)} />;
+  if (shared) return <ListingView view={fromShared(shared, reference)} />;
 
   if (state.status === "loading") {
     return (
@@ -54,34 +148,19 @@ export default function ListingDetail({ reference }: { reference: string }) {
     );
   }
 
-  const feedError = state.status === "ready" ? state.feedError : undefined;
+  return <NotFound feedError={state.feedError} />;
+}
 
-  if (!entry) {
-    return <NotFound feedError={feedError} />;
-  }
-
-  const {
-    isTraveller,
-    isSample,
-    name,
-    from,
-    to,
-    date,
-    airline,
-    languages,
-    body,
-    relationship,
-    mobility,
-    parentAge,
-    capacity,
-    amount,
-  } = entry;
+function ListingView({ view }: { view: View }) {
+  const origin = useOrigin();
+  const { isTraveller, reference, details, name, dateLabel, languages, body, extra, capacity, amount, pending } = view;
+  const { from, to, airline } = details;
 
   const bg = destinationImage(to, from);
   const route = [from, to].filter(Boolean).join(" → ") || "Route on request";
 
   const meta: { icon: typeof CalendarDays; text: string }[] = [];
-  if (date) meta.push({ icon: CalendarDays, text: date });
+  if (dateLabel) meta.push({ icon: CalendarDays, text: dateLabel });
   if (airline) meta.push({ icon: Plane, text: airline });
   if (languages) meta.push({ icon: Languages, text: languages });
   if (capacity !== undefined)
@@ -90,10 +169,19 @@ export default function ListingDetail({ reference }: { reference: string }) {
       text: `Can accompany ${capacity} ${capacity === 1 ? "person" : "people"}`,
     });
 
-  const details: string[] = [];
-  if (relationship) details.push(relationship);
-  if (parentAge !== undefined) details.push(`Age ${parentAge}`);
-  if (mobility) details.push(mobility);
+  const shareUrl = buildShareUrl(origin, reference ?? null, details);
+  const shareMessage = buildShareMessage({
+    details,
+    reference: reference ?? null,
+    url: shareUrl,
+    voice: "board",
+  });
+
+  const whatsappUs = `${WHATSAPP_URL}?text=${encodeURIComponent(
+    `Hi Wicket Travel, I'm getting in touch about Assist Family ${
+      reference ? `listing ${reference}` : "a shared request"
+    } (${route}${dateLabel ? `, ${dateLabel}` : ""}).`
+  )}`;
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -127,25 +215,11 @@ export default function ListingDetail({ reference }: { reference: string }) {
         </div>
       </div>
 
-      {isSample && (
-        <p className="mt-6 flex items-start gap-3 rounded-md border border-warning/30 bg-warning-surface px-4 py-3 t-body-sm text-text-secondary">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent-700" aria-hidden="true" />
-          <span>
-            <span className="t-label-2 block text-primary-800">
-              This is an example listing
-            </span>
-            It shows what a real entry looks like while the live board is
-            quiet. Nobody is waiting on this one — post your own and it
-            appears here once a coordinator approves it.
-          </span>
-        </p>
-      )}
-
       <div className="card mt-6 p-6 sm:p-8">
         {name && <p className="t-label-1 text-primary-800">{name}</p>}
 
         {meta.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+          <ul className={cn("flex flex-wrap gap-x-5 gap-y-2", name && "mt-3")}>
             {meta.map(({ icon: Icon, text }) => (
               <li
                 key={text}
@@ -158,15 +232,26 @@ export default function ListingDetail({ reference }: { reference: string }) {
           </ul>
         )}
 
-        {details.length > 0 && (
+        {extra.length > 0 && (
           <p className="mt-4 t-body-sm text-text-secondary">
-            {details.join(" · ")}
+            {extra.join(" · ")}
           </p>
         )}
 
         {body && (
           <p className="t-body mt-5 whitespace-pre-line text-text-secondary">
             {body}
+          </p>
+        )}
+
+        {pending && (
+          <p className="mt-5 flex items-start gap-3 rounded-md bg-primary-050 px-4 py-3 t-body-sm text-text-secondary">
+            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary-700" aria-hidden="true" />
+            <span>
+              {isTraveller
+                ? "This traveller has shared their flight with us. Their contact details stay with our team, and we make every introduction ourselves."
+                : "This family has sent their full details to our team. If you’re on this flight, tell us you can help and a coordinator will call you both to make the introduction."}
+            </span>
           </p>
         )}
 
@@ -182,16 +267,25 @@ export default function ListingDetail({ reference }: { reference: string }) {
             </span>
           )}
           <div className="flex flex-wrap gap-3">
+            {isTraveller ? (
+              <a
+                href={`tel:${BUSINESS.phone}`}
+                className="btn btn-primary"
+                aria-label={`Call Wicket Travel about ${reference ? `entry ${reference}` : "this listing"}`}
+              >
+                <Phone className="h-4 w-4" aria-hidden="true" />
+                Ask for an introduction
+              </a>
+            ) : (
+              // A full page load, not <Link>: the form reads its prefill
+              // from the address bar as it mounts.
+              <a href={buildHelpHref(details, reference ?? null)} className="btn btn-primary">
+                <HandHeart className="h-4 w-4" aria-hidden="true" />
+                I’m on this flight, I can help
+              </a>
+            )}
             <a
-              href={`tel:${BUSINESS.phone}`}
-              className="btn btn-primary"
-              aria-label={`Call Wicket Travel about entry ${reference}`}
-            >
-              <Phone className="h-4 w-4" aria-hidden="true" />
-              Ask for an introduction
-            </a>
-            <a
-              href={WHATSAPP_URL}
+              href={whatsappUs}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline"
@@ -202,11 +296,42 @@ export default function ListingDetail({ reference }: { reference: string }) {
           </div>
         </div>
         <p className="mt-4 t-body-sm text-text-secondary">
-          Reference <span className="t-code">{reference}</span>. Contact
-          details are never published — quote this reference and our team
-          makes the introduction.
+          {reference ? (
+            <>
+              Reference <span className="t-code">{reference}</span>. Contact
+              details are never published — quote this reference and our team
+              makes the introduction.
+            </>
+          ) : (
+            "Contact details are never published — our team makes every introduction."
+          )}
+          {!isTraveller && (
+            <>
+              {" "}Rather talk?{" "}
+              <a
+                href={`tel:${BUSINESS.phone}`}
+                className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+              >
+                Call {BUSINESS.phoneDisplay}
+              </a>
+              .
+            </>
+          )}
         </p>
       </div>
+
+      <ShareToWhatsApp
+        key={shareUrl}
+        className="mt-6"
+        initialMessage={shareMessage}
+        url={shareUrl}
+        title={
+          isTraveller
+            ? "Know a family who needs this? Share it"
+            : "Know someone on this flight? Share it"
+        }
+        lead="Help is usually found through someone who knows someone. Send this to your WhatsApp groups. The link opens this page, and our team handles every introduction."
+      />
 
       <div className="mt-6 flex flex-wrap gap-4 t-label-2">
         <Link
