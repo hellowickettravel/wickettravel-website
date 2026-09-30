@@ -61,6 +61,7 @@ export default function Select({
   onChange,
   options,
   placeholder = "Select…",
+  emptyValue = "",
   variant = "field",
   label,
   icon: Icon,
@@ -74,6 +75,10 @@ export default function Select({
   onChange: (value: string) => void;
   options: SelectOption[];
   placeholder?: string;
+  /** The value that means "nothing chosen" ("Any airline", "Any date").
+   *  It renders as a placeholder: lighter and regular weight, so a real
+   *  choice in bold navy is told apart at a glance. */
+  emptyValue?: string;
   variant?: Variant;
   /** Visible label inside a "well" trigger. */
   label?: string;
@@ -257,6 +262,14 @@ export default function Select({
     // Focus moves into the menu a tick after it opens; until it has, keys
     // pressed on the trigger belong to the menu.
     if (open) {
+      // A letter typed before the search box has focus still belongs in it.
+      if (searchable && e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        setQuery((q) => q + e.key);
+        setActive(0);
+        searchRef.current?.focus({ preventScroll: true });
+        return;
+      }
       onMenuKey(e);
       return;
     }
@@ -271,7 +284,10 @@ export default function Select({
 
   /* ── Trigger ──────────────────────────────────────────────────────── */
   const shown = selected?.label ?? placeholder;
-  const isPlaceholder = !selected || selected.value === "";
+  const isPlaceholder = !selected || selected.value === emptyValue;
+  const valueTone = isPlaceholder
+    ? "font-normal text-text-secondary"
+    : "font-bold text-primary-800";
 
   const chevron = (
     <ChevronDown
@@ -290,7 +306,7 @@ export default function Select({
         {Icon && <Icon className="h-[18px] w-[18px] shrink-0 text-accent-500" aria-hidden="true" />}
         <span className="flex min-w-0 flex-1 flex-col py-2 text-left">
           {label && <span className="t-caption font-bold text-text-secondary">{label}</span>}
-          <span className="truncate font-sans text-[16px] font-bold leading-[22px] text-primary-800">
+          <span className={cn("truncate font-sans text-[16px] leading-[22px]", valueTone)}>
             {shown}
           </span>
         </span>
@@ -304,7 +320,11 @@ export default function Select({
         <span
           className={cn(
             "min-w-0 flex-1 truncate text-left",
-            isPlaceholder && variant === "field" ? "text-text-secondary" : "text-primary-800"
+            variant === "field"
+              ? isPlaceholder
+                ? "text-text-secondary"
+                : "text-primary-800"
+              : valueTone
           )}
         >
           {shown}
@@ -317,18 +337,22 @@ export default function Select({
   // Written out per variant and per state rather than layered as overrides:
   // cn() is plain clsx here, so two conflicting utilities would be decided by
   // stylesheet order, not by which was written last.
+  // Three states: open, holding a real choice (white, navy edge, so an
+  // active filter stands out in the rail), and resting on "Any …".
   const bordered = open
     ? "border-primary-700 bg-neutral-000 ring-2 ring-primary-700/15"
-    : "border-primary-100/80 bg-primary-050/50 hover:border-primary-300";
+    : isPlaceholder
+      ? "border-primary-100/80 bg-primary-050/50 hover:border-primary-300"
+      : "border-primary-300 bg-neutral-000 hover:border-primary-700";
   const triggerClass = {
     well: cn("min-h-[58px] gap-3 rounded-md border pl-4 pr-3.5", bordered),
-    compact: cn("h-11 gap-2 rounded-md border px-3 font-sans text-[14px] font-bold leading-[20px]", bordered),
+    compact: cn("h-11 gap-2 rounded-md border px-3 font-sans text-[14px] leading-[20px]", bordered),
     field: cn(
       "min-h-[48px] gap-2.5 rounded-sm border bg-neutral-000 px-4 font-sans text-[16px] leading-[24px]",
       open ? "border-primary-700 ring-2 ring-primary-700" : "border-neutral-300 hover:border-primary-300"
     ),
     toolbar: cn(
-      "h-12 gap-2 rounded-lg bg-neutral-000 px-4 font-sans text-[14px] font-bold leading-[20px] shadow-e1",
+      "h-12 gap-2 rounded-lg bg-neutral-000 px-4 font-sans text-[14px] leading-[20px] shadow-e1",
       open ? "ring-2 ring-primary-700/30" : "ring-1 ring-primary-900/[0.06] hover:ring-primary-200"
     ),
   }[variant];
@@ -434,8 +458,11 @@ export default function Select({
                         <span
                           className={cn(
                             "min-w-0 flex-1 truncate font-sans text-[14px] leading-[20px]",
-                            isSel ? "font-bold text-primary-800" : "text-text-primary",
-                            option.muted && !isSel && "text-text-secondary"
+                            isSel
+                              ? "font-bold text-primary-800"
+                              : option.muted || option.value === emptyValue
+                                ? "text-text-secondary"
+                                : "text-text-primary"
                           )}
                         >
                           {option.label}

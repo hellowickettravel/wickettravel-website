@@ -32,7 +32,7 @@ import {
 import { cn } from "@/lib/cn";
 import { WHATSAPP_URL } from "@/lib/links";
 import {
-  avatarTone,
+  boardTone,
   daysUntil,
   departureLabel,
   formatEntryDate,
@@ -239,7 +239,14 @@ function cleanLanguage(part: string): string {
  * button stretches over it via a pseudo-element, so the click target is the
  * full card while the focus ring stays on one real anchor.
  */
-function Row({ entry }: { entry: ParsedEntry }) {
+function Row({
+  entry,
+  tone,
+}: {
+  entry: ParsedEntry;
+  /** This card's colour pair, from its position (lib/parents.ts, boardTone). */
+  tone: ReturnType<typeof boardTone>;
+}) {
   const {
     isTraveller,
     reference,
@@ -288,7 +295,10 @@ function Row({ entry }: { entry: ParsedEntry }) {
   return (
     <article
       className={cn(
-        "group relative isolate rounded-md bg-neutral-000 p-4 shadow-e1 ring-1 ring-primary-900/[0.06] sm:p-5",
+        // Each card carries its own soft colour, a wash that holds across
+        // half the card and fades to white, matched to its avatar.
+        "group relative isolate rounded-md bg-gradient-to-br to-neutral-000 p-4 shadow-e1 ring-1 sm:p-5",
+        tone.card,
         // The lift is a transform and the deeper shadow a pre-painted layer
         // that only fades in: nothing on hover repaints (PRODUCT.md).
         "transition-transform duration-200 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0",
@@ -300,8 +310,8 @@ function Row({ entry }: { entry: ParsedEntry }) {
         <span
           aria-hidden="true"
           className={cn(
-            "grid h-11 w-11 shrink-0 place-items-center rounded-full font-sans text-[14px] font-extrabold ring-2",
-            avatarTone(name)
+            "grid h-11 w-11 shrink-0 place-items-center rounded-full font-sans text-[14px] font-extrabold text-primary-800 shadow-e1 ring-2 ring-neutral-000",
+            tone.avatar
           )}
         >
           {initialsOf(name)}
@@ -368,7 +378,7 @@ function Row({ entry }: { entry: ParsedEntry }) {
 
           <ul className="mt-3 flex flex-wrap gap-1.5">
             {careChip && (
-              <li className="inline-flex items-center gap-1 rounded-full bg-accent-050 px-2.5 py-1 t-caption font-bold text-primary-800 ring-1 ring-accent-100">
+              <li className="inline-flex items-center gap-1 rounded-full bg-neutral-000 px-2.5 py-1 t-caption font-bold text-primary-800 ring-1 ring-accent-200">
                 <HandHeart className="h-3 w-3 shrink-0 text-accent-700" aria-hidden="true" />
                 {careChip}
               </li>
@@ -376,7 +386,7 @@ function Row({ entry }: { entry: ParsedEntry }) {
             {plainChips.slice(0, careChip ? 2 : 3).map((tag) => (
               <li
                 key={tag}
-                className="rounded-full bg-primary-050 px-2.5 py-1 t-caption text-primary-700"
+                className="rounded-full bg-neutral-000/85 px-2.5 py-1 t-caption text-primary-700 ring-1 ring-primary-900/[0.07]"
               >
                 {tag}
               </li>
@@ -386,7 +396,7 @@ function Row({ entry }: { entry: ParsedEntry }) {
       </div>
 
       {/* Price left, action right, on a soft footer that spans the card. */}
-      <div className="-mx-4 -mb-4 mt-4 flex items-center justify-between gap-3 rounded-b-md border-t border-primary-900/[0.06] bg-neutral-050 px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
+      <div className="-mx-4 -mb-4 mt-4 flex items-center justify-between gap-3 rounded-b-md border-t border-primary-900/[0.06] bg-neutral-000/75 px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
         <span className="t-caption text-text-secondary">
           {amount === undefined ? (
             "Amount agreed with us"
@@ -447,16 +457,19 @@ function BoardColumn({
   return (
     <section
       aria-label={title}
-      // Each side is a tinted panel its cards sit on — warm for families,
-      // cool navy for travellers — so the two halves of the board read as
-      // two places at a glance, without a coloured rule doing the work.
+      // A white panel so the colour belongs to the cards; the side is told
+      // by the header band (warm for families, cool navy for travellers).
       className={cn(
-        "min-w-0 rounded-lg p-2.5 ring-1 sm:p-3",
-        warm ? "bg-accent-050 ring-accent-100" : "bg-primary-050 ring-primary-100",
+        "min-w-0 rounded-lg bg-neutral-000 p-2.5 shadow-e1 ring-1 ring-primary-900/[0.06] sm:p-3",
         className
       )}
     >
-      <header className="flex items-center justify-between gap-3 px-1.5 pb-3.5 pt-1.5">
+      <header
+        className={cn(
+          "mb-2.5 flex items-center justify-between gap-3 rounded-md px-3 py-3",
+          warm ? "bg-accent-050" : "bg-primary-050"
+        )}
+      >
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={cn(
@@ -484,7 +497,7 @@ function BoardColumn({
         <ul className="space-y-2.5">
           {rows.map((entry, i) => (
             <li key={entry.reference ?? `row-${i}`}>
-              <Row entry={entry} />
+              <Row entry={entry} tone={boardTone(i, warm ? 0 : 2)} />
             </li>
           ))}
         </ul>
@@ -846,6 +859,7 @@ export default function AssistFamilyApp({
           label="When"
           icon={CalendarDays}
           ariaLabel="When"
+          emptyValue="any"
           value={when}
           onChange={(v) => setWhen(v as When)}
           options={whenOptions}
@@ -1238,19 +1252,23 @@ export default function AssistFamilyApp({
                     <div
                       key={col}
                       className={cn(
-                        "rounded-lg p-3 ring-1",
-                        col === "requester" ? "bg-accent-050 ring-accent-100" : "bg-primary-050 ring-primary-100",
+                        "rounded-lg bg-neutral-000 p-3 shadow-e1 ring-1 ring-primary-900/[0.06]",
                         !lockSide && col !== mobileSide && "hidden lg:block"
                       )}
                       aria-hidden="true"
                     >
-                      <div className="flex items-center gap-3 px-1.5 pb-3.5 pt-1.5">
+                      <div
+                        className={cn(
+                          "mb-2.5 flex items-center gap-3 rounded-md px-3 py-3",
+                          col === "requester" ? "bg-accent-050" : "bg-primary-050"
+                        )}
+                      >
                         <div className="h-10 w-10 rounded-full bg-neutral-000/80" />
                         <div className="h-4 w-40 rounded-full bg-neutral-000/80" />
                       </div>
                       <div className="space-y-2.5">
                         {[0, 1, 2].map((i) => (
-                          <div key={i} className="flex animate-pulse gap-3.5 rounded-md bg-neutral-000 p-5 shadow-e1">
+                          <div key={i} className="flex animate-pulse gap-3.5 rounded-md bg-neutral-050 p-5 ring-1 ring-primary-900/[0.05]">
                             <div className="h-11 w-11 shrink-0 rounded-full bg-neutral-100" />
                             <div className="flex-1 space-y-2.5">
                               <div className="h-3.5 w-32 rounded-full bg-neutral-100" />

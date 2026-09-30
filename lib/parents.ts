@@ -228,37 +228,37 @@ export function destinationImage(...locations: (string | undefined)[]): string {
  * Avatars are drawn, never photographed. The feed is anonymised down to a
  * first name and a last initial, so there is no real face to show and a
  * stock portrait would imply we had one — these are initials on a tinted
- * disc, picked deterministically from the name so the same poster always
- * gets the same colour on every surface.
+ * disc.
  *
- * All six pairs are brand ramps (Primary / Accent / Sand / semantic
- * surfaces). Every pair is measured against its own surface and clears the
- * 4.5:1 floor — the ratio is noted beside each. The two warm tones used to
- * set Accent 700 on Accent 100 / Warning Surface, which measured 3.89:1 and
- * 4.24:1 at the 14px the initials render at; the discs keep their colour and
- * the letters went to Primary 800.
+ * Each tone is a pair (client feedback, 2026-09-30: every card should carry
+ * its own soft colour, not sit white on a tinted column):
+ *
+ *   card    a wash of one brand surface fading to white, behind the card
+ *   avatar  a step deeper of the same hue, so the disc still reads as a
+ *           disc on its own card; a white ring separates the two
+ *
+ * All six hues are brand ramps (Primary / Accent / Sand / semantic
+ * surfaces). Initials are Primary 800 on every disc (10:1 or better), and
+ * the card's secondary text still clears 4.5:1 on the strongest end of each
+ * wash (4.52:1 on Info Surface is the lowest).
  */
-const AVATAR_TONES = [
-  "bg-primary-050 text-primary-700 ring-primary-100", // 12.5:1
-  "bg-accent-100 text-primary-800 ring-accent-200", //   14.0:1
-  "bg-success-surface text-success ring-success/20", //  4.6:1
-  "bg-info-surface text-info ring-info/20", //           5.7:1
-  "bg-sand-500 text-primary-800 ring-sand-600", //      15.6:1
-  "bg-warning-surface text-primary-800 ring-warning/25", // 15.3:1
+const TONES = [
+  { card: "from-accent-050 via-accent-050/60 ring-accent-100", avatar: "bg-accent-100" },
+  { card: "from-info-surface via-info-surface/60 ring-info/15", avatar: "bg-info/15" },
+  { card: "from-success-surface via-success-surface/60 ring-success/15", avatar: "bg-success/15" },
+  { card: "from-warning-surface via-warning-surface/60 ring-warning/20", avatar: "bg-warning/25" },
+  { card: "from-sand-500 via-sand-500/60 ring-sand-600", avatar: "bg-sand-600" },
+  { card: "from-primary-050 via-primary-050/60 ring-primary-100", avatar: "bg-primary-100" },
 ] as const;
 
-/** Stable, non-cryptographic hash — only ever used to choose a colour. */
-function hashString(value: string): number {
-  let h = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    h = (h << 5) - h + value.charCodeAt(i);
-    h |= 0;
-  }
-  return Math.abs(h);
-}
-
-export function avatarTone(seed: string | undefined): string {
-  return AVATAR_TONES[hashString(seed ?? "anon") % AVATAR_TONES.length];
+/**
+ * The tone for the card at `index` in a list. Tones cycle by position
+ * rather than by a hash of the name — hashing clustered, and five cards in
+ * a row came out the same grey-blue. `offset` shifts the cycle for the
+ * second column so the two cards side by side never match either.
+ */
+export function boardTone(index: number, offset = 0) {
+  return TONES[(index + offset) % TONES.length];
 }
 
 /** "Priya S." → "PS"; a single word → its first two letters; nothing → "··". */
