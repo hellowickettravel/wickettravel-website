@@ -21,11 +21,36 @@ import {
   MAX_PAYLOAD_BYTES,
   rateLimited,
 } from "@/lib/relay";
+import { PORTAL_ORIGIN } from "@/lib/links";
 
-const PORTAL_ENDPOINT =
-  "https://wicket-travel-portal.vercel.app/api/parent-ticket";
+const PORTAL_ENDPOINT = `${PORTAL_ORIGIN}/api/parent-ticket`;
 
 type Clean = Record<string, string | number | boolean>;
+
+/**
+ * The form and this relay's validation speak the website's field names; the
+ * portal stores three of them under different names and silently ignores
+ * keys it doesn't know. So they are renamed on the way out, and any field
+ * errors the portal sends back are renamed on the way in, so a 422 still
+ * lands on the right input.
+ */
+const TO_PORTAL: Record<string, string> = {
+  languages_spoken: "languages",
+  parents_capacity: "parents_can_help",
+  assistance_fee: "fee_amount",
+};
+const FROM_PORTAL: Record<string, string> = Object.fromEntries(
+  Object.entries(TO_PORTAL).map(([site, portal]) => [portal, site])
+);
+
+function renameKeys<T>(
+  value: Record<string, T>,
+  map: Record<string, string>
+): Record<string, T> {
+  return Object.fromEntries(
+    Object.entries(value).map(([k, v]) => [map[k] ?? k, v])
+  );
+}
 type BuildResult =
   | { ok: true; value: Clean }
   | { ok: false; fields: Record<string, string> };
@@ -91,7 +116,8 @@ function build(input: Record<string, unknown>): BuildResult {
   if (enquiry === "traveller") {
     const a = cleanString(input.assistance_offered, 4000);
     if (a) out.assistance_offered = a;
-    num("parents_capacity", 1, 99, "Enter how many parents you can help.");
+    // The portal caps parents_can_help at 20.
+    num("parents_capacity", 1, 20, "Enter how many people you could accompany (1–20).");
     num("assistance_fee", 0, 100, "Enter an amount between 0 and 100.");
   } else if (enquiry === "requester") {
     const pn = cleanString(input.parent_name, 120);
@@ -162,10 +188,26 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
         ...forwardedIpHeaders(request),
       },
-      body: JSON.stringify(result.value),
+      body: JSON.stringify(renameKeys(result.value, TO_PORTAL)),
       signal: AbortSignal.timeout(55_000),
     });
     const text = await upstream.text();
+
+    if (upstream.status === 422) {
+      try {
+        const body = JSON.parse(text) as Record<string, unknown>;
+        if (body.fields && typeof body.fields === "object") {
+          body.fields = renameKeys(
+            body.fields as Record<string, unknown>,
+            FROM_PORTAL
+          );
+        }
+        return json(body, 422);
+      } catch {
+        // Not JSON: pass it through untouched below.
+      }
+    }
+
     return new Response(text, {
       status: upstream.status,
       headers: {

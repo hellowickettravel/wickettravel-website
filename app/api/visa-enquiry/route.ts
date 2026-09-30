@@ -24,9 +24,9 @@ import {
   MAX_PAYLOAD_BYTES,
   rateLimited,
 } from "@/lib/relay";
+import { PORTAL_ORIGIN } from "@/lib/links";
 
-const PORTAL_ENDPOINT =
-  "https://wicket-travel-portal.vercel.app/api/visa-enquiry";
+const PORTAL_ENDPOINT = `${PORTAL_ORIGIN}/api/visa-enquiry`;
 
 const ALLOWED_MIME = new Set([
   "application/pdf",

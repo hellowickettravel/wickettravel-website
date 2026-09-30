@@ -27,3 +27,17 @@ export const PORTAL_BOOKING_URL =
 
 /** WhatsApp deep link — +44 7417 564704 (opens in a new tab). */
 export const WHATSAPP_URL = "https://wa.me/447417564704";
+
+/**
+ * Where the three server-side relays (/api/parent-ticket,
+ * /api/parent-ticket/public, /api/visa-enquiry) forward to. The portal's
+ * apex domain; `www.` only redirects to it.
+ *
+ * Never a Vercel deployment URL: the old value, wicket-travel-portal.vercel.app,
+ * stopped resolving and silently took down every Assist Family post, every
+ * visa lead and the whole public board. Override server-side with the
+ * `PORTAL_ORIGIN` env var (locally, http://localhost:3200).
+ */
+export const PORTAL_ORIGIN = (
+  process.env.PORTAL_ORIGIN || "https://portal.wickettravel.com"
+).replace(/\/+$/, "");
