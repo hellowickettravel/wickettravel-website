@@ -220,7 +220,7 @@ const REVIEWS = [
     rating: "5.0",
     quote:
       "Booked flights with Wicket and they sorted the hotel through their holidays side in the same phone call. One team, one set of dates, nothing lost between the two.",
-    name: "Ayesha R.",
+    name: "Hannah R.",
     city: "Hounslow",
     trip: "Dubai, 6 nights",
   },
@@ -236,7 +236,7 @@ const REVIEWS = [
     rating: "4.0",
     quote:
       "Resort was exactly as described and the upgrade came through at check-in. Took a couple of emails to confirm the airport transfer, but someone answered every time.",
-    name: "Priya S.",
+    name: "Sarah S.",
     city: "Birmingham",
     trip: "Krabi, 10 nights",
   },
