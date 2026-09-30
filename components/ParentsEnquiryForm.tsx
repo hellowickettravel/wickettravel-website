@@ -525,7 +525,7 @@ export default function ParentsEnquiryForm() {
             aria-describedby={
               errors.full_name ? `${id("full_name")}-error` : undefined
             }
-            placeholder="Aisha Khan"
+            placeholder="Emily Clarke"
           />
           {errors.full_name && (
             <Err id={`${id("full_name")}-error`} message={errors.full_name} />
@@ -830,7 +830,7 @@ export default function ParentsEnquiryForm() {
                 value={data.parent_name}
                 onChange={(e) => set("parent_name", e.target.value)}
                 maxLength={120}
-                placeholder="Fatima"
+                placeholder="Margaret"
               />
               <p className={hintClass}>
                 Not shown on the board — for our team only.

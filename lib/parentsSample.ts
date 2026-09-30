@@ -66,7 +66,7 @@ type Seed = {
 const REQUESTERS: Seed[] = [
   {
     ref: "WTDC-1429",
-    name: "Priya S.",
+    name: "Emily C.",
     from: "London Heathrow (LHR)",
     to: "Hyderabad (HYD)",
     inDays: 0,
@@ -81,7 +81,7 @@ const REQUESTERS: Seed[] = [
   },
   {
     ref: "WTDC-2817",
-    name: "Imran K.",
+    name: "James W.",
     from: "Manchester (MAN)",
     to: "Dubai (DXB)",
     inDays: 2,
@@ -96,7 +96,7 @@ const REQUESTERS: Seed[] = [
   },
   {
     ref: "WTDC-3604",
-    name: "Aisha R.",
+    name: "Olivia B.",
     from: "London Gatwick (LGW)",
     to: "Delhi (DEL)",
     inDays: 5,
@@ -111,7 +111,7 @@ const REQUESTERS: Seed[] = [
   },
   {
     ref: "WTDC-1952",
-    name: "Daniel O.",
+    name: "Thomas R.",
     from: "Birmingham (BHX)",
     to: "Mumbai (BOM)",
     inDays: 9,
@@ -126,7 +126,7 @@ const REQUESTERS: Seed[] = [
   },
   {
     ref: "WTDC-4376",
-    name: "Sana M.",
+    name: "Sophie M.",
     from: "London Heathrow (LHR)",
     to: "Bangalore (BLR)",
     inDays: 12,
@@ -141,7 +141,7 @@ const REQUESTERS: Seed[] = [
   },
   {
     ref: "WTDC-2261",
-    name: "Yusuf A.",
+    name: "William T.",
     from: "Edinburgh (EDI)",
     to: "Abu Dhabi (AUH)",
     inDays: 16,
@@ -156,7 +156,7 @@ const REQUESTERS: Seed[] = [
   },
   {
     ref: "WTDC-3138",
-    name: "Meera P.",
+    name: "Charlotte P.",
     from: "London Luton (LTN)",
     to: "Kochi (COK)",
     inDays: 21,
@@ -171,7 +171,7 @@ const REQUESTERS: Seed[] = [
   },
   {
     ref: "WTDC-1785",
-    name: "Harjit S.",
+    name: "Robert S.",
     from: "Manchester (MAN)",
     to: "Delhi (DEL)",
     inDays: 28,
@@ -189,7 +189,7 @@ const REQUESTERS: Seed[] = [
 const TRAVELLERS: Seed[] = [
   {
     ref: "WTDC-4520",
-    name: "Nadia H.",
+    name: "Jack H.",
     from: "London Heathrow (LHR)",
     to: "Dubai (DXB)",
     inDays: 0,
@@ -202,7 +202,7 @@ const TRAVELLERS: Seed[] = [
   },
   {
     ref: "WTDC-2694",
-    name: "Rahul V.",
+    name: "Oliver V.",
     from: "London Heathrow (LHR)",
     to: "Hyderabad (HYD)",
     inDays: 1,
@@ -215,7 +215,7 @@ const TRAVELLERS: Seed[] = [
   },
   {
     ref: "WTDC-1307",
-    name: "Fatima B.",
+    name: "Grace B.",
     from: "Manchester (MAN)",
     to: "Islamabad (ISB)",
     inDays: 4,
@@ -228,7 +228,7 @@ const TRAVELLERS: Seed[] = [
   },
   {
     ref: "WTDC-3871",
-    name: "James T.",
+    name: "Harry T.",
     from: "London Gatwick (LGW)",
     to: "Delhi (DEL)",
     inDays: 6,
@@ -241,7 +241,7 @@ const TRAVELLERS: Seed[] = [
   },
   {
     ref: "WTDC-2048",
-    name: "Anjali D.",
+    name: "Lucy D.",
     from: "Birmingham (BHX)",
     to: "Mumbai (BOM)",
     inDays: 10,
@@ -254,7 +254,7 @@ const TRAVELLERS: Seed[] = [
   },
   {
     ref: "WTDC-4613",
-    name: "Omar S.",
+    name: "Henry S.",
     from: "London Heathrow (LHR)",
     to: "Abu Dhabi (AUH)",
     inDays: 14,
@@ -267,7 +267,7 @@ const TRAVELLERS: Seed[] = [
   },
   {
     ref: "WTDC-1596",
-    name: "Grace N.",
+    name: "Amelia N.",
     from: "Edinburgh (EDI)",
     to: "London Heathrow (LHR)",
     inDays: 18,
@@ -280,7 +280,7 @@ const TRAVELLERS: Seed[] = [
   },
   {
     ref: "WTDC-3325",
-    name: "Bilal Q.",
+    name: "George M.",
     from: "Manchester (MAN)",
     to: "Lahore (LHE)",
     inDays: 25,

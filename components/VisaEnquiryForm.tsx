@@ -197,7 +197,7 @@ export default function VisaEnquiryForm({
               errors.first_name ? `${idPrefix}-first-error` : undefined
             }
             className={field}
-            placeholder="Aisha"
+            placeholder="Emily"
           />
           {errors.first_name && (
             <p
@@ -222,7 +222,7 @@ export default function VisaEnquiryForm({
               errors.last_name ? `${idPrefix}-last-error` : undefined
             }
             className={field}
-            placeholder="Khan"
+            placeholder="Clarke"
           />
           {errors.last_name && (
             <p
