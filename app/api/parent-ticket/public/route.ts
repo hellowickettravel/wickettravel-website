@@ -14,9 +14,9 @@
  */
 
 import { forwardedIpHeaders, json } from "@/lib/relay";
+import { PORTAL_ORIGIN } from "@/lib/links";
 
-const PORTAL_PUBLIC_ENDPOINT =
-  "https://wicket-travel-portal.vercel.app/api/parent-ticket/public";
+const PORTAL_PUBLIC_ENDPOINT = `${PORTAL_ORIGIN}/api/parent-ticket/public`;
 
 // Short shared cache so a burst of visitors doesn't hammer the upstream, while
 // keeping the feed feeling live. Kept low (30s) so newly-approved entries show
