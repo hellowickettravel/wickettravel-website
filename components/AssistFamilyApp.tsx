@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
+import Select, { type SelectOption } from "@/components/Select";
+import { AIRPORTS } from "@/lib/airports";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  ArrowDownUp,
   ArrowRight,
   ArrowRightLeft,
   CalendarDays,
   Check,
-  ChevronDown,
   ChevronRight,
   Clock3,
   HandHeart,
@@ -24,6 +26,7 @@ import {
   Search,
   SlidersHorizontal,
   Users,
+  Wallet,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -40,6 +43,7 @@ import {
   searchHaystack,
   splitPlace,
 } from "@/lib/parents";
+import { MOBILITY_NEEDS } from "@/lib/parents";
 import { useParentBoard } from "@/lib/useParentBoard";
 
 /**
@@ -60,13 +64,16 @@ import { useParentBoard } from "@/lib/useParentBoard";
  * argument for posting. Below `lg` there is no room for two, so a segmented
  * control picks one; that is a responsive adaptation, not a different design.
  *
- * EVERY FILTER IS BUILT FROM THE DATA. Airports, airlines, languages and
- * support needs are collected from the entries actually on the board, so a
- * filter can never offer an option with nothing behind it — and there is no
- * filter for anything the feed does not carry. In particular there is no
+ * FILTERS ARE FIXED LISTS, WITH COUNTS. They used to be built only from
+ * the entries on the board, which made the rail shrink to two or three
+ * options whenever the board was quiet (client feedback, 2026-09-30). Now
+ * each filter offers a fixed list of the routes, airlines, languages and
+ * support needs this service actually sees, plus anything new a post
+ * brings in, and every option shows how many listings it would match.
+ * Options with none are dimmed but still selectable: choosing one lands on
+ * the empty state, which asks the visitor to post. There is still no
  * "verified only" toggle and no response-time badge: we issue no
- * verification and measure no response time, so neither may appear as if we
- * did.
+ * verification and measure no response time.
  *
  * AVATARS ARE INITIALS, NEVER PHOTOGRAPHS. The feed is anonymised down to a
  * first name and a last initial, so there is no real face to show.
@@ -113,8 +120,94 @@ function shortLanguages(value: string): string {
   return parts.length === 1 ? parts[0] : `${parts[0]} +${parts.length - 1}`;
 }
 
-const selectClass =
-  "h-11 w-full cursor-pointer rounded-md border border-primary-100/80 bg-primary-050/50 px-3 font-sans text-[14px] font-bold leading-[20px] text-primary-800 transition-colors hover:border-primary-300 focus-visible:border-primary-700 focus-visible:bg-neutral-000 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700/15";
+type Sort = "soonest" | "newest";
+
+const SORT_OPTIONS: SelectOption[] = [
+  { value: "soonest", label: "Soonest departure" },
+  { value: "newest", label: "Newest posts" },
+];
+
+/* The fixed lists behind the filters. Anything a real post brings in that
+   isn't here is added to its list at runtime, so nothing is ever unfindable. */
+const COMMON_FROM = ["LHR", "LGW", "MAN", "BHX", "STN", "EDI", "GLA", "LTN"];
+const COMMON_TO = ["DXB", "DEL", "BOM", "HYD", "BLR", "ISB", "LHE", "KHI", "AUH", "DOH", "COK", "AMD", "ATQ", "DAC", "CMB", "JED"];
+const COMMON_AIRLINES = [
+  "Air India",
+  "British Airways",
+  "Emirates",
+  "Etihad Airways",
+  "Gulf Air",
+  "Kuwait Airways",
+  "Oman Air",
+  "Pakistan International Airlines",
+  "Qatar Airways",
+  "Saudia",
+  "SriLankan Airlines",
+  "Turkish Airlines",
+  "Virgin Atlantic",
+];
+const COMMON_LANGUAGES = [
+  "Arabic",
+  "Bengali",
+  "English",
+  "Gujarati",
+  "Hindi",
+  "Kannada",
+  "Malayalam",
+  "Marathi",
+  "Pashto",
+  "Punjabi",
+  "Sinhala",
+  "Tamil",
+  "Telugu",
+  "Urdu",
+];
+
+/** Names for codes the directory doesn't carry, as posters usually write them. */
+const EXTRA_PLACE_NAMES: Record<string, string> = {
+  LTN: "London Luton",
+  GLA: "Glasgow",
+  ISB: "Islamabad",
+  LHE: "Lahore",
+  KHI: "Karachi",
+  COK: "Kochi",
+  AMD: "Ahmedabad",
+  ATQ: "Amritsar",
+  DAC: "Dhaka",
+  CMB: "Colombo",
+  JED: "Jeddah",
+  HYD: "Hyderabad",
+  BLR: "Bengaluru",
+};
+
+/** "LHR" → "LHR · London Heathrow"; a free-text place stays as it is. */
+function placeLabel(key: string, seen: Map<string, string>): string {
+  if (!/^[A-Z]{3}$/.test(key)) return key;
+  const fromFeed = seen.get(key);
+  if (fromFeed) return `${key} · ${fromFeed}`;
+  const a = AIRPORTS.find((x) => x.code === key);
+  if (a) {
+    const name = a.name && a.name !== a.city ? `${a.city} ${a.name}` : a.city;
+    return `${key} · ${name}`;
+  }
+  return EXTRA_PLACE_NAMES[key] ? `${key} · ${EXTRA_PLACE_NAMES[key]}` : key;
+}
+
+/** Union of a fixed list and whatever the feed brought in, sorted. */
+function withFeed(fixed: string[], feed: Iterable<string>, sort = true): string[] {
+  const all = new Set(fixed);
+  for (const v of feed) all.add(v);
+  const out = [...all];
+  return sort ? out.sort((a, b) => a.localeCompare(b)) : out;
+}
+
+/** Normalise a language as posters write it ("basic Hindi" → "Hindi"). */
+function cleanLanguage(part: string): string {
+  return part
+    .trim()
+    .replace(/^(basic|some|fluent|conversational|a little)\s+/i, "")
+    .replace(/^./, (c) => c.toUpperCase());
+}
 
 /* ── Row ───────────────────────────────────────────────────────────────── */
 
@@ -402,54 +495,77 @@ function BoardColumn({
 
 /* ── Filter rail ───────────────────────────────────────────────────────── */
 
-function CheckGroup({
+type ChipOption = { value: string; label: string; count?: number };
+
+/**
+ * A group of filter chips. Each chip is a real checkbox (or radio, for a
+ * single choice), visually hidden, so keyboard and screen reader get native
+ * semantics; the label is what you see and tap. A count, where given, says
+ * how many listings the option would match, and an option with none is
+ * dimmed rather than removed.
+ */
+function ChipGroup({
   title,
   icon: Icon,
   options,
   selected,
   onToggle,
-  format,
+  single,
+  className,
 }: {
   title: string;
   icon: typeof Users;
-  options: string[];
+  options: ChipOption[];
   selected: string[];
   onToggle: (value: string) => void;
-  format?: (value: string) => string;
+  /** Radio behaviour: exactly one option is always on. */
+  single?: boolean;
+  className?: string;
 }) {
+  const name = useId();
   if (options.length === 0) return null;
   return (
-    <fieldset>
+    <fieldset className={className}>
       <legend className="flex items-center gap-1.5 t-label-2 text-primary-800">
         <Icon className="h-3.5 w-3.5 shrink-0 text-accent-500" aria-hidden="true" />
         {title}
       </legend>
-      {/* Chips, not a checkbox column: the options are short and the
-          visitor is tapping, often on a phone. Each is still a real
-          checkbox, visually hidden, so keyboard and screen reader get
-          native semantics. */}
       <ul className="mt-3 flex flex-wrap gap-1.5">
         {options.map((option) => {
-          const on = selected.includes(option);
+          const on = selected.includes(option.value);
+          const empty = option.count === 0 && !on;
           return (
-            <li key={option}>
+            <li key={option.value}>
               <label
                 className={cn(
-                  "inline-flex min-h-[32px] cursor-pointer select-none items-center gap-1 rounded-full px-3 py-1.5 t-caption transition-colors duration-150",
+                  "inline-flex min-h-[34px] cursor-pointer select-none items-center gap-1.5 rounded-full px-3 py-1.5 t-caption transition-colors duration-150",
                   "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary-700 has-[:focus-visible]:ring-offset-1",
                   on
-                    ? "bg-primary-800 font-bold text-neutral-000"
-                    : "bg-neutral-050 text-text-secondary ring-1 ring-neutral-200 hover:bg-primary-050 hover:text-primary-800 hover:ring-primary-100"
+                    ? "border border-primary-800 bg-primary-800 font-bold text-neutral-000 shadow-e1"
+                    : empty
+                      ? "border border-dashed border-neutral-300 bg-neutral-000 text-text-secondary hover:border-primary-200"
+                      : "border border-neutral-200 bg-neutral-050 text-primary-800 hover:border-primary-100 hover:bg-primary-050"
                 )}
               >
                 <input
-                  type="checkbox"
+                  type={single ? "radio" : "checkbox"}
+                  name={single ? name : undefined}
                   checked={on}
-                  onChange={() => onToggle(option)}
+                  onChange={() => onToggle(option.value)}
                   className="sr-only"
                 />
-                {on && <Check className="h-3 w-3 shrink-0" aria-hidden="true" />}
-                {format ? format(option) : option}
+                {on && !single && <Check className="h-3 w-3 shrink-0" aria-hidden="true" />}
+                {option.label}
+                {option.count !== undefined && (
+                  <span
+                    className={cn(
+                      "rounded-full px-1.5 text-[11px] font-bold leading-[16px]",
+                      on ? "bg-neutral-000/15 text-neutral-000" : "bg-neutral-000 text-text-secondary ring-1 ring-neutral-200"
+                    )}
+                  >
+                    {option.count}
+                  </span>
+                )}
               </label>
             </li>
           );
@@ -484,6 +600,11 @@ export default function AssistFamilyApp({
   const [airline, setAirline] = useState("");
   const [langs, setLangs] = useState<string[]>([]);
   const [supports, setSupports] = useState<string[]>([]);
+  /** Which sides of the board are shown (the rail's "Show" group, lg up). */
+  const [sides, setSides] = useState<Side[]>(["requester", "traveller"]);
+  const [freeOnly, setFreeOnly] = useState(false);
+  const [multi, setMulti] = useState(false);
+  const [sort, setSort] = useState<Sort>("soonest");
   const [filtersOpen, setFiltersOpen] = useState(false);
   /** Which column a narrow screen is showing; ignored from lg up. */
   const [mobileSide, setMobileSide] = useState<Side>(lockSide ?? "requester");
@@ -491,37 +612,85 @@ export default function AssistFamilyApp({
   const toggle = (list: string[], set: (v: string[]) => void) => (value: string) =>
     set(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
 
+  /* ── Option lists: fixed lists ∪ what the feed carries, with counts ── */
   const options = useMemo(() => {
-    const f = new Set<string>();
-    const t = new Set<string>();
-    const al = new Set<string>();
-    const lg = new Set<string>();
-    const sp = new Set<string>();
+    const names = new Map<string, string>();
+    const f: string[] = [];
+    const t: string[] = [];
+    const al: string[] = [];
+    const lg: string[] = [];
+    const sp: string[] = [];
+    const count = new Map<string, number>();
+    const bump = (k: string) => count.set(k, (count.get(k) ?? 0) + 1);
+
     for (const e of entries) {
+      for (const raw of [e.from, e.to]) {
+        const { code, name } = splitPlace(raw);
+        if (code && name && !names.has(code)) names.set(code, name);
+      }
       const fk = placeKey(e.from);
       const tk = placeKey(e.to);
-      if (fk) f.add(fk);
-      if (tk) t.add(tk);
-      if (e.airline) al.add(e.airline);
-      for (const part of (e.languages ?? "").split(/[,/]/)) {
-        // Posters qualify languages freely ("basic Hindi"). The qualifier is
-        // theirs and stays on the card, but as a filter it would sit as a
-        // second, lowercase entry beside the real one.
-        const v = part
-          .trim()
-          .replace(/^(basic|some|fluent|conversational|a little)\s+/i, "")
-          .replace(/^./, (c) => c.toUpperCase());
-        if (v) lg.add(v);
+      if (fk) {
+        f.push(fk);
+        bump(`from:${fk}`);
       }
-      if (e.mobility && e.type !== "traveller") sp.add(e.mobility);
+      if (tk) {
+        t.push(tk);
+        bump(`to:${tk}`);
+      }
+      if (e.airline) {
+        al.push(e.airline);
+        bump(`air:${e.airline}`);
+      }
+      const spoken = new Set(
+        (e.languages ?? "").split(/[,/]/).map(cleanLanguage).filter(Boolean)
+      );
+      for (const l of spoken) {
+        lg.push(l);
+        bump(`lang:${l}`);
+      }
+      if (e.mobility && e.type !== "traveller") {
+        sp.push(e.mobility);
+        bump(`sup:${e.mobility}`);
+      }
     }
-    const sorted = (s: Set<string>) => [...s].sort((x, y) => x.localeCompare(y));
+
+    const n = (k: string) => count.get(k) ?? 0;
+    const listing = (c: number) => `${c} ${c === 1 ? "listing" : "listings"}`;
+    const place = (kind: "from" | "to", list: string[]): SelectOption[] =>
+      list.map((k) => {
+        const c = n(`${kind}:${k}`);
+        return { value: k, label: placeLabel(k, names), hint: listing(c), muted: c === 0 };
+      });
+
+    // Places keep the fixed order (busiest UK airports and routes first),
+    // with anything new from the feed after them.
+    const fromKeys = withFeed(COMMON_FROM, f.filter((k) => !COMMON_FROM.includes(k)).sort(), false);
+    const toKeys = withFeed(COMMON_TO, t.filter((k) => !COMMON_TO.includes(k)).sort(), false);
+
     return {
-      from: sorted(f),
-      to: sorted(t),
-      airlines: sorted(al),
-      languages: sorted(lg),
-      supports: sorted(sp),
+      from: place("from", fromKeys),
+      to: place("to", toKeys),
+      airlines: withFeed(COMMON_AIRLINES, al).map((a) => {
+        const c = n(`air:${a}`);
+        return { value: a, label: a, hint: listing(c), muted: c === 0 };
+      }),
+      languages: withFeed(COMMON_LANGUAGES, lg).map((l) => ({
+        value: l,
+        label: l,
+        count: n(`lang:${l}`),
+      })),
+      supports: withFeed([...MOBILITY_NEEDS], sp, false).map((v) => ({
+        value: v,
+        label: shortSupport(v),
+        count: n(`sup:${v}`),
+      })),
+      sideCount: {
+        requester: entries.filter((e) => e.type !== "traveller").length,
+        traveller: entries.filter((e) => e.type === "traveller").length,
+      },
+      freeCount: entries.filter((e) => e.amount === 0).length,
+      multiCount: entries.filter((e) => e.type === "traveller" && (e.capacity ?? 0) >= 2).length,
     };
   }, [entries]);
 
@@ -539,11 +708,13 @@ export default function AssistFamilyApp({
         const have = (e.languages ?? "").toLowerCase();
         if (!langs.some((l) => have.includes(l.toLowerCase()))) return false;
       }
-      // A support need only describes a family's post, so it narrows that
-      // column and leaves the travellers' one alone.
+      // A support need only describes a family's post, and a headcount only
+      // a traveller's, so each narrows its own column and leaves the other.
       if (supports.length > 0 && e.type !== "traveller") {
         if (!e.mobility || !supports.includes(e.mobility)) return false;
       }
+      if (multi && e.type === "traveller" && (e.capacity ?? 0) < 2) return false;
+      if (freeOnly && e.amount !== 0) return false;
       if (when !== "any") {
         const d = daysUntil(e.dateISO);
         if (d === undefined || d < 0) return false;
@@ -553,23 +724,27 @@ export default function AssistFamilyApp({
       }
       return true;
     };
-  }, [query, from, to, airline, langs, supports, when]);
+  }, [query, from, to, airline, langs, supports, multi, freeOnly, when]);
 
-  const soonest = (x: ParsedEntry, y: ParsedEntry) => {
-    const v = (e: ParsedEntry) => {
-      const d = e.dateISO ? new Date(e.dateISO).getTime() : NaN;
-      return Number.isFinite(d) ? d : Number.POSITIVE_INFINITY;
+  const order = useMemo(() => {
+    const time = (v: string | undefined, missing: number) => {
+      const d = v ? new Date(v).getTime() : NaN;
+      return Number.isFinite(d) ? d : missing;
     };
-    return v(x) - v(y);
-  };
+    return sort === "newest"
+      ? (x: ParsedEntry, y: ParsedEntry) =>
+          time(y.postedISO, -Infinity) - time(x.postedISO, -Infinity)
+      : (x: ParsedEntry, y: ParsedEntry) =>
+          time(x.dateISO, Infinity) - time(y.dateISO, Infinity);
+  }, [sort]);
 
   const requesters = useMemo(
-    () => entries.filter((e) => e.type !== "traveller").filter(match).sort(soonest),
-    [entries, match]
+    () => entries.filter((e) => e.type !== "traveller").filter(match).sort(order),
+    [entries, match, order]
   );
   const travellers = useMemo(
-    () => entries.filter((e) => e.type === "traveller").filter(match).sort(soonest),
-    [entries, match]
+    () => entries.filter((e) => e.type === "traveller").filter(match).sort(order),
+    [entries, match, order]
   );
 
   const activeCount =
@@ -578,6 +753,9 @@ export default function AssistFamilyApp({
     (to ? 1 : 0) +
     (airline ? 1 : 0) +
     (when !== "any" ? 1 : 0) +
+    (sides.length < 2 ? 1 : 0) +
+    (freeOnly ? 1 : 0) +
+    (multi ? 1 : 0) +
     langs.length +
     supports.length;
 
@@ -589,6 +767,9 @@ export default function AssistFamilyApp({
     setWhen("any");
     setLangs([]);
     setSupports([]);
+    setSides(["requester", "traveller"]);
+    setFreeOnly(false);
+    setMulti(false);
   };
 
   const swap = () => {
@@ -596,80 +777,48 @@ export default function AssistFamilyApp({
     setTo(from);
   };
 
+  // At least one side always stays on: switching off the last one would
+  // leave an empty board that looks broken rather than filtered.
+  const toggleSide = (side: string) =>
+    setSides((cur) =>
+      cur.includes(side as Side)
+        ? cur.length > 1
+          ? cur.filter((v) => v !== side)
+          : cur
+        : [...cur, side as Side]
+    );
+
   const loading = state.status === "loading";
 
-  const placeSelect = (
-    value: string,
-    set: (v: string) => void,
-    list: string[],
-    anyLabel: string
-  ) => (
-    <select
-      value={value}
-      onChange={(e) => set(e.target.value)}
-      className={selectClass}
-      disabled={loading}
-    >
-      <option value="">{anyLabel}</option>
-      {list.map((o) => (
-        <option key={o} value={o}>
-          {o}
-        </option>
-      ))}
-    </select>
-  );
+  const anyFrom: SelectOption = { value: "", label: "Any airport" };
+  const anyTo: SelectOption = { value: "", label: "Anywhere" };
+  const anyAirline: SelectOption = { value: "", label: "Any airline" };
+  const whenOptions: SelectOption[] = WHEN_OPTIONS.map((o) => ({
+    value: o.key,
+    label: o.label,
+  }));
 
   const label = (text: string, Icon: typeof MapPin) => (
-    <span className="flex items-center gap-1.5 t-label-2 text-primary-800">
+    <span className="mb-1.5 flex items-center gap-1.5 t-label-2 text-primary-800">
       <Icon className="h-3.5 w-3.5 shrink-0 text-accent-500" aria-hidden="true" />
       {text}
     </span>
   );
 
   /* ── Search bar ──────────────────────────────────────────────────── */
-
-  /** One field of the search: the same tinted "well" the flight search on
-   *  the homepage uses (components/FlightSearch.tsx), with a native select
-   *  laid over it so it stays a real, accessible control. */
-  const well = (
-    text: string,
-    Icon: typeof MapPin,
-    control: React.ReactNode
-  ) => (
-    <label className="group relative flex min-h-[58px] w-full cursor-pointer items-center gap-3 rounded-md border border-primary-100/80 bg-primary-050/50 pl-4 pr-10 transition-colors duration-200 hover:border-primary-300 focus-within:border-primary-700 focus-within:bg-neutral-000 focus-within:ring-2 focus-within:ring-primary-700/15">
-      <Icon className="h-[18px] w-[18px] shrink-0 text-accent-500" aria-hidden="true" />
-      <span className="flex min-w-0 flex-1 flex-col py-2">
-        <span className="t-caption font-bold text-text-secondary">{text}</span>
-        {control}
-      </span>
-      <ChevronDown
-        className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary transition-transform duration-200 group-focus-within:rotate-180"
-        aria-hidden="true"
-      />
-    </label>
-  );
-
-  const wellSelect =
-    "w-full cursor-pointer appearance-none truncate bg-transparent pr-1 font-sans text-[16px] font-bold leading-[22px] text-primary-800 focus:outline-none disabled:cursor-wait";
-
   const searchBar = (
     <div className="rounded-lg bg-neutral-000 p-4 shadow-e3 ring-1 ring-primary-900/[0.06] sm:p-5">
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center">
-        {well(
-          "Flying from",
-          PlaneTakeoff,
-          <select
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            className={wellSelect}
-            disabled={loading}
-          >
-            <option value="">Any airport</option>
-            {options.from.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
-        )}
+        <Select
+          variant="well"
+          label="Flying from"
+          icon={PlaneTakeoff}
+          ariaLabel="Flying from"
+          value={from}
+          onChange={setFrom}
+          options={[anyFrom, ...options.from]}
+          menuMinWidth={300}
+        />
 
         <button
           type="button"
@@ -681,35 +830,26 @@ export default function AssistFamilyApp({
           <ArrowRightLeft className="h-4 w-4" aria-hidden="true" />
         </button>
 
-        {well(
-          "Flying to",
-          PlaneLanding,
-          <select
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            className={wellSelect}
-            disabled={loading}
-          >
-            <option value="">Anywhere</option>
-            {options.to.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
-        )}
+        <Select
+          variant="well"
+          label="Flying to"
+          icon={PlaneLanding}
+          ariaLabel="Flying to"
+          value={to}
+          onChange={setTo}
+          options={[anyTo, ...options.to]}
+          menuMinWidth={300}
+        />
 
-        {well(
-          "When",
-          CalendarDays,
-          <select
-            value={when}
-            onChange={(e) => setWhen(e.target.value as When)}
-            className={wellSelect}
-          >
-            {WHEN_OPTIONS.map((o) => (
-              <option key={o.key} value={o.key}>{o.label}</option>
-            ))}
-          </select>
-        )}
+        <Select
+          variant="well"
+          label="When"
+          icon={CalendarDays}
+          ariaLabel="When"
+          value={when}
+          onChange={(v) => setWhen(v as When)}
+          options={whenOptions}
+        />
 
         <a
           href="#results"
@@ -723,9 +863,6 @@ export default function AssistFamilyApp({
   );
 
   /* ── Filter rail ─────────────────────────────────────────────────── */
-  /* Route and date live in the search above the board. Repeating them here
-     put two sets of controls on one piece of state, so the rail only
-     carries them on the two list pages, which have no hero search. */
   const filters = (
     <div className="rounded-lg bg-neutral-000 p-5 shadow-e1 ring-1 ring-primary-900/[0.06]">
       <div className="flex items-center justify-between gap-2">
@@ -743,66 +880,108 @@ export default function AssistFamilyApp({
         </button>
       </div>
 
-      <div className="mt-5 space-y-4">
-        {!showHero && (
-          <>
-            <label className="block">
-              {label("Travel date", CalendarDays)}
-              <select
-                value={when}
-                onChange={(e) => setWhen(e.target.value as When)}
-                className={cn(selectClass, "mt-1.5")}
-              >
-                {WHEN_OPTIONS.map((o) => (
-                  <option key={o.key} value={o.key}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block">
-              {label("From", MapPin)}
-              <div className="mt-1.5">
-                {placeSelect(from, setFrom, options.from, "Any airport")}
-              </div>
-            </label>
-            <label className="block">
-              {label("To", MapPin)}
-              <div className="mt-1.5">
-                {placeSelect(to, setTo, options.to, "Anywhere")}
-              </div>
-            </label>
-          </>
+      <div className="mt-5 space-y-6">
+        {!lockSide && (
+          <ChipGroup
+            className="hidden lg:block"
+            title="Show"
+            icon={Users}
+            options={[
+              { value: "requester", label: "Families needing help", count: options.sideCount.requester },
+              { value: "traveller", label: "Travellers offering help", count: options.sideCount.traveller },
+            ]}
+            selected={sides}
+            onToggle={toggleSide}
+          />
         )}
-        <label className="block">
-          {label("Airline", Plane)}
-          <div className="mt-1.5">
-            {placeSelect(airline, setAirline, options.airlines, "Any airline")}
-          </div>
-        </label>
-      </div>
 
-      <div className="mt-6 space-y-6 border-t border-neutral-200 pt-5">
-        <CheckGroup
-          title="Assistance needed"
-          icon={HandHeart}
-          options={options.supports}
-          selected={supports}
-          onToggle={toggle(supports, setSupports)}
-          format={shortSupport}
+        <ChipGroup
+          title="Travel date"
+          icon={CalendarDays}
+          single
+          options={WHEN_OPTIONS.map((o) => ({ value: o.key, label: o.label }))}
+          selected={[when]}
+          onToggle={(v) => setWhen(v as When)}
         />
-        <CheckGroup
-          title="Language spoken"
-          icon={Languages}
-          options={options.languages}
-          selected={langs}
-          onToggle={toggle(langs, setLangs)}
-        />
+
+        <div className="space-y-3">
+          <div>
+            {label("Flying from", PlaneTakeoff)}
+            <Select
+              variant="compact"
+              ariaLabel="Flying from"
+              value={from}
+              onChange={setFrom}
+              options={[anyFrom, ...options.from]}
+              menuMinWidth={300}
+            />
+          </div>
+          <div>
+            {label("Flying to", PlaneLanding)}
+            <Select
+              variant="compact"
+              ariaLabel="Flying to"
+              value={to}
+              onChange={setTo}
+              options={[anyTo, ...options.to]}
+              menuMinWidth={300}
+            />
+          </div>
+          <div>
+            {label("Airline", Plane)}
+            <Select
+              variant="compact"
+              ariaLabel="Airline"
+              value={airline}
+              onChange={setAirline}
+              options={[anyAirline, ...options.airlines]}
+              menuMinWidth={300}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-6 border-t border-neutral-200 pt-5">
+          <ChipGroup
+            title="Help needed"
+            icon={HandHeart}
+            options={options.supports}
+            selected={supports}
+            onToggle={toggle(supports, setSupports)}
+          />
+          <ChipGroup
+            title="Language spoken"
+            icon={Languages}
+            options={options.languages}
+            selected={langs}
+            onToggle={toggle(langs, setLangs)}
+          />
+          <ChipGroup
+            title="Cost and group size"
+            icon={Wallet}
+            options={[
+              { value: "free", label: "Free help only", count: options.freeCount },
+              { value: "multi", label: "Can help 2+ people", count: options.multiCount },
+            ]}
+            selected={[freeOnly ? "free" : "", multi ? "multi" : ""].filter(Boolean)}
+            onToggle={(v) => (v === "free" ? setFreeOnly((x) => !x) : setMulti((x) => !x))}
+          />
+        </div>
       </div>
     </div>
   );
 
   /* ── Columns ─────────────────────────────────────────────────────── */
+  /* Below lg the segmented control picks one column; from lg up the rail's
+     "Show" group can hide either. The two rules never share a breakpoint,
+     so there's no display-class tug of war between them. */
+  const columnVisibility = (side: Side) => {
+    if (lockSide) return undefined;
+    const mobile = mobileSide === side ? "" : "hidden";
+    const desktop = sides.includes(side) ? "lg:block" : "lg:hidden";
+    return cn(mobile, desktop);
+  };
+  const bothShown = !lockSide && sides.length === 2;
+
   const familiesColumn = lockSide === "traveller" ? null : (
     <BoardColumn
       title="Parents / Passengers"
@@ -812,7 +991,7 @@ export default function AssistFamilyApp({
       rows={requesters}
       countLabel={`${requesters.length} ${requesters.length === 1 ? "request" : "requests"}`}
       empty="No families are asking on this route yet — if you're flying it, your offer would be the first."
-      className={cn(!lockSide && mobileSide !== "requester" && "hidden lg:block")}
+      className={columnVisibility("requester")}
     />
   );
 
@@ -825,13 +1004,11 @@ export default function AssistFamilyApp({
       rows={travellers}
       countLabel={`${travellers.length} ${travellers.length === 1 ? "helper" : "helpers"}`}
       empty="Nobody is offering this route yet — post the journey and our team will go looking."
-      className={cn(!lockSide && mobileSide !== "traveller" && "hidden lg:block")}
+      className={columnVisibility("traveller")}
     />
   );
 
-  const columnGrid = lockSide
-    ? "grid-cols-1"
-    : "grid-cols-1 lg:grid-cols-2";
+  const columnGrid = bothShown ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1";
 
   return (
     <>
@@ -951,29 +1128,41 @@ export default function AssistFamilyApp({
             <div id="results" className="min-w-0 scroll-mt-20">
               {/* Keyword search sits with the results, not in the rail: it
                   searches the rows, and the rail narrows them. */}
-              <div className="relative">
-                <Search
-                  className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-accent-500"
-                  aria-hidden="true"
-                />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  aria-label="Search the board"
-                  placeholder="Search a name, route or reference…"
-                  className="input h-12 rounded-lg border-transparent py-0 pl-11 pr-10 text-[15px] shadow-e1 ring-1 ring-primary-900/[0.06] focus-visible:border-primary-700"
-                />
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    aria-label="Clear search"
-                    className="absolute right-2.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-text-secondary transition-colors hover:bg-neutral-100 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
-                  >
-                    <X className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                )}
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="relative min-w-0 flex-1">
+                  <Search
+                    className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-accent-500"
+                    aria-hidden="true"
+                  />
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    aria-label="Search the board"
+                    placeholder="Search a name, route or reference…"
+                    className="input h-12 rounded-lg border-transparent py-0 pl-11 pr-10 text-[15px] shadow-e1 ring-1 ring-primary-900/[0.06] focus-visible:border-primary-700"
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => setQuery("")}
+                      aria-label="Clear search"
+                      className="absolute right-2.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-text-secondary transition-colors hover:bg-neutral-100 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                    >
+                      <X className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
+                <div className="sm:w-[220px]">
+                  <Select
+                    variant="toolbar"
+                    icon={ArrowDownUp}
+                    ariaLabel="Sort by"
+                    value={sort}
+                    onChange={(v) => setSort(v as Sort)}
+                    options={SORT_OPTIONS}
+                  />
+                </div>
               </div>
 
               {/* Below lg there is no room for two columns, so one is picked. */}

@@ -21,9 +21,12 @@ import { buildSampleEntries } from "@/lib/parentsSample";
  *   source: "sample"  the worked examples in lib/parentsSample.ts, shown
  *                     only when the relay errors or returns zero entries
  *
- * The examples are never silently mixed into live data — it is one or the
- * other, live always wins, and each sample entry carries `isSample` so a
- * card can tag itself. `feedError` keeps the real failure available for the
+ * TOP-UP (client decision, 2026-09-30). Once the relay started returning
+ * real posts, a side with one or two entries made the whole board look
+ * empty. So each side is filled up to MIN_PER_SIDE from the prepared
+ * entries: real posts first and never replaced, then prepared ones for
+ * whatever is left. Set MIN_PER_SIDE to 0 to show real posts only. Prepared
+ * rows still carry `isSample` internally. `feedError` keeps the real failure available for the
  * one place that still needs to surface it honestly (the detail page, where
  * "we couldn't load your listing" is not interchangeable with an example).
  */
@@ -41,6 +44,25 @@ export type BoardState =
     };
 
 const NO_ENTRIES: ParsedEntry[] = [];
+
+/** How many rows each side of the board shows before it stops topping up. */
+const MIN_PER_SIDE = 6;
+
+function topUp(live: ParsedEntry[]): ParsedEntry[] {
+  if (MIN_PER_SIDE <= 0) return live;
+  const seen = new Set(live.map((e) => e.reference));
+  const samples = parseRows(buildSampleEntries()).filter(
+    (e) => !seen.has(e.reference)
+  );
+  const out = [...live];
+  for (const side of ["requester", "traveller"] as const) {
+    const isSide = (e: ParsedEntry) =>
+      side === "traveller" ? e.type === "traveller" : e.type !== "traveller";
+    const missing = MIN_PER_SIDE - live.filter(isSide).length;
+    if (missing > 0) out.push(...samples.filter(isSide).slice(0, missing));
+  }
+  return out;
+}
 
 function parseRows(rows: unknown[]): ParsedEntry[] {
   return rows
@@ -102,7 +124,7 @@ export function useParentBoard(limit = 50) {
         // because nothing actually failed.
         settle(
           rows.length > 0
-            ? { status: "ready", entries: rows, source: "live" }
+            ? { status: "ready", entries: topUp(rows), source: "live" }
             : sampleState()
         );
       } catch {

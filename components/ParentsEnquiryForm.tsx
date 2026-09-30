@@ -18,6 +18,7 @@ import {
   readSharedDetails,
 } from "@/lib/parentsShare";
 import ShareToWhatsApp from "@/components/ShareToWhatsApp";
+import Select from "@/components/Select";
 
 /**
  * Parents Tickets — the real dual-role enquiry form.
@@ -875,19 +876,16 @@ export default function ParentsEnquiryForm() {
                   (optional)
                 </span>
               </label>
-              <select
+              <Select
                 id={id("relationship")}
-                className="input mt-2"
+                className="mt-2"
                 value={data.relationship}
-                onChange={(e) => set("relationship", e.target.value)}
-              >
-                <option value="">Select…</option>
-                {RELATIONSHIPS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => set("relationship", v)}
+                options={[
+                  { value: "", label: "Select…" },
+                  ...RELATIONSHIPS.map((o) => ({ value: o, label: o })),
+                ]}
+              />
             </div>
             <div>
               <label htmlFor={id("mobility_needs")} className={labelClass}>
@@ -896,19 +894,16 @@ export default function ParentsEnquiryForm() {
                   (optional)
                 </span>
               </label>
-              <select
+              <Select
                 id={id("mobility_needs")}
-                className="input mt-2"
+                className="mt-2"
                 value={data.mobility_needs}
-                onChange={(e) => set("mobility_needs", e.target.value)}
-              >
-                <option value="">Select…</option>
-                {MOBILITY_NEEDS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => set("mobility_needs", v)}
+                options={[
+                  { value: "", label: "Select…" },
+                  ...MOBILITY_NEEDS.map((o) => ({ value: o, label: o })),
+                ]}
+              />
             </div>
           </div>
 
