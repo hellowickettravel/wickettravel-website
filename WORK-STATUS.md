@@ -357,6 +357,53 @@ Rebuilt onto it:
 - A locked list page no longer renders the other column at all — it was
   building eight rows of DOM behind `display:none`.
 
+**Fifth pass — visual polish audit (UI Pro Max skill).** Client: structure
+is right, styling isn't. Audited the rows against the skill's guidelines and
+the project's own `globals.css` / PRODUCT.md, found 12 issues, fixed all 12.
+
+*Hierarchy.* The route — the one fact a visitor scans for — rendered at 12px
+and showed only the destination, with the origin on a separate grey line
+above, so "LHR → HYD" never appeared as one object. It is now the row's
+headline (t-h5 navy, plane glyph, date beside it), with the city names under
+it. The row is built in three tiers: who / where / what.
+
+*Redundancy.* The "Looking for help" pill repeated the column's own header on
+every single row and was the loudest thing on it. Replaced with the departure
+countdown, which differs per row and is what makes a listing urgent.
+
+*Depth.* `shadow-e1/e2/e3` are defined in globals.css and the board used none
+of them. Columns, filter rail, search bar and the closing band now sit on
+their own surfaces, and each row grows a 3px accent bar from its left edge on
+hover — a transform, so it costs no repaint (PRODUCT.md rule 3).
+
+*Colour discipline.* The care-need chip was accent-tinted, which put orange on
+every row; the spec reserves Accent for action. It takes the Primary tint now,
+so orange means only the CTA and a genuinely urgent departure.
+
+*Contrast — 11 real failures found by measuring every text node on the board.*
+White on Accent 500 is **3.37:1** and Accent 700 on Accent 050 is **4.30:1**,
+both under the 4.5:1 floor at the sizes used; the departure chips now use
+Accent 700 against white either way round (**4.66:1**). Two avatar tones set
+Accent 700 on Accent 100 / Warning Surface (**3.89:1** and **4.24:1**) — the
+discs keep their colour, the letters went to Primary 800 (**14:1**). Ratios
+are now noted per tone in `lib/parents.ts`.
+
+*Focus.* The whole row is the link (stretched pseudo-element), but the focus
+ring outlined only the 12px button. Ring, background and CTA fill all moved
+to the row, so keyboard focus shows exactly what Enter will activate.
+
+*Also:* price labelled ("Offering £60" / "Asking £25" / "No charge"); footer
+split onto its own line so it stops jumping between row one and row two
+depending on chip length; description moved from t-caption (12/16) to
+t-body-sm (14/20); avatar 36→44px with ring-2; checkbox rows given a hover
+surface and a real hit area.
+
+**Known, NOT changed — pre-existing and site-wide:** `btn-primary` is white on
+Accent 500 = **3.37:1**, under the WCAG AA floor PRODUCT.md targets. The brand
+spec explicitly specifies white-on-Accent-500 fills, so spec and a11y target
+conflict. Accent 600 gives 3.82:1, Accent 700 gives 4.66:1. Fixing it changes
+the primary button on every page — a brand decision, not a board fix.
+
 **Page re-ordered** to the sequence a visitor's questions actually arrive in:
 board → why a board and not a group chat → how it works (two lanes) → the
 form → trust/money/privacy FAQ. The listings used to be last, past

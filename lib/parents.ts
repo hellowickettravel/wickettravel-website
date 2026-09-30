@@ -232,15 +232,19 @@ export function destinationImage(...locations: (string | undefined)[]): string {
  * gets the same colour on every surface.
  *
  * All six pairs are brand ramps (Primary / Accent / Sand / semantic
- * surfaces), and every one clears 4.5:1 on its own surface.
+ * surfaces). Every pair is measured against its own surface and clears the
+ * 4.5:1 floor — the ratio is noted beside each. The two warm tones used to
+ * set Accent 700 on Accent 100 / Warning Surface, which measured 3.89:1 and
+ * 4.24:1 at the 14px the initials render at; the discs keep their colour and
+ * the letters went to Primary 800.
  */
 const AVATAR_TONES = [
-  "bg-primary-050 text-primary-700 ring-primary-100",
-  "bg-accent-100 text-accent-700 ring-accent-200",
-  "bg-success-surface text-success ring-success/20",
-  "bg-info-surface text-info ring-info/20",
-  "bg-sand-500 text-primary-800 ring-sand-600",
-  "bg-warning-surface text-accent-700 ring-warning/25",
+  "bg-primary-050 text-primary-700 ring-primary-100", // 12.5:1
+  "bg-accent-100 text-primary-800 ring-accent-200", //   14.0:1
+  "bg-success-surface text-success ring-success/20", //  4.6:1
+  "bg-info-surface text-info ring-info/20", //           5.7:1
+  "bg-sand-500 text-primary-800 ring-sand-600", //      15.6:1
+  "bg-warning-surface text-primary-800 ring-warning/25", // 15.3:1
 ] as const;
 
 /** Stable, non-cryptographic hash — only ever used to choose a colour. */

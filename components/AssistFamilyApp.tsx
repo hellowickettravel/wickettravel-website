@@ -31,6 +31,7 @@ import {
   initialsOf,
   type ParsedEntry,
   placeKey,
+  postedAgo,
   searchHaystack,
   splitPlace,
 } from "@/lib/parents";
@@ -112,6 +113,32 @@ const selectClass =
 
 /* ── Row ───────────────────────────────────────────────────────────────── */
 
+/**
+ * One listing.
+ *
+ * The row is built in three tiers, because a visitor scanning forty of these
+ * reads them in that order and not one of them straight through:
+ *
+ *   1. WHO   avatar, name, when it was posted
+ *   2. WHERE the route, set as the headline — this is the fact they came for
+ *   3. WHAT  the ask in their own words, then the chips, price and action
+ *
+ * The route used to render at caption size and show only the destination,
+ * with the origin on a separate line above, so "LHR → HYD" never appeared as
+ * one object and the reader had to assemble it. It is now the largest thing
+ * on the row.
+ *
+ * The status pill that sat top-right ("Looking for help") is gone: it
+ * repeated the column's own header on every row and was the loudest element
+ * for no information. That slot now carries the departure countdown, which
+ * differs per row and is what makes a listing urgent. The side is still
+ * legible from the column header, the accent bar, and the action's wording.
+ *
+ * Hover moves only transform, opacity and colour (PRODUCT.md: "transform/
+ * opacity motion only"), and the whole row is the link — the visible button
+ * stretches over the card via a pseudo-element, so the click target is the
+ * full row while the focus ring stays on one real anchor.
+ */
 function Row({ entry }: { entry: ParsedEntry }) {
   const {
     isTraveller,
@@ -129,98 +156,139 @@ function Row({ entry }: { entry: ParsedEntry }) {
     mobility,
     capacity,
     amount,
+    postedISO,
   } = entry;
 
   const a = splitPlace(from);
   const b = splitPlace(to);
   const depart = departureLabel(dateISO);
+  const posted = postedAgo(postedISO);
 
-  /* Three chips at most — real fields only, never an invented badge. */
-  const tags: string[] = [];
+  /* Chips carry meaning through colour, not just words: the care need is the
+     one a family is actually filtering on, so it is the only tinted chip. */
+  const careChip = !isTraveller && mobility ? shortSupport(mobility) : undefined;
+  const plainChips: string[] = [];
   if (isTraveller) {
     if (capacity !== undefined) {
-      tags.push(`${capacity} ${capacity === 1 ? "person" : "people"}`);
+      plainChips.push(`${capacity} ${capacity === 1 ? "person" : "people"}`);
     }
-    if (airline) tags.push(airline);
+    if (airline) plainChips.push(airline);
   } else {
-    if (mobility) tags.push(shortSupport(mobility));
-    if (relationship) tags.push(relationship);
+    if (relationship) plainChips.push(relationship);
   }
-  if (languages) tags.push(shortLanguages(languages));
+  if (languages) plainChips.push(shortLanguages(languages));
 
   const href = reference
     ? `/parents-tickets/listing/${encodeURIComponent(reference)}`
     : undefined;
 
+  const cityLine = [a.name ?? a.code, b.name ?? b.code]
+    .filter(Boolean)
+    .join(" → ");
+
   return (
-    <article className="group flex gap-3 px-4 py-4 transition-colors hover:bg-neutral-050">
+    <article
+      className={cn(
+        "group relative isolate px-4 py-4 transition-colors duration-200",
+        "hover:bg-primary-050/50 focus-within:bg-primary-050/50",
+        "focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-700"
+      )}
+    >
+      {/* Depth without a shadow on every row: a bar that grows out of the
+          left edge on hover. Pure transform, so it costs no repaint. */}
       <span
         aria-hidden="true"
         className={cn(
-          "grid h-9 w-9 shrink-0 place-items-center rounded-full font-sans text-[12px] font-extrabold ring-1",
-          avatarTone(name)
+          "absolute inset-y-0 left-0 w-[3px] origin-top scale-y-0 transition-transform duration-200 ease-out group-hover:scale-y-100 group-focus-within:scale-y-100",
+          isTraveller ? "bg-primary-800" : "bg-accent-500"
         )}
-      >
-        {initialsOf(name)}
-      </span>
+      />
 
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-              <span className="t-label-2 text-primary-800">
+      <div className="flex gap-3.5">
+        <span
+          aria-hidden="true"
+          className={cn(
+            "grid h-11 w-11 shrink-0 place-items-center rounded-full font-sans text-[14px] font-extrabold ring-2 transition-transform duration-200 group-hover:-translate-y-0.5 group-focus-within:-translate-y-0.5",
+            avatarTone(name)
+          )}
+        >
+          {initialsOf(name)}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          {/* ── 1. Who ─────────────────────────────────────────────── */}
+          <div className="flex items-start justify-between gap-2">
+            <p className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className="t-label-1 text-primary-800">
                 {name ?? "A board member"}
               </span>
+              {posted && (
+                <span className="t-caption text-text-secondary">{posted}</span>
+              )}
               {isSample && (
-                <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 t-caption text-text-tertiary">
+                <span className="rounded-xs bg-neutral-100 px-1.5 py-0.5 t-caption text-text-secondary">
                   Example
                 </span>
               )}
             </p>
-            {(a.name ?? a.code) && (
-              <p className="mt-0.5 flex items-center gap-1 t-caption text-text-secondary">
-                <MapPin className="h-3 w-3 shrink-0" aria-hidden="true" />
-                <span className="truncate">{a.name ?? a.code}</span>
-              </p>
+
+            {depart && (
+              <span
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 t-caption font-bold",
+                  // White on Accent 500 is 3.37:1 and Accent 700 on Accent
+                  // 050 is 4.30:1 — both under the floor at 12px. Accent 700
+                  // against white, either way round, is 4.66:1.
+                  depart.tone === "today" && "bg-accent-700 text-neutral-000 shadow-e1",
+                  depart.tone === "soon" &&
+                    "bg-neutral-000 text-accent-700 ring-1 ring-accent-200",
+                  depart.tone === "later" && "bg-primary-050 text-primary-700",
+                  depart.tone === "past" && "bg-neutral-100 text-text-secondary"
+                )}
+              >
+                <CalendarDays className="h-3 w-3 shrink-0" aria-hidden="true" />
+                {depart.text}
+              </span>
             )}
           </div>
 
-          <span
-            className={cn(
-              "shrink-0 rounded-full px-2 py-1 t-caption font-bold",
-              isTraveller
-                ? "bg-success-surface text-success"
-                : "bg-accent-050 text-accent-700"
-            )}
-          >
-            {isTraveller ? "Available to help" : "Looking for help"}
-          </span>
-        </div>
-
-        <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 t-caption text-primary-800">
-          <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-secondary" aria-hidden="true" />
-          <span className="font-bold">{date ?? formatEntryDate(dateISO) ?? "Date on request"}</span>
-          <ArrowRight className="h-3 w-3 shrink-0 text-neutral-400" aria-hidden="true" />
-          <span className="font-bold">
-            {b.name ? `${b.name} (${b.code ?? "—"})` : (b.code ?? "—")}
-          </span>
-          {depart && depart.tone === "today" && (
-            <span className="rounded-full bg-accent-500 px-2 py-0.5 t-caption font-bold text-neutral-000">
-              {depart.text}
+          {/* ── 2. Where — the headline ─────────────────────────────── */}
+          <p className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <span className="t-h5 text-primary-800">{a.code ?? a.name ?? "—"}</span>
+            <Plane
+              className={cn(
+                "h-4 w-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-within:translate-x-0.5",
+                isTraveller ? "text-primary-500" : "text-accent-500"
+              )}
+              aria-hidden="true"
+            />
+            <span className="t-h5 text-primary-800">{b.code ?? b.name ?? "—"}</span>
+            <span aria-hidden="true" className="h-4 w-px bg-neutral-300" />
+            <span className="t-label-3 text-text-secondary">
+              {date ?? formatEntryDate(dateISO) ?? "Date on request"}
             </span>
+          </p>
+          {cityLine && (
+            <p className="mt-1 truncate t-caption text-text-secondary">{cityLine}</p>
           )}
-        </p>
 
-        {body && (
-          <p className="mt-2 line-clamp-2 t-caption text-text-secondary">{body}</p>
-        )}
+          {/* ── 3. What ────────────────────────────────────────────── */}
+          {body && (
+            <p className="t-body-sm mt-2.5 line-clamp-2 text-text-secondary">
+              {body}
+            </p>
+          )}
 
-        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-          <ul className="flex min-w-0 flex-wrap gap-1.5">
-            {/* Two, never three: at this column width a third chip is what
-                tips the chips and the button onto separate lines, and the row
-                stops scanning as one thing. */}
-            {tags.slice(0, 2).map((tag) => (
+          <ul className="mt-3 flex flex-wrap gap-1.5">
+            {careChip && (
+              <li className="inline-flex items-center gap-1 rounded-sm bg-primary-050 px-2 py-1 t-caption font-bold text-primary-700 ring-1 ring-primary-100">
+                <HandHeart className="h-3 w-3 shrink-0" aria-hidden="true" />
+                {careChip}
+              </li>
+            )}
+            {/* The chips have the row's full width now that the price and
+                action sit on their own line, so a third fits. */}
+            {plainChips.slice(0, careChip ? 2 : 3).map((tag) => (
               <li
                 key={tag}
                 className="rounded-sm bg-neutral-100 px-2 py-1 t-caption text-text-secondary"
@@ -230,33 +298,35 @@ function Row({ entry }: { entry: ParsedEntry }) {
             ))}
           </ul>
 
-          <div className="ml-auto flex shrink-0 items-center gap-3">
-            {amount !== undefined && (
-              <span className="t-caption text-text-secondary">
-                {amount > 0 ? (
-                  <>
-                    <span className="t-label-2 text-primary-800">£{amount}</span>
-                  </>
-                ) : (
-                  <span className="font-bold text-success">No charge</span>
-                )}
-              </span>
-            )}
-            {href && (
-              <Link
-                href={href}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-sm px-3 py-2 font-sans text-[12px] font-bold leading-[16px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-                  isTraveller
-                    ? "bg-primary-800 text-neutral-000 hover:bg-primary-700 focus-visible:ring-primary-700"
-                    : "border border-primary-800 text-primary-800 hover:bg-primary-050 focus-visible:ring-primary-700"
-                )}
-              >
-                {isTraveller ? "Ask for a match" : "View details"}
-                <ArrowRight
-                  className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
+          <div className="mt-3 flex items-center justify-end gap-3 border-t border-neutral-200 pt-3">
+              {amount !== undefined && (
+                <span className="t-caption text-text-secondary">
+                  {amount > 0 ? (
+                    <>
+                      {isTraveller ? "Asking " : "Offering "}
+                      <span className="t-label-1 text-primary-800">£{amount}</span>
+                    </>
+                  ) : (
+                    <span className="t-label-3 text-success">No charge</span>
+                  )}
+                </span>
+              )}
+              {href && (
+                <Link
+                  href={href}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-sm border px-3 py-2 font-sans text-[12px] font-bold leading-[16px] transition-colors duration-200",
+                    "after:absolute after:inset-0 after:content-[''] focus-visible:outline-none",
+                    isTraveller
+                      ? "border-primary-800 text-primary-800 group-hover:bg-primary-800 group-hover:text-neutral-000 group-focus-within:bg-primary-800 group-focus-within:text-neutral-000"
+                      : "border-accent-700 text-accent-700 group-hover:bg-accent-700 group-hover:text-neutral-000 group-focus-within:bg-accent-700 group-focus-within:text-neutral-000"
+                  )}
+                >
+                  {isTraveller ? "Ask for a match" : "View details"}
+                  <ArrowRight
+                    className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-within:translate-x-0.5"
+                    aria-hidden="true"
+                  />
               </Link>
             )}
           </div>
@@ -291,18 +361,25 @@ function BoardColumn({
     <section
       aria-label={title}
       className={cn(
-        "min-w-0 overflow-hidden rounded-md border border-neutral-300 bg-neutral-000",
+        "min-w-0 overflow-hidden rounded-md border border-neutral-300 bg-neutral-000 shadow-e1",
         className
       )}
     >
-      <header className="flex items-center justify-between gap-3 border-b border-neutral-200 bg-neutral-050 px-4 py-3">
+      {/* A 2px rule in the side's own colour, so the two columns are
+          distinguishable at a glance from across the page. */}
+      <header
+        className={cn(
+          "flex items-center justify-between gap-3 border-b-2 bg-neutral-050 px-4 py-3.5",
+          tone === "traveller" ? "border-primary-800" : "border-accent-500"
+        )}
+      >
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={cn(
-              "grid h-9 w-9 shrink-0 place-items-center rounded-sm bg-neutral-000 ring-1",
+              "grid h-9 w-9 shrink-0 place-items-center rounded-sm shadow-e1 ring-1",
               tone === "traveller"
-                ? "text-primary-700 ring-primary-100"
-                : "text-accent-600 ring-accent-200"
+                ? "bg-primary-800 text-neutral-000 ring-primary-800"
+                : "bg-accent-500 text-neutral-000 ring-accent-500"
             )}
           >
             <Icon className="h-4 w-4" aria-hidden="true" />
@@ -312,7 +389,7 @@ function BoardColumn({
             <p className="t-caption truncate text-text-secondary">{subtitle}</p>
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-neutral-000 px-2.5 py-1 t-caption text-text-secondary ring-1 ring-neutral-300">
+        <span className="shrink-0 rounded-full bg-neutral-000 px-3 py-1 t-label-3 text-primary-800 shadow-e1 ring-1 ring-neutral-300">
           {countLabel}
         </span>
       </header>
@@ -361,7 +438,7 @@ function CheckGroup({
       <ul className="mt-3 space-y-2">
         {options.map((option) => (
           <li key={option}>
-            <label className="flex cursor-pointer items-start gap-2 t-caption text-text-secondary transition-colors hover:text-primary-800">
+            <label className="-mx-1.5 flex cursor-pointer items-start gap-2 rounded-xs px-1.5 py-1 t-caption text-text-secondary transition-colors hover:bg-primary-050 hover:text-primary-800">
               <input
                 type="checkbox"
                 checked={selected.includes(option)}
@@ -540,7 +617,7 @@ export default function AssistFamilyApp({
 
   /* ── Search bar ──────────────────────────────────────────────────── */
   const searchBar = (
-    <div className="rounded-md border border-neutral-300 bg-neutral-000 p-3 shadow-e2">
+    <div className="rounded-md border border-neutral-300 bg-neutral-000 p-3 shadow-e3">
       <div className="grid gap-3 lg:grid-cols-[1fr_auto_1fr_1fr_auto] lg:items-end">
         <label className="block">
           {label("From", MapPin)}
@@ -594,7 +671,7 @@ export default function AssistFamilyApp({
 
   /* ── Filter rail ─────────────────────────────────────────────────── */
   const filters = (
-    <div className="rounded-md border border-neutral-300 bg-neutral-000 p-4">
+    <div className="rounded-md border border-neutral-300 bg-neutral-000 p-4 shadow-e1">
       <div className="flex items-center justify-between gap-2">
         <h2 className="t-label-1 text-primary-800">Filters</h2>
         <button
@@ -895,7 +972,7 @@ export default function AssistFamilyApp({
 
               {/* The way out of "nobody is on my route" is to post, so the
                   board closes on one dark band rather than trailing off. */}
-              <div className="mt-5 flex flex-col items-center gap-4 rounded-md bg-primary-800 px-5 py-5 sm:flex-row sm:justify-between sm:px-6">
+              <div className="mt-5 flex flex-col items-center gap-4 rounded-md bg-primary-800 px-5 py-5 shadow-e2 sm:flex-row sm:justify-between sm:px-6">
                 <div className="flex items-center gap-3">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-000/10">
                     <Users className="h-5 w-5 text-accent-400" aria-hidden="true" />
