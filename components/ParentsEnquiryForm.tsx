@@ -11,7 +11,8 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { MOBILITY_NEEDS, RELATIONSHIPS, ROLES, type EnquiryType } from "@/lib/parents";
+import { RELATIONSHIPS, ROLES, type EnquiryType } from "@/lib/parents";
+import { useBoardOptions } from "@/lib/useBoardOptions";
 import {
   buildShareMessage,
   buildShareUrl,
@@ -245,6 +246,7 @@ export default function ParentsEnquiryForm() {
   const id = (name: string) => `pt-${uid}-${name}`;
 
   const [role, setRole] = useState<EnquiryType>("requester");
+  const boardOptions = useBoardOptions();
   const [data, setData] = useState<FormState>(EMPTY);
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
@@ -901,7 +903,8 @@ export default function ParentsEnquiryForm() {
                 onChange={(v) => set("mobility_needs", v)}
                 options={[
                   { value: "", label: "Select…" },
-                  ...MOBILITY_NEEDS.map((o) => ({ value: o, label: o })),
+                  // The admin's "help needed" list (portal, Board options).
+                  ...boardOptions.supports.map((o) => ({ value: o.value, label: o.value })),
                 ]}
               />
             </div>
