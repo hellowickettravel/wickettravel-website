@@ -15,18 +15,18 @@ import { OG_BASE, SITE_URL, TWITTER_BASE } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Travellers Offering to Help",
   description:
-    "Every open Assist Family offer right now — travellers already booked on a route who are happy to keep an elderly passenger company.",
+    "Every open Parent Travel Assist offer right now — travellers already booked on a route who are happy to keep an elderly passenger company.",
   alternates: { canonical: "/parents-tickets/offers" },
   openGraph: {
     ...OG_BASE,
     url: `${SITE_URL}/parents-tickets/offers`,
-    title: "Travellers Offering to Help | Assist Family",
+    title: "Travellers Offering to Help | Parent Travel Assist",
     description:
       "Every open offer right now, shortened for privacy — recognise a family who needs your route?",
   },
   twitter: {
     ...TWITTER_BASE,
-    title: "Travellers Offering to Help | Assist Family",
+    title: "Travellers Offering to Help | Parent Travel Assist",
     description:
       "Every open offer right now, shortened for privacy — recognise a family who needs your route?",
   },
@@ -43,7 +43,7 @@ const jsonLd = {
         {
           "@type": "ListItem",
           position: 2,
-          name: "Assist Family",
+          name: "Parent Travel Assist",
           item: `${SITE_URL}/parents-tickets`,
         },
         {
@@ -73,7 +73,7 @@ export default function AssistFamilyOffersPage() {
           lead="Every open offer right now. Contact details are never published — ask us for the introduction."
           breadcrumbs={[
             { label: "Home", href: "/" },
-            { label: "Assist Family", href: "/parents-tickets" },
+            { label: "Parent Travel Assist", href: "/parents-tickets" },
             { label: "Offers" },
           ]}
         />

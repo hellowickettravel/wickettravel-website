@@ -1,10 +1,9 @@
 /* Server component: no hooks or client-only APIs remain after the scroll-reveal
    wrapper and the CTA's scale gesture were removed. */
 import { HeartHandshake, MessageCircle, PhoneCall } from "lucide-react";
-import { WHATSAPP_URL } from "@/lib/links";
+import { PHONE_LINK, WHATSAPP_URL } from "@/lib/links";
 
 const PHONE_DISPLAY = "+44 7417 564704";
-const PHONE_TEL = "+447417564704";
 
 /**
  * Parents Tickets — marketing banner only. The community board and enquiry
@@ -42,6 +41,11 @@ export default function ParentsBanner() {
             </div>
 
             <div className="text-center lg:text-left">
+              {/* The service's name, so the homepage, the menu and the page
+                  it links to all call it the same thing. */}
+              <p className="mb-3 inline-flex items-center rounded-full bg-neutral-000 px-3 py-1 t-label-3 text-primary-800 shadow-e1 ring-1 ring-primary-900/[0.06]">
+                Parent Travel Assist
+              </p>
               <h2 id="parents-tickets-heading" className="t-h2 text-primary-800">
                 Travelling with elderly parents, made easier
               </h2>
@@ -62,9 +66,9 @@ export default function ParentsBanner() {
                   button's job is to be recognised as "the call button," not
                   to carry this section's differentiation. */}
               <a
-                href={`tel:${PHONE_TEL}`}
+                {...PHONE_LINK}
                 className="inline-flex items-center gap-3 rounded-full bg-accent-500 px-8 py-4 t-label-1 text-text-on-dark shadow-e2 shadow-accent-500/30 transition-colors hover:bg-accent-600 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-500"
-                aria-label={`Call us about Assist Family on ${PHONE_DISPLAY}`}
+                aria-label={`Message us on WhatsApp about Parent Travel Assist: ${PHONE_DISPLAY}`}
               >
                 <PhoneCall className="h-5 w-5" aria-hidden="true" />
                 {PHONE_DISPLAY}

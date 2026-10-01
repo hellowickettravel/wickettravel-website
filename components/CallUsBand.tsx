@@ -1,16 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { Clock, MessageCircle, PhoneCall, ShieldCheck } from "lucide-react";
+import { Clock, MessageCircle, ShieldCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { WHATSAPP_URL } from "@/lib/links";
+import { PHONE_LINK } from "@/lib/links";
+import { WhatsAppIcon } from "@/components/WhatsAppButton";
 
 const PHONE_DISPLAY = "+44 7417 564704";
-const PHONE_TEL = "+447417564704";
 
 /**
  * "Talk to a real person" — standalone premium support section placed
- * mid-page. A real, friendly agent photo + prominent click-to-call number
+ * mid-page. A real, friendly agent photo + a prominent number that opens WhatsApp
  * make phone booking feel human and trustworthy. 24/7, on-brand navy/orange.
  */
 export default function CallUsBand() {
@@ -79,22 +79,20 @@ export default function CallUsBand() {
                   reads as a toy, and this is the single most important action on
                   the page. The accent-600 hover fill is the feedback. */}
               <a
-                href={`tel:${PHONE_TEL}`}
+                {...PHONE_LINK}
                 className="inline-flex items-center gap-3 rounded-full bg-accent-500 px-8 py-4 t-h4 text-text-on-dark shadow-e2 shadow-accent-500/30 transition-colors hover:bg-accent-600 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 focus-visible:ring-offset-primary-800"
-                aria-label={`${t("call.cta")} ${PHONE_DISPLAY}`}
+                aria-label={`Chat with us on WhatsApp: ${PHONE_DISPLAY}`}
               >
-                <PhoneCall className="h-6 w-6" aria-hidden="true" />
+                <WhatsAppIcon className="h-6 w-6" />
                 {PHONE_DISPLAY}
               </a>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 t-label-2 text-primary-100 transition-colors hover:text-text-on-dark focus-visible:outline-none focus-visible:text-text-on-dark"
-              >
+              {/* The number opens WhatsApp (lib/links.ts, PHONE_LINK), so the
+                  line under it says so rather than offering a second button
+                  to the same place. */}
+              <p className="inline-flex items-center gap-2 t-label-2 text-primary-100">
                 <MessageCircle className="h-4 w-4 text-success" aria-hidden="true" />
-                Or message us on WhatsApp
-              </a>
+                Tap to chat or call on WhatsApp · 24/7
+              </p>
             </div>
           </div>
         </div>

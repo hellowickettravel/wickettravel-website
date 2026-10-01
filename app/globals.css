@@ -372,6 +372,35 @@ body {
   animation-play-state: paused;
 }
 
+/* Homepage reviews (components/Reviews.tsx): two marquee rows whose
+   edges fade out rather than cut off. With reduced motion each row becomes
+   a still, swipeable strip, the duplicate copy goes, and so does the
+   second row, which only repeats the first. */
+.reviews-marquee {
+  overflow: hidden;
+}
+.reviews-fade {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reviews-marquee {
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-inline: 16px;
+  }
+  .reviews-marquee .marquee-track {
+    animation: none;
+  }
+  .reviews-marquee [data-marquee-copy],
+  .reviews-marquee[data-decorative] {
+    display: none;
+  }
+  .reviews-marquee li {
+    scroll-snap-align: start;
+  }
+}
+
 /* Respect reduced-motion globally as a safety net */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/SocialIcons";
-import { PORTAL_LOGIN_URL } from "@/lib/links";
+import { PHONE_LINK, PORTAL_LOGIN_URL } from "@/lib/links";
 
 /** Internal routes wired up for the footer's link columns. Flights/Hotels/
  *  Car Rental used to be a "#" stub or an external link out to the holidays
@@ -83,7 +83,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 shrink-0 text-accent-400" aria-hidden="true" />
-                <a href="tel:+447417564704" className="hover:text-text-on-dark">
+                <a {...PHONE_LINK} className="hover:text-text-on-dark">
                   +44 7417 564704
                 </a>
               </li>

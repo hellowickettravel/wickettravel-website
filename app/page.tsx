@@ -10,6 +10,7 @@ import BestFaresByCity from "@/components/BestFaresByCity";
 import VisaBanner from "@/components/VisaBanner";
 import ParentsBanner from "@/components/ParentsBanner";
 import HowItWorks from "@/components/HowItWorks";
+import Reviews from "@/components/Reviews";
 import CallUsBand from "@/components/CallUsBand";
 import BestPriceGuarantee from "@/components/BestPriceGuarantee";
 import Newsletter from "@/components/Newsletter";
@@ -163,6 +164,7 @@ export default function Home() {
         <BestFaresByCity />
         <VisaBanner />
         <HowItWorks />
+        <Reviews />
         <CallUsBand />
         <ParentsBanner />
         <BestPriceGuarantee />

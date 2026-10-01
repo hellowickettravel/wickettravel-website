@@ -217,7 +217,7 @@ export async function POST(request: Request) {
     });
   } catch {
     return json(
-      { ok: false, error: "Could not reach the Parents Tickets service." },
+      { ok: false, error: "Could not reach the Parent Travel Assist service." },
       502
     );
   }

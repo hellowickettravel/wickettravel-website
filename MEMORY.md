@@ -40,7 +40,7 @@ have already caught us: `error.tsx` receives `unstable_retry`, not `reset`;
   `http://localhost:3200`.
 - **Never put a Vercel deployment URL there.** The old value,
   `wicket-travel-portal.vercel.app`, stopped resolving and silently took down
-  every Assist Family lead, every visa lead and the whole public board.
+  every Parent Travel Assist lead, every visa lead and the whole public board.
 - **`WICKET_RELAY_SECRET`** (Website) must equal **`VISA_RELAY_SECRET`**
   (Portal). Without it the portal rate-limits every website visitor as one
   person: 8 submissions per 15 minutes, 25 per day, worldwide.
@@ -145,9 +145,11 @@ fallback so the app runs whether or not a migration has been applied.
 Keyword research uses Google's autocomplete (`suggestqueries.google.com`,
 `gl=uk`). A query that returns nothing is a finding, not a failure.
 
-- **"Assist Family" has zero search demand.** People search "airport
-  assistance for elderly" and "elderly parent flying alone". Never use the
-  product name alone as a page title.
+- **Product names get no search demand.** The old name, "Assist Family",
+  had none; the current one, "Parent Travel Assist" (renamed 2026-10-01),
+  hasn't been measured. People search "airport assistance for elderly" and
+  "elderly parent flying alone". Never use the product name alone as a page
+  title.
 - **Best untapped search demand:** UAE visas for non-British passport holders
   living in the UK ("uae visa for uk brp holders", "dubai visa for indian
   passport holders").

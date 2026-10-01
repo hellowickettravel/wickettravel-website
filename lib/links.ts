@@ -29,12 +29,25 @@ export const PORTAL_BOOKING_URL =
 export const WHATSAPP_URL = "https://wa.me/447417564704";
 
 /**
+ * Every visible phone number and "call us" button on the site opens a
+ * WhatsApp chat with the same number, not a tel: link (client request,
+ * 2026-10-01): on a desktop, tel: hands off to Skype or FaceTime, which
+ * most visitors don't use. Spread onto an <a>: `<a {...PHONE_LINK}>`.
+ * JSON-LD still publishes the number itself (lib/seo.ts BUSINESS.phone).
+ */
+export const PHONE_LINK = {
+  href: WHATSAPP_URL,
+  target: "_blank",
+  rel: "noopener noreferrer",
+} as const;
+
+/**
  * Where the three server-side relays (/api/parent-ticket,
  * /api/parent-ticket/public, /api/visa-enquiry) forward to. The portal's
  * apex domain; `www.` only redirects to it.
  *
  * Never a Vercel deployment URL: the old value, wicket-travel-portal.vercel.app,
- * stopped resolving and silently took down every Assist Family post, every
+ * stopped resolving and silently took down every Parent Travel Assist post, every
  * visa lead and the whole public board. Override server-side with the
  * `PORTAL_ORIGIN` env var (locally, http://localhost:3200).
  */

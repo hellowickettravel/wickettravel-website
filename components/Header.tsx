@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import Logo from "@/components/Logo";
 import { useI18n } from "@/lib/i18n";
 import { BUSINESS } from "@/lib/seo";
-import { PORTAL_LOGIN_URL } from "@/lib/links";
+import { PHONE_LINK, PORTAL_LOGIN_URL } from "@/lib/links";
 
 /* Every service now has its own dedicated page (added after this comment was
    first written) — nav points there directly rather than to a homepage
@@ -125,7 +125,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
               faceless OTAs, so the number is a first-class header item, not
               something buried in the footer. */}
           <a
-            href={`tel:${BUSINESS.phone}`}
+            {...PHONE_LINK}
             className={cn(
               /* Was `xl:inline-flex` — the differentiator phone number
                  disappeared between 1024px (lg:, where the nav itself
@@ -263,7 +263,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
               {/* Footer block — call first, then the quote CTA. */}
               <div className="mt-auto shrink-0 space-y-3 border-t border-primary-100 p-6">
                 <a
-                  href={`tel:${BUSINESS.phone}`}
+                  {...PHONE_LINK}
                   onClick={() => setOpen(false)}
                   className="flex min-h-[48px] items-center justify-center gap-2 rounded-sm border border-primary-800 px-6 t-label-1 text-primary-800 transition-colors hover:bg-primary-050 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                 >

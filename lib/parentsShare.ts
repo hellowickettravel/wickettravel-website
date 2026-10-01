@@ -1,5 +1,5 @@
 /**
- * Sharing an Assist Family post into WhatsApp.
+ * Sharing a Parent Travel Assist post into WhatsApp.
  *
  * WHY. The families this is for already run the service by hand, in WhatsApp
  * groups: "Mum is flying LHR→HYD on Thursday, anyone on that flight?". So
@@ -169,13 +169,13 @@ export function buildShareMessage({
     return details.type === "traveller"
       ? [
           "Hi everyone 👋",
-          `Someone flying ${flight} is offering to keep an elderly traveller company. It's listed on the Wicket Travel Assist Family portal${ref}.`,
+          `Someone flying ${flight} is offering to keep an elderly traveller company. It's listed on Wicket Travel's Parent Travel Assist portal${ref}.`,
           "If your parents or grandparents are on this flight, you can request an introduction here:",
           url,
         ].join("\n\n")
       : [
           "Hi everyone 👋",
-          `A family on the Wicket Travel Assist Family portal is looking for someone flying ${flight} to keep their elderly relative company${ref}.`,
+          `A family on Wicket Travel's Parent Travel Assist portal is looking for someone flying ${flight} to keep their elderly relative company${ref}.`,
           "If you or anyone you know is on this flight, please offer your help here:",
           url,
           "Thank you 🙏",
@@ -186,7 +186,7 @@ export function buildShareMessage({
     return [
       "Hi everyone 👋",
       `I'm flying ${flight} and I'm happy to keep an elderly traveller company on the way.`,
-      `I've listed it on the Wicket Travel Assist Family portal${ref}.`,
+      `I've listed it on Wicket Travel's Parent Travel Assist portal${ref}.`,
       "If your parents or grandparents are on this flight, you can request an introduction here:",
       url,
     ].join("\n\n");
@@ -195,7 +195,7 @@ export function buildShareMessage({
   return [
     "Hi everyone 👋",
     `${whoIsFlying(relationship)} flying ${flight} and would really appreciate some company and a helping hand on the journey.`,
-    `I've submitted all the details on the Wicket Travel Assist Family portal${ref}.`,
+    `I've submitted all the details on Wicket Travel's Parent Travel Assist portal${ref}.`,
     "If you or anyone you know is travelling on this flight, please offer your help using this link:",
     url,
     "Thank you 🙏",
