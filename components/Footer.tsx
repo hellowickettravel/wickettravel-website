@@ -1,44 +1,72 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import Image from "next/image";
-import { BadgeCheck, Building2, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
+import { Building2, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
+import { BUSINESS } from "@/lib/seo";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/SocialIcons";
 import { PHONE_LINK, PORTAL_LOGIN_URL } from "@/lib/links";
 
 /**
- * Registrations shown as badges above the bottom bar (client request,
- * 2026-10-01: "people see logos more than numbers").
+ * Registrations and ratings shown as logo badges above the bottom bar
+ * (client request, 2026-10-01: "people see logos more than numbers").
+ * Logos are the client-supplied originals, trimmed onto white, in
+ * public/accreditations/.
  *
- * ONLY WHAT THE COMPANY ACTUALLY HOLDS. Wicket Travel has an IATA TIDS
- * code, which is not IATA accreditation, and no ATOL licence (MEMORY.md).
- * So there is no "IATA Accredited Agent", ATOL or ABTA mark here: using
- * the ATOL logo without a licence is a criminal offence in the UK, and
- * ABTA's logo is for members, who must show their membership number with
- * it. Add an entry only with the licence or membership number in hand.
- *
- * `logo` takes an official artwork file from public/accreditations/ (the
- * one the issuing body supplies to its members), never a copy found
- * online. Without one, the badge is set in type, which imitates nobody.
+ * Every badge says exactly what it is, beside the logo:
+ *   IATA         "TIDS registered · 96239010". The company holds an IATA
+ *                TIDS code, which is not IATA accreditation (MEMORY.md), so
+ *                the caption names the registration it really has.
+ *   Trustpilot   "Rated Excellent", linked to the live profile. No star
+ *                row: five full stars would claim a 5.0 score, and the
+ *                profile's isn't (Excellent is Trustpilot's label for it).
+ *   Companies    linked to the public register.
+ *   ABTA         only once ABTA_MEMBER_NUMBER is set. ABTA's logo is for
+ *                members, shown with their membership number; it is
+ *                unlawful to use otherwise.
+ * No ATOL mark: the company holds no ATOL licence (MEMORY.md), and using the
+ * logo without one is a criminal offence.
  */
+const ABTA_MEMBER_NUMBER = ""; // e.g. "P1234" — the ABTA logo appears once this is set.
+
+const TRUSTPILOT_URL =
+  BUSINESS.sameAs.find((url) => url.includes("trustpilot.com")) ??
+  "https://www.trustpilot.com/review/wickettravel.com";
+
 type Accreditation = {
   name: string;
   detail: string;
-  icon: LucideIcon;
-  /** Public record a visitor can check the claim against. */
+  /** Public page a visitor can check the claim against. */
   href?: string;
-  /** Official artwork in public/accreditations/, e.g. "/accreditations/tids.svg". */
-  logo?: string;
+  /** Logo in public/accreditations/ with its intrinsic size. */
+  logo?: { src: string; width: number; height: number };
+  /** Shown instead of a logo when there isn't one. */
+  icon?: LucideIcon;
 };
 
 const ACCREDITATIONS: Accreditation[] = [
   {
-    name: "IATA TIDS",
-    detail: "Registered travel agent · 96239010",
-    icon: BadgeCheck,
+    name: "IATA",
+    detail: "TIDS registered · 96239010",
+    logo: { src: "/accreditations/iata.png", width: 245, height: 160 },
+  },
+  ...(ABTA_MEMBER_NUMBER
+    ? [
+        {
+          name: "ABTA",
+          detail: `ABTA member · ${ABTA_MEMBER_NUMBER}`,
+          logo: { src: "/accreditations/abta.png", width: 403, height: 160 },
+        },
+      ]
+    : []),
+  {
+    name: "Trustpilot",
+    detail: "Rated Excellent · read our reviews",
+    href: TRUSTPILOT_URL,
+    logo: { src: "/accreditations/trustpilot.png", width: 635, height: 160 },
   },
   {
     name: "Companies House",
-    detail: "Registered in England & Wales · No. 17001759",
+    detail: "England & Wales · No. 17001759",
     icon: Building2,
     href: "https://find-and-update.company-information.service.gov.uk/company/17001759",
   },
@@ -182,38 +210,48 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Registrations, as badges on a white plate so official artwork
-            (usually drawn for white) can drop in without a dark variant. */}
+        {/* Logo badges on white plates, which is what the original artwork is
+            drawn for. Equal heights; one row on desktop, a 2-up grid on
+            phones. */}
         <ul
-          aria-label="Registrations"
-          className="mt-10 flex flex-wrap items-stretch justify-center gap-3 sm:justify-start"
+          aria-label="Registrations and ratings"
+          className="mt-10 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-stretch [&>li:last-child:nth-child(odd)]:col-span-2"
         >
           {ACCREDITATIONS.map((a) => {
             const body = (
               <>
-                {a.logo ? (
-                  <Image src={a.logo} alt={a.name} width={120} height={40} className="h-10 w-auto" />
-                ) : (
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary-050 text-primary-800">
-                    <a.icon className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                )}
-                <span className="flex flex-col leading-tight">
-                  <span className="t-label-2 text-primary-800">{a.name}</span>
-                  <span className="t-caption text-text-secondary">{a.detail}</span>
+                <span className="flex h-11 items-center justify-center">
+                  {a.logo ? (
+                    <Image
+                      src={a.logo.src}
+                      alt={a.name}
+                      width={a.logo.width}
+                      height={a.logo.height}
+                      sizes="140px"
+                      className="h-full w-auto max-w-[140px] object-contain"
+                    />
+                  ) : a.icon ? (
+                    <span className="flex items-center gap-2 t-label-1 text-primary-800">
+                      <a.icon className="h-6 w-6 text-primary-700" aria-hidden="true" />
+                      {a.name}
+                    </span>
+                  ) : null}
+                </span>
+                <span className="mt-2 block text-center t-caption leading-tight text-text-secondary">
+                  {a.detail}
                 </span>
               </>
             );
             const box =
-              "flex w-full items-center gap-3 rounded-md bg-neutral-000 px-4 py-3 shadow-e1";
+              "flex h-full w-full flex-col items-center justify-center rounded-md bg-neutral-000 px-4 py-3 shadow-e1 sm:min-w-[176px]";
             return (
-              <li key={a.name} className="flex w-full sm:w-auto">
+              <li key={a.name} className="flex">
                 {a.href ? (
                   <a
                     href={a.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`${a.name}: ${a.detail} (check the public record, opens in a new tab)`}
+                    aria-label={`${a.name}: ${a.detail} (opens in a new tab)`}
                     className={`${box} transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400`}
                   >
                     {body}
