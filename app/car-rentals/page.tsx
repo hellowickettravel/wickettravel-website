@@ -29,7 +29,7 @@ import {
   SITE_URL,
   TWITTER_BASE,
 } from "@/lib/seo";
-import { HOLIDAYS_URL, externalLinkProps } from "@/lib/links";
+import { HOLIDAYS_URL, PHONE_LINK, externalLinkProps } from "@/lib/links";
 
 /**
  * /car-rentals — Wicket Travel's car hire showcase.
@@ -563,8 +563,8 @@ export default function CarRentalsPage() {
                 Prefer to just talk to someone? Call {BUSINESS.phoneDisplay} —
                 any hour, any day.
               </p>
-              <a href={`tel:${BUSINESS.phone}`} className="btn btn-outline btn-sm">
-                Call the team
+              <a {...PHONE_LINK} className="btn btn-outline btn-sm">
+                WhatsApp the team
               </a>
             </div>
           </div>

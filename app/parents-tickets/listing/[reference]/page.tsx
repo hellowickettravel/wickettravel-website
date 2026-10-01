@@ -50,21 +50,21 @@ function toSearchParams(
 function shareCopy(shared: SharedDetails | undefined) {
   if (!shared) {
     return {
-      title: "Listing | Assist Family",
+      title: "Listing | Parent Travel Assist",
       description:
-        "One open Assist Family request or offer, in full — every introduction still made through Wicket Travel, never a direct contact detail.",
+        "One open Parent Travel Assist request or offer, in full — every introduction still made through Wicket Travel, never a direct contact detail.",
     };
   }
   const when = formatShareDate(shared.date);
   const flight = `${shared.from} → ${shared.to}${when ? `, ${when}` : ""}`;
   return shared.type === "traveller"
     ? {
-        title: `Travelling ${flight} and happy to help | Assist Family`,
+        title: `Travelling ${flight} and happy to help | Parent Travel Assist`,
         description:
           "A traveller on this flight is offering to keep an elderly passenger company. Ask Wicket Travel for an introduction.",
       }
     : {
-        title: `Help needed: ${flight} | Assist Family`,
+        title: `Help needed: ${flight} | Parent Travel Assist`,
         description:
           "A family is looking for someone on this flight to keep their elderly relative company. Are you travelling? Offer your help through Wicket Travel.",
       };
@@ -107,7 +107,7 @@ export default async function ListingDetailPage({ params, searchParams }: Props)
           lead="Contact details are never published — ask us for the introduction."
           breadcrumbs={[
             { label: "Home", href: "/" },
-            { label: "Assist Family", href: "/parents-tickets" },
+            { label: "Parent Travel Assist", href: "/parents-tickets" },
             { label: hasReference ? decoded : "Shared request" },
           ]}
         />

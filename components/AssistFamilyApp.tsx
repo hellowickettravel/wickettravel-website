@@ -1060,7 +1060,7 @@ export default function AssistFamilyApp({
                 <li className="flex items-center gap-2">
                   <ChevronRight className="h-3.5 w-3.5 text-primary-300" aria-hidden="true" />
                   <span aria-current="page" className="text-text-on-dark">
-                    Assist Family
+                    Parent Travel Assist
                   </span>
                 </li>
               </ol>

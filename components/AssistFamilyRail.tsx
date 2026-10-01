@@ -45,7 +45,7 @@ export default function AssistFamilyRail() {
     >
       <div className="container-page">
         <h2 id="assist-family-trust" className="sr-only">
-          How Assist Family works, and what we promise
+          How Parent Travel Assist works, and what we promise
         </h2>
 
         <div className="grid gap-4 md:grid-cols-3">

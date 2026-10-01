@@ -1,3 +1,4 @@
+import { WHATSAPP_URL } from "@/lib/links";
 import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -104,7 +105,7 @@ const sections: LegalSection[] = [
           fare, seat or price is guaranteed.
         </P>
         <P>
-          Some enquiries (for example, our Dubai visa or Assist Family
+          Some enquiries (for example, our Dubai visa or Parent Travel Assist
           forms) are handled as assisted, human-reviewed requests rather than
           instant bookings — our team will contact you to complete the
           process.
@@ -260,7 +261,7 @@ const sections: LegalSection[] = [
         {BUSINESS.addressRegion}, {BUSINESS.postalCode}, UK.{" "}
         <br className="hidden sm:block" />
         Email: <LegalLink href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</LegalLink> ·
-        {" "}Phone/WhatsApp: <LegalLink href={`tel:${BUSINESS.phone}`}>{BUSINESS.phoneDisplay}</LegalLink>
+        {" "}Phone/WhatsApp: <LegalLink href={WHATSAPP_URL} external>{BUSINESS.phoneDisplay}</LegalLink>
       </P>
     ),
   },

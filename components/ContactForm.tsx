@@ -1,5 +1,6 @@
 "use client";
 
+import { PHONE_LINK } from "@/lib/links";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { AlertCircle, CheckCircle2, ChevronDown, Send } from "lucide-react";
@@ -165,9 +166,9 @@ export default function ContactForm() {
         <h3 className="t-h3 mt-6 text-primary-800">Almost there, {data.name.split(" ")[0] || "traveler"}!</h3>
         <p className="t-body-sm mx-auto mt-3 max-w-sm text-text-secondary">
           Your email app should have opened with your message pre-filled — just
-          hit send. Prefer not to wait? Call or WhatsApp us on{" "}
+          hit send. Prefer not to wait? WhatsApp us on{" "}
           <a
-            href={`tel:${BUSINESS.phone}`}
+            {...PHONE_LINK}
             className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
           >
             {BUSINESS.phoneDisplay}

@@ -1,3 +1,4 @@
+import { WHATSAPP_URL } from "@/lib/links";
 import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -165,7 +166,7 @@ const sections: LegalSection[] = [
     content: (
       <P>
         Email: <LegalLink href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</LegalLink> ·{" "}
-        Phone/WhatsApp: <LegalLink href={`tel:${BUSINESS.phone}`}>{BUSINESS.phoneDisplay}</LegalLink>.
+        Phone/WhatsApp: <LegalLink href={WHATSAPP_URL} external>{BUSINESS.phoneDisplay}</LegalLink>.
         {" "}{BUSINESS.legalName}, {BUSINESS.streetAddress}, {BUSINESS.addressLocality},{" "}
         {BUSINESS.addressRegion}, {BUSINESS.postalCode}, UK.
       </P>

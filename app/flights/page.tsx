@@ -1,3 +1,4 @@
+import { PHONE_LINK } from "@/lib/links";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -569,7 +570,7 @@ export default function FlightsPage() {
                   Search flights
                 </a>
                 <a
-                  href={`tel:${BUSINESS.phone}`}
+                  {...PHONE_LINK}
                   className="btn btn-outline h-12 w-full px-8 sm:w-auto"
                 >
                   <Phone className="h-4 w-4" aria-hidden="true" />

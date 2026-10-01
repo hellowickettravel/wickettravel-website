@@ -23,10 +23,10 @@ import {
   SITE_URL,
   TWITTER_BASE,
 } from "@/lib/seo";
-import { WHATSAPP_URL } from "@/lib/links";
+import { PHONE_LINK, WHATSAPP_URL } from "@/lib/links";
 
 /**
- * /parents-tickets — the dedicated home for Assist Family.
+ * /parents-tickets — the dedicated home for Parent Travel Assist.
  *
  * WHAT THIS PAGE IS NOW. It was a long read: hero, two columns of prose about
  * how it works, a form, then — right at the bottom, past everything — a
@@ -67,20 +67,22 @@ import { WHATSAPP_URL } from "@/lib/links";
    /api/parent-ticket relay are untouched for the same reason: they're wired
    to the live portal backend, not display copy. */
 export const metadata: Metadata = {
-  title: "Assist Family",
+  // The product name alone has no search demand (MEMORY.md, SEO), so the
+  // title carries the words people actually search for as well.
+  title: "Parent Travel Assist: Companions for Elderly Parents Flying Alone",
   description:
-    "See who's flying your route today. Assist Family is the board where families whose elderly relative is flying alone meet travellers already going the same way. Free to post, contact details never published.",
+    "See who's flying your route today. Parent Travel Assist is the board where families whose elderly relative is flying alone meet travellers already going the same way. Free to post, contact details never published.",
   alternates: { canonical: "/parents-tickets" },
   openGraph: {
     ...OG_BASE,
     url: `${SITE_URL}/parents-tickets`,
-    title: "Assist Family | Who's flying your route today?",
+    title: "Parent Travel Assist | Who's flying your route today?",
     description:
       "Search the board by airport, date, airline or language. Families asking for a companion on one side, travellers already booked on the other — a coordinator makes every introduction.",
   },
   twitter: {
     ...TWITTER_BASE,
-    title: "Assist Family | Who's flying your route today?",
+    title: "Parent Travel Assist | Who's flying your route today?",
     description:
       "The board where families flying an elderly relative alone meet travellers already on that route. Searchable, filterable, and nothing published unless you ask.",
   },
@@ -132,7 +134,7 @@ const jsonLd = {
         {
           "@type": "ListItem",
           position: 2,
-          name: "Assist Family",
+          name: "Parent Travel Assist",
           item: `${SITE_URL}/parents-tickets`,
         },
       ],
@@ -145,7 +147,7 @@ const jsonLd = {
          published as one. */
       "@type": "Service",
       "@id": `${SITE_URL}/parents-tickets#service`,
-      name: "Assist Family travel companion matching",
+      name: "Parent Travel Assist — travel companion matching",
       serviceType: "Travel companion introduction service",
       url: `${SITE_URL}/parents-tickets`,
       description:
@@ -297,7 +299,7 @@ export default function ParentsTicketsPage() {
                 </p>
                 <div className="mt-5 flex flex-col gap-3">
                   <a
-                    href={`tel:${BUSINESS.phone}`}
+                    {...PHONE_LINK}
                     className="btn btn-secondary w-full"
                   >
                     <PhoneCall className="h-4 w-4" aria-hidden="true" />

@@ -27,7 +27,7 @@ import {
   SITE_URL,
   TWITTER_BASE,
 } from "@/lib/seo";
-import { WHATSAPP_URL } from "@/lib/links";
+import { PHONE_LINK, WHATSAPP_URL } from "@/lib/links";
 
 /**
  * /visa — the dedicated Dubai / UAE visa page.
@@ -245,7 +245,7 @@ export default function VisaPage() {
                     <ArrowRight className="h-5 w-5" aria-hidden="true" />
                   </a>
                   <a
-                    href={`tel:${BUSINESS.phone}`}
+                    {...PHONE_LINK}
                     className="inline-flex items-center justify-center gap-2 rounded-full border border-neutral-000/20 bg-neutral-000/5 px-8 py-4 t-label-2 text-text-on-dark transition-colors hover:bg-neutral-000/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-000/60 focus-visible:ring-offset-2 focus-visible:ring-offset-primary-900"
                   >
                     <PhoneCall className="h-4 w-4" aria-hidden="true" />
@@ -405,7 +405,7 @@ export default function VisaPage() {
                 </p>
                 <div className="mt-5 flex flex-col gap-3">
                   <a
-                    href={`tel:${BUSINESS.phone}`}
+                    {...PHONE_LINK}
                     className="btn btn-secondary w-full"
                   >
                     <PhoneCall className="h-4 w-4" aria-hidden="true" />

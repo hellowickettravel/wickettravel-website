@@ -13,7 +13,7 @@ import {
   SITE_URL,
   TWITTER_BASE,
 } from "@/lib/seo";
-import { WHATSAPP_URL } from "@/lib/links";
+import { PHONE_LINK, WHATSAPP_URL } from "@/lib/links";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -111,16 +111,16 @@ export default function ContactPage() {
                   promise the card can't keep. */}
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <a
-                  href={`tel:${BUSINESS.phone}`}
+                  {...PHONE_LINK}
                   className="card card-hover group flex h-full items-start gap-4 p-6"
                 >
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-primary-050 text-primary-700 transition-colors duration-200 group-hover:bg-accent-500 group-hover:text-text-on-dark">
                     <Phone className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span>
-                    <span className="block t-label-2 text-primary-800">Call us</span>
+                    <span className="block t-label-2 text-primary-800">Call us on WhatsApp</span>
                     <span className="mt-1 block t-body-sm text-text-secondary">{BUSINESS.phoneDisplay}</span>
-                    <span className="mt-1 block t-label-3 text-success">Available 24/7</span>
+                    <span className="mt-1 block t-label-3 text-success">Voice or video call, 24/7</span>
                   </span>
                 </a>
 

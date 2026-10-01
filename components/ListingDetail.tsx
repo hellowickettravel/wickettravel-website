@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { BUSINESS, SITE_URL } from "@/lib/seo";
-import { WHATSAPP_URL } from "@/lib/links";
+import { PHONE_LINK, WHATSAPP_URL } from "@/lib/links";
 import { destinationImage, formatEntryDate, type ParsedEntry } from "@/lib/parents";
 import {
   buildHelpHref,
@@ -178,7 +178,7 @@ function ListingView({ view }: { view: View }) {
   });
 
   const whatsappUs = `${WHATSAPP_URL}?text=${encodeURIComponent(
-    `Hi Wicket Travel, I'm getting in touch about Assist Family ${
+    `Hi Wicket Travel, I'm getting in touch about Parent Travel Assist ${
       reference ? `listing ${reference}` : "a shared request"
     } (${route}${dateLabel ? `, ${dateLabel}` : ""}).`
   )}`;
@@ -269,9 +269,9 @@ function ListingView({ view }: { view: View }) {
           <div className="flex flex-wrap gap-3">
             {isTraveller ? (
               <a
-                href={`tel:${BUSINESS.phone}`}
+                {...PHONE_LINK}
                 className="btn btn-primary"
-                aria-label={`Call Wicket Travel about ${reference ? `entry ${reference}` : "this listing"}`}
+                aria-label={`Message Wicket Travel on WhatsApp about ${reference ? `entry ${reference}` : "this listing"}`}
               >
                 <Phone className="h-4 w-4" aria-hidden="true" />
                 Ask for an introduction
@@ -309,10 +309,10 @@ function ListingView({ view }: { view: View }) {
             <>
               {" "}Rather talk?{" "}
               <a
-                href={`tel:${BUSINESS.phone}`}
+                {...PHONE_LINK}
                 className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
               >
-                Call {BUSINESS.phoneDisplay}
+                WhatsApp {BUSINESS.phoneDisplay}
               </a>
               .
             </>
@@ -389,8 +389,8 @@ function NotFound({ feedError }: { feedError?: "rate_limited" | "generic" }) {
         <Link href="/parents-tickets/offers" className="btn btn-outline">
           See offers
         </Link>
-        <a href={`tel:${BUSINESS.phone}`} className="btn btn-secondary">
-          Call {BUSINESS.phoneDisplay}
+        <a {...PHONE_LINK} className="btn btn-secondary">
+          WhatsApp {BUSINESS.phoneDisplay}
         </a>
       </div>
     </div>
