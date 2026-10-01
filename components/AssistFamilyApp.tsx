@@ -43,7 +43,8 @@ import {
   searchHaystack,
   splitPlace,
 } from "@/lib/parents";
-import { MOBILITY_NEEDS } from "@/lib/parents";
+import { useBoardOptions } from "@/lib/useBoardOptions";
+import type { BoardOptions } from "@/lib/boardOptions";
 import { useParentBoard } from "@/lib/useParentBoard";
 
 /**
@@ -109,8 +110,10 @@ const SUPPORT_LABELS: [RegExp, string][] = [
   [/^other/i, "Other support"],
 ];
 
-function shortSupport(value: string): string {
-  return SUPPORT_LABELS.find(([re]) => re.test(value))?.[1] ?? value;
+/** The admin's short label for a support option when there is one
+ *  (lib/boardOptions.ts), else the built-in mapping above, else the value. */
+function shortSupport(value: string, labels?: Map<string, string>): string {
+  return labels?.get(value) ?? SUPPORT_LABELS.find(([re]) => re.test(value))?.[1] ?? value;
 }
 
 /** "Telugu, Hindi, English" is three chips' worth of width in one chip. */
@@ -127,70 +130,25 @@ const SORT_OPTIONS: SelectOption[] = [
   { value: "newest", label: "Newest posts" },
 ];
 
-/* The fixed lists behind the filters. Anything a real post brings in that
-   isn't here is added to its list at runtime, so nothing is ever unfindable. */
-const COMMON_FROM = ["LHR", "LGW", "MAN", "BHX", "STN", "EDI", "GLA", "LTN"];
-const COMMON_TO = ["DXB", "DEL", "BOM", "HYD", "BLR", "ISB", "LHE", "KHI", "AUH", "DOH", "COK", "AMD", "ATQ", "DAC", "CMB", "JED"];
-const COMMON_AIRLINES = [
-  "Air India",
-  "British Airways",
-  "Emirates",
-  "Etihad Airways",
-  "Gulf Air",
-  "Kuwait Airways",
-  "Oman Air",
-  "Pakistan International Airlines",
-  "Qatar Airways",
-  "Saudia",
-  "SriLankan Airlines",
-  "Turkish Airlines",
-  "Virgin Atlantic",
-];
-const COMMON_LANGUAGES = [
-  "Arabic",
-  "Bengali",
-  "English",
-  "Gujarati",
-  "Hindi",
-  "Kannada",
-  "Malayalam",
-  "Marathi",
-  "Pashto",
-  "Punjabi",
-  "Sinhala",
-  "Tamil",
-  "Telugu",
-  "Urdu",
-];
-
-/** Names for codes the directory doesn't carry, as posters usually write them. */
-const EXTRA_PLACE_NAMES: Record<string, string> = {
-  LTN: "London Luton",
-  GLA: "Glasgow",
-  ISB: "Islamabad",
-  LHE: "Lahore",
-  KHI: "Karachi",
-  COK: "Kochi",
-  AMD: "Ahmedabad",
-  ATQ: "Amritsar",
-  DAC: "Dhaka",
-  CMB: "Colombo",
-  JED: "Jeddah",
-  HYD: "Hyderabad",
-  BLR: "Bengaluru",
-};
+/* The fixed lists behind the filters (airports, airlines, languages,
+   support needs) come from the portal, where an admin keeps them
+   (lib/boardOptions.ts, lib/useBoardOptions.ts). Anything a real post
+   brings in that isn't on a list is added at runtime, so nothing is ever
+   unfindable. */
 
 /** "LHR" → "LHR · London Heathrow"; a free-text place stays as it is. */
-function placeLabel(key: string, seen: Map<string, string>): string {
+function placeLabel(key: string, admin: Map<string, string>, seen: Map<string, string>): string {
   if (!/^[A-Z]{3}$/.test(key)) return key;
-  const fromFeed = seen.get(key);
-  if (fromFeed) return `${key} · ${fromFeed}`;
+  // The admin's name wins, then what posters wrote, then the site's airport
+  // directory, then the bare code.
+  const known = admin.get(key) ?? seen.get(key);
+  if (known) return `${key} · ${known}`;
   const a = AIRPORTS.find((x) => x.code === key);
   if (a) {
     const name = a.name && a.name !== a.city ? `${a.city} ${a.name}` : a.city;
     return `${key} · ${name}`;
   }
-  return EXTRA_PLACE_NAMES[key] ? `${key} · ${EXTRA_PLACE_NAMES[key]}` : key;
+  return key;
 }
 
 /** Union of a fixed list and whatever the feed brought in, sorted. */
@@ -242,8 +200,10 @@ function cleanLanguage(part: string): string {
 function Row({
   entry,
   tone,
+  supportLabels,
 }: {
   entry: ParsedEntry;
+  supportLabels?: Map<string, string>;
   /** This card's colour pair, from its position (lib/parents.ts, boardTone). */
   tone: ReturnType<typeof boardTone>;
 }) {
@@ -272,7 +232,7 @@ function Row({
 
   /* Chips carry meaning through colour, not just words: the care need is the
      one a family is actually filtering on, so it is the only tinted chip. */
-  const careChip = !isTraveller && mobility ? shortSupport(mobility) : undefined;
+  const careChip = !isTraveller && mobility ? shortSupport(mobility, supportLabels) : undefined;
   const plainChips: string[] = [];
   if (isTraveller) {
     if (capacity !== undefined) {
@@ -432,6 +392,73 @@ function Row({
   );
 }
 
+/* ── Both-directions switch ────────────────────────────────────────────── */
+
+/**
+ * "LHR → HYD" families and "HYD → LHR" families are the same people on the
+ * way out and the way back, so the board matches a route either way round
+ * by default. The sentence spells out what's being matched with the
+ * airports actually picked, so the switch never reads as jargon.
+ */
+function BothWaysSwitch({
+  on,
+  onChange,
+  from,
+  to,
+  compact,
+}: {
+  on: boolean;
+  onChange: (v: boolean) => void;
+  from: string;
+  to: string;
+  compact?: boolean;
+}) {
+  const a = from || "A";
+  const b = to || "B";
+  return (
+    <label
+      className={cn(
+        "flex cursor-pointer select-none items-start gap-3",
+        compact ? "t-caption" : "t-body-sm"
+      )}
+    >
+      <input
+        type="checkbox"
+        role="switch"
+        checked={on}
+        onChange={(e) => onChange(e.target.checked)}
+        className="peer sr-only"
+      />
+      <span
+        aria-hidden="true"
+        className={cn(
+          "relative mt-0.5 inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200",
+          "peer-focus-visible:ring-2 peer-focus-visible:ring-primary-700 peer-focus-visible:ring-offset-2",
+          on ? "bg-primary-800" : "bg-neutral-300"
+        )}
+      >
+        <span
+          className={cn(
+            "absolute left-0.5 h-5 w-5 rounded-full bg-neutral-000 shadow-e1 transition-transform duration-200",
+            on ? "translate-x-5" : "translate-x-0"
+          )}
+        />
+      </span>
+      <span className="min-w-0">
+        <span className="flex items-center gap-1.5 font-bold text-primary-800">
+          <ArrowRightLeft className="h-3.5 w-3.5 text-accent-500" aria-hidden="true" />
+          Search both directions
+        </span>
+        <span className="block text-text-secondary">
+          {on
+            ? `Showing ${a} → ${b} and ${b} → ${a}.`
+            : `Only ${a} → ${b}, in that order.`}
+        </span>
+      </span>
+    </label>
+  );
+}
+
 /* ── Column ────────────────────────────────────────────────────────────── */
 
 function BoardColumn({
@@ -443,6 +470,7 @@ function BoardColumn({
   countLabel,
   empty,
   className,
+  supportLabels,
 }: {
   title: string;
   subtitle: string;
@@ -452,6 +480,7 @@ function BoardColumn({
   countLabel: string;
   empty: string;
   className?: string;
+  supportLabels?: Map<string, string>;
 }) {
   const warm = tone === "requester";
   return (
@@ -497,7 +526,7 @@ function BoardColumn({
         <ul className="space-y-2.5">
           {rows.map((entry, i) => (
             <li key={entry.reference ?? `row-${i}`}>
-              <Row entry={entry} tone={boardTone(i, warm ? 0 : 2)} />
+              <Row entry={entry} tone={boardTone(i, warm ? 0 : 2)} supportLabels={supportLabels} />
             </li>
           ))}
         </ul>
@@ -618,6 +647,10 @@ export default function AssistFamilyApp({
   const [freeOnly, setFreeOnly] = useState(false);
   const [multi, setMulti] = useState(false);
   const [sort, setSort] = useState<Sort>("soonest");
+  /** Match a route either way round: LHR → HYD also finds HYD → LHR. On by
+   *  default, because families post in whichever direction they think of. */
+  const [bothWays, setBothWays] = useState(true);
+  const boardOptions: BoardOptions = useBoardOptions();
   const [filtersOpen, setFiltersOpen] = useState(false);
   /** Which column a narrow screen is showing; ignored from lg up. */
   const [mobileSide, setMobileSide] = useState<Side>(lockSide ?? "requester");
@@ -625,11 +658,10 @@ export default function AssistFamilyApp({
   const toggle = (list: string[], set: (v: string[]) => void) => (value: string) =>
     set(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
 
-  /* ── Option lists: fixed lists ∪ what the feed carries, with counts ── */
+  /* ── Option lists: the admin's lists ∪ what the feed carries, with counts ── */
   const options = useMemo(() => {
     const names = new Map<string, string>();
-    const f: string[] = [];
-    const t: string[] = [];
+    const places: string[] = [];
     const al: string[] = [];
     const lg: string[] = [];
     const sp: string[] = [];
@@ -644,12 +676,14 @@ export default function AssistFamilyApp({
       const fk = placeKey(e.from);
       const tk = placeKey(e.to);
       if (fk) {
-        f.push(fk);
+        places.push(fk);
         bump(`from:${fk}`);
+        bump(`any:${fk}`);
       }
       if (tk) {
-        t.push(tk);
+        places.push(tk);
         bump(`to:${tk}`);
+        if (tk !== fk) bump(`any:${tk}`);
       }
       if (e.airline) {
         al.push(e.airline);
@@ -670,34 +704,41 @@ export default function AssistFamilyApp({
 
     const n = (k: string) => count.get(k) ?? 0;
     const listing = (c: number) => `${c} ${c === 1 ? "listing" : "listings"}`;
+
+    // Every airport is offered on BOTH dropdowns: a family flying HYD → LHR
+    // needs HYD under "Flying from". Order differs by end: UK departures
+    // first under "from", destinations first under "to", then anything
+    // new from the feed.
+    const adminNames = new Map(boardOptions.airports.map((a) => [a.code, a.name]));
+    const uk = boardOptions.airports.filter((a) => a.region === "uk").map((a) => a.code);
+    const dest = boardOptions.airports.filter((a) => a.region !== "uk").map((a) => a.code);
+    const extra = [...new Set(places)].filter((k) => !adminNames.has(k)).sort();
     const place = (kind: "from" | "to", list: string[]): SelectOption[] =>
       list.map((k) => {
-        const c = n(`${kind}:${k}`);
-        return { value: k, label: placeLabel(k, names), hint: listing(c), muted: c === 0 };
+        const c = n(bothWays ? `any:${k}` : `${kind}:${k}`);
+        return { value: k, label: placeLabel(k, adminNames, names), hint: listing(c), muted: c === 0 };
       });
 
-    // Places keep the fixed order (busiest UK airports and routes first),
-    // with anything new from the feed after them.
-    const fromKeys = withFeed(COMMON_FROM, f.filter((k) => !COMMON_FROM.includes(k)).sort(), false);
-    const toKeys = withFeed(COMMON_TO, t.filter((k) => !COMMON_TO.includes(k)).sort(), false);
+    const supportLabels = new Map(boardOptions.supports.map((x) => [x.value, x.label]));
 
     return {
-      from: place("from", fromKeys),
-      to: place("to", toKeys),
-      airlines: withFeed(COMMON_AIRLINES, al).map((a) => {
+      from: place("from", [...new Set([...uk, ...dest, ...extra])]),
+      to: place("to", [...new Set([...dest, ...uk, ...extra])]),
+      airlines: withFeed(boardOptions.airlines, [...al].sort(), false).map((a) => {
         const c = n(`air:${a}`);
         return { value: a, label: a, hint: listing(c), muted: c === 0 };
       }),
-      languages: withFeed(COMMON_LANGUAGES, lg).map((l) => ({
+      languages: withFeed(boardOptions.languages, [...lg].sort(), false).map((l) => ({
         value: l,
         label: l,
         count: n(`lang:${l}`),
       })),
-      supports: withFeed([...MOBILITY_NEEDS], sp, false).map((v) => ({
+      supports: withFeed(boardOptions.supports.map((x) => x.value), sp, false).map((v) => ({
         value: v,
-        label: shortSupport(v),
+        label: shortSupport(v, supportLabels),
         count: n(`sup:${v}`),
       })),
+      supportLabels,
       sideCount: {
         requester: entries.filter((e) => e.type !== "traveller").length,
         traveller: entries.filter((e) => e.type === "traveller").length,
@@ -705,7 +746,7 @@ export default function AssistFamilyApp({
       freeCount: entries.filter((e) => e.amount === 0).length,
       multiCount: entries.filter((e) => e.type === "traveller" && (e.capacity ?? 0) >= 2).length,
     };
-  }, [entries]);
+  }, [entries, boardOptions, bothWays]);
 
   const match = useMemo(() => {
     const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -714,8 +755,14 @@ export default function AssistFamilyApp({
         const hay = searchHaystack(e);
         if (!terms.every((term) => hay.includes(term))) return false;
       }
-      if (from && placeKey(e.from) !== from) return false;
-      if (to && placeKey(e.to) !== to) return false;
+      if (from || to) {
+        const fk = placeKey(e.from);
+        const tk = placeKey(e.to);
+        const forward = (!from || fk === from) && (!to || tk === to);
+        // Either way round: the same pair of airports, reversed.
+        const reverse = bothWays && (!from || tk === from) && (!to || fk === to);
+        if (!forward && !reverse) return false;
+      }
       if (airline && e.airline !== airline) return false;
       if (langs.length > 0) {
         const have = (e.languages ?? "").toLowerCase();
@@ -737,7 +784,7 @@ export default function AssistFamilyApp({
       }
       return true;
     };
-  }, [query, from, to, airline, langs, supports, multi, freeOnly, when]);
+  }, [query, from, to, bothWays, airline, langs, supports, multi, freeOnly, when]);
 
   const order = useMemo(() => {
     const time = (v: string | undefined, missing: number) => {
@@ -783,6 +830,7 @@ export default function AssistFamilyApp({
     setSides(["requester", "traveller"]);
     setFreeOnly(false);
     setMulti(false);
+    setBothWays(true);
   };
 
   const swap = () => {
@@ -873,6 +921,9 @@ export default function AssistFamilyApp({
           Search
         </a>
       </div>
+      <div className="mt-4 border-t border-neutral-200 pt-4">
+        <BothWaysSwitch on={bothWays} onChange={setBothWays} from={from} to={to} />
+      </div>
     </div>
   );
 
@@ -941,6 +992,7 @@ export default function AssistFamilyApp({
               menuMinWidth={300}
             />
           </div>
+          <BothWaysSwitch on={bothWays} onChange={setBothWays} from={from} to={to} compact />
           <div>
             {label("Airline", Plane)}
             <Select
@@ -998,6 +1050,7 @@ export default function AssistFamilyApp({
 
   const familiesColumn = lockSide === "traveller" ? null : (
     <BoardColumn
+      supportLabels={options.supportLabels}
       title="Parents / Passengers"
       subtitle="Looking for help"
       icon={Users}
@@ -1011,6 +1064,7 @@ export default function AssistFamilyApp({
 
   const travellersColumn = lockSide === "requester" ? null : (
     <BoardColumn
+      supportLabels={options.supportLabels}
       title="Travellers"
       subtitle="Available to help"
       icon={Plane}
