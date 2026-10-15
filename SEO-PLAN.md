@@ -116,8 +116,9 @@ account-gated, not code:
    registered address (or set it up as a service-area business if there's no
    walk-in office), category "Travel agency", 24/7 hours, and start
    collecting Google reviews specifically — Google weights its own reviews
-   far more heavily than Trustpilot for local-pack ranking, even though the
-   Trustpilot number (4.8, 12,480 reviews) is a strong trust signal to keep.
+   far more heavily than Trustpilot for local-pack ranking, even though a
+   verified Trustpilot rating is a strong trust signal to keep (the site
+   currently states no score or review count while the client verifies it).
 4. **NAP-consistent citations** — Yell, Bing Places, Apple Maps Business
    Connect, and any UK travel-trade directories, all using the exact name/
    address/phone in `lib/seo.ts` (Wicket Travel Limited, Lampton Avenue,

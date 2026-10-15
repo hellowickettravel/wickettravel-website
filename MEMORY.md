@@ -185,8 +185,11 @@ Keyword research uses Google's autocomplete (`suggestqueries.google.com`,
 
 ### Two public claims waiting on the client (don't change them yourself)
 
-1. **Trustpilot:** the site publishes 4.8 from 12,480 reviews. The real
-   profile shows 4.5 from 17. It appears on 5 pages and in homepage schema.
+1. **Trustpilot:** the site no longer states any score or review count (the
+   old 4.8 from 12,480 was removed; the real profile shows about 4.5 from
+   17). It now says "Rated Excellent on Trustpilot" and links to the live
+   profile, and the homepage schema has no `aggregateRating`. Add numbers
+   back only when the client confirms them (`BUSINESS` in `lib/seo.ts`).
 2. **"ATOL-style financial protection"** in `lib/faq.ts`. The company has an
    IATA TIDS number, not an ATOL licence.
 

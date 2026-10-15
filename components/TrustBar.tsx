@@ -6,7 +6,7 @@ const STATS = [
   { value: "2M+", label: "Travelers flown" },
   { value: "60+", label: "Trusted airlines" },
   { value: "120+", label: "Countries served" },
-  { value: "4.8★", label: "Average traveler rating" },
+  { value: "Excellent", label: "Rated on Trustpilot" },
 ];
 
 export default function TrustBar() {
