@@ -21,10 +21,11 @@ export const BUSINESS = {
   addressRegion: "London",
   addressCountry: "GB",
   postalCode: "TW3 4EW",
-  /* No ratingValue / reviewCount on purpose: the Trustpilot score and review
-     count are being verified with the client, so the site makes no numeric
-     claim. Say "Rated Excellent on Trustpilot" and link to the live profile
-     (sameAs below) — add the numbers back only once they're confirmed. */
+  /** Trustpilot score, as approved by the client. There is deliberately no
+   *  review count anywhere on the site (and so no aggregateRating JSON-LD,
+   *  which requires one) — the client asked us not to claim a number of
+   *  reviews. Link to the live profile (sameAs below) for the detail. */
+  ratingValue: 4.5,
   sameAs: [
     "https://x.com/WicketTravel",
     "https://www.instagram.com/wickettravel/",
@@ -36,6 +37,20 @@ export const BUSINESS = {
    *  Not the exact building; that's all a postcode centroid ever gives you. */
   geo: { latitude: 51.477288, longitude: -0.365695 },
 } as const;
+
+/** Trustpilot-green star box background for star `i` (0-based) of a 5-star
+ *  rating: solid green when fully earned, half green / half grey for a
+ *  fractional star (4.5 => the fifth box is half filled), grey otherwise. */
+export function starBackground(i: number, rating: number): string {
+  const green = "#00b67a";
+  const grey = "#d8d8d4"; // --color-neutral-300
+  if (i + 1 <= rating) return green;
+  if (i < rating) {
+    const pct = Math.round((rating - i) * 100);
+    return `linear-gradient(to right, ${green} ${pct}%, ${grey} ${pct}%)`;
+  }
+  return grey;
+}
 
 /**
  * Phone/WhatsApp support is staffed 24/7 — the same fact the Contact page

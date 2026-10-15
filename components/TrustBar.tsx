@@ -1,12 +1,13 @@
 /* Server component: with the scroll-reveal wrappers gone this section holds no
    state, no hooks and no client-only APIs, so it ships no JS of its own. */
 import { ShieldCheck } from "lucide-react";
+import { BUSINESS } from "@/lib/seo";
 
 const STATS = [
   { value: "2M+", label: "Travelers flown" },
   { value: "60+", label: "Trusted airlines" },
   { value: "120+", label: "Countries served" },
-  { value: "Excellent", label: "Rated on Trustpilot" },
+  { value: `${BUSINESS.ratingValue}★`, label: "Rated Excellent on Trustpilot" },
 ];
 
 export default function TrustBar() {
