@@ -23,6 +23,7 @@ import {
   SITE_URL,
   TWITTER_BASE,
   UK_DEPARTURES,
+  starBackground,
 } from "@/lib/seo";
 import { PORTAL_LOGIN_URL } from "@/lib/links";
 
@@ -268,16 +269,20 @@ export default function AboutPage() {
               <div className="card h-full p-8 text-center">
                 <span className="mx-auto flex w-fit gap-1" aria-hidden="true">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className="grid h-7 w-7 place-items-center rounded-xs bg-[#00b67a]">
+                    <span
+                      key={i}
+                      className="grid h-7 w-7 place-items-center rounded-xs"
+                      style={{ background: starBackground(i, BUSINESS.ratingValue) }}
+                    >
                       <Star className="h-4 w-4 fill-neutral-000 text-text-on-dark" />
                     </span>
                   ))}
                 </span>
                 <p className="mt-4 t-h3 text-primary-800">
-                  Rated &ldquo;Excellent&rdquo;
+                  {BUSINESS.ratingValue} out of 5
                 </p>
                 <p className="t-body-sm mt-1 text-text-secondary">
-                  Read what our customers say on Trustpilot
+                  Rated &ldquo;Excellent&rdquo; on Trustpilot
                 </p>
                 <a
                   href={BUSINESS.sameAs[3]}

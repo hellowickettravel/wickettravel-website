@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import { BUSINESS } from "@/lib/seo";
+import { BUSINESS, starBackground } from "@/lib/seo";
 import { cn } from "@/lib/cn";
 
 /**
@@ -73,8 +73,8 @@ function Stars({ rating, size = "sm" }: { rating: number; size?: "sm" | "lg" }) 
       {Array.from({ length: 5 }).map((_, i) => (
         <span
           key={i}
-          className={cn("grid place-items-center rounded-[3px]", box, i >= rating && "bg-neutral-300")}
-          style={i < rating ? { backgroundColor: TP_GREEN } : undefined}
+          className={cn("grid place-items-center rounded-[3px]", box)}
+          style={{ background: starBackground(i, rating) }}
         >
           <Star className={cn(star, "fill-neutral-000 text-neutral-000")} aria-hidden="true" />
         </span>
@@ -210,7 +210,7 @@ export default function Reviews() {
               <span className="flex items-baseline gap-2">
                 <span className="t-h4 text-primary-800">Excellent</span>
               </span>
-              <Stars rating={5} size="lg" />
+              <Stars rating={BUSINESS.ratingValue} size="lg" />
             </span>
             <span aria-hidden="true" className="h-14 w-px bg-neutral-200" />
             <span className="flex flex-col gap-1">

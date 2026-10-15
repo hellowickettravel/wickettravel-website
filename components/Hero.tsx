@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Headset, ShieldCheck, Star } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { BUSINESS } from "@/lib/seo";
 import FlightSearch from "@/components/FlightSearch";
 import TrustpilotBadge from "@/components/TrustpilotBadge";
 
@@ -13,7 +14,7 @@ import TrustpilotBadge from "@/components/TrustpilotBadge";
 const PROOF = [
   {
     icon: Star,
-    text: "Rated Excellent on Trustpilot",
+    text: `${BUSINESS.ratingValue}/5 rated Excellent on Trustpilot`,
   },
   { icon: ShieldCheck, text: "No hidden booking fees" },
   { icon: Headset, text: "Real UK agents, 24/7" },

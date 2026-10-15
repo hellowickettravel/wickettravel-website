@@ -187,7 +187,7 @@ const REASONS = [
   {
     icon: BadgeCheck,
     title: "Reviews from guests who actually stayed",
-    body: "Ratings come from completed bookings only, alongside the Excellent Trustpilot rating the wider Wicket team already holds.",
+    body: `Ratings come from completed bookings only, alongside the ${BUSINESS.ratingValue}/5 Excellent Trustpilot rating the wider Wicket team already holds.`,
   },
   {
     icon: Sparkles,
