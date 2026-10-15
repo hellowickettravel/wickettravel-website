@@ -79,12 +79,6 @@ const jsonLd = {
         "Flights to Dubai",
         "Airline ticket deals",
       ],
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: BUSINESS.ratingValue,
-        bestRating: 5,
-        reviewCount: BUSINESS.reviewCount,
-      },
     },
     {
       "@type": "WebSite",

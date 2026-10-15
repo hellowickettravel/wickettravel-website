@@ -274,10 +274,10 @@ export default function AboutPage() {
                   ))}
                 </span>
                 <p className="mt-4 t-h3 text-primary-800">
-                  {BUSINESS.ratingValue} out of 5
+                  Rated &ldquo;Excellent&rdquo;
                 </p>
                 <p className="t-body-sm mt-1 text-text-secondary">
-                  Rated &ldquo;Excellent&rdquo; from {BUSINESS.reviewCount.toLocaleString()}+ reviews on Trustpilot
+                  Read what our customers say on Trustpilot
                 </p>
                 <a
                   href={BUSINESS.sameAs[3]}

@@ -21,9 +21,10 @@ export const BUSINESS = {
   addressRegion: "London",
   addressCountry: "GB",
   postalCode: "TW3 4EW",
-  /** Trustpilot rating as shown on-page (TrustpilotBadge + Testimonials). */
-  ratingValue: 4.8,
-  reviewCount: 12480,
+  /* No ratingValue / reviewCount on purpose: the Trustpilot score and review
+     count are being verified with the client, so the site makes no numeric
+     claim. Say "Rated Excellent on Trustpilot" and link to the live profile
+     (sameAs below) — add the numbers back only once they're confirmed. */
   sameAs: [
     "https://x.com/WicketTravel",
     "https://www.instagram.com/wickettravel/",

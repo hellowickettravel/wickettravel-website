@@ -293,14 +293,11 @@ const jsonLd = {
   ],
 };
 
-/* Facts already standing elsewhere on the site — the rating feeds the
-   TravelAgency JSON-LD, the airline count matches the homepage trust bar,
-   and the fee and support promises are the agency's own. */
+/* Facts already standing elsewhere on the site — the airline count matches
+   the homepage trust bar, and the fee and support promises are the agency's
+   own. The Trustpilot line states no score or review count (see lib/seo.ts). */
 const STATS = [
-  {
-    value: `${BUSINESS.ratingValue}/5`,
-    label: `Rated by ${BUSINESS.reviewCount.toLocaleString("en-GB")} travelers`,
-  },
+  { value: "Excellent", label: "Rated on Trustpilot" },
   { value: "60+", label: "Trusted airlines compared" },
   { value: "Zero", label: "Hidden booking fees, ever" },
   { value: "24/7", label: "Real UK agents on the phone" },
@@ -405,7 +402,7 @@ export default function FlightsPage() {
                 {[
                   {
                     icon: Star,
-                    label: `${BUSINESS.ratingValue}/5 from ${BUSINESS.reviewCount.toLocaleString("en-GB")} reviews`,
+                    label: "Rated Excellent on Trustpilot",
                   },
                   { icon: ShieldCheck, label: "No hidden booking fees" },
                   { icon: Headset, label: "Real UK agents, 24/7" },
