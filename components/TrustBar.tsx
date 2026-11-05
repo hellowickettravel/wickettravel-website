@@ -2,12 +2,29 @@
    state, no hooks and no client-only APIs, so it ships no JS of its own. */
 import { ShieldCheck } from "lucide-react";
 import { BUSINESS } from "@/lib/seo";
+import { COMPANY } from "@/lib/legal";
 
-const STATS = [
-  { value: "2M+", label: "Travelers flown" },
-  { value: "60+", label: "Trusted airlines" },
-  { value: "120+", label: "Countries served" },
-  { value: `${BUSINESS.ratingValue}★`, label: "Rated Excellent on Trustpilot" },
+/* Every figure here can be checked by a visitor: the IATA TIDS code, the
+   Companies House number, the live Trustpilot score and the WhatsApp line.
+   The old "2M+ travelers", "60+ airlines" and "120+ countries" figures were
+   removed (website audit, 5 Nov 2026): nothing on record backs them up. */
+const TRUSTPILOT_URL =
+  BUSINESS.sameAs.find((u) => u.includes("trustpilot.com")) ??
+  "https://www.trustpilot.com/review/wickettravel.com";
+
+const STATS: { value: string; label: string; href?: string }[] = [
+  { value: "IATA", label: `TIDS registered · ${COMPANY.iataTids}` },
+  {
+    value: "Ltd",
+    label: `Companies House · No. ${COMPANY.number}`,
+    href: COMPANY.companiesHouseUrl,
+  },
+  {
+    value: `${BUSINESS.ratingValue}★`,
+    label: "Rated Excellent on Trustpilot",
+    href: TRUSTPILOT_URL,
+  },
+  { value: "24/7", label: "On WhatsApp" },
 ];
 
 export default function TrustBar() {
@@ -16,7 +33,7 @@ export default function TrustBar() {
       <div className="container-page">
         <div className="card overflow-hidden">
           <h2 className="sr-only">
-            Trusted by millions of UK travelers booking cheap flights
+            Why UK travellers book their flights with Wicket Travel
           </h2>
           {/* Stats band */}
           <div className="grid grid-cols-2 sm:grid-cols-4">
@@ -35,7 +52,18 @@ export default function TrustBar() {
                   {s.value}
                 </div>
                 <div className="mt-1 t-label-2 text-text-secondary">
-                  {s.label}
+                  {s.href ? (
+                    <a
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-primary-800"
+                    >
+                      {s.label}
+                    </a>
+                  ) : (
+                    s.label
+                  )}
                 </div>
               </div>
             ))}
@@ -48,7 +76,7 @@ export default function TrustBar() {
                 className="h-4 w-4 text-accent-500"
                 aria-hidden="true"
               />
-              Best available fares from the world&apos;s most trusted airlines
+              Your total price is agreed before you pay — nothing added at checkout
             </div>
           </div>
         </div>

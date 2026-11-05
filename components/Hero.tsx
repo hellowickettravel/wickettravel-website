@@ -17,7 +17,7 @@ const PROOF = [
     text: `${BUSINESS.ratingValue}/5 rated Excellent on Trustpilot`,
   },
   { icon: ShieldCheck, text: "No hidden booking fees" },
-  { icon: Headset, text: "Real UK agents, 24/7" },
+  { icon: Headset, text: "24/7 on WhatsApp" },
 ];
 
 export default function Hero() {

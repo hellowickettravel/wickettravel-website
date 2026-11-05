@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Star,
 } from "lucide-react";
+import { ROUTES } from "@/lib/routes";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FlightSearch from "@/components/FlightSearch";
@@ -32,96 +33,27 @@ import {
 export const metadata: Metadata = {
   title: "Flights from the UK",
   description:
-    "Search flights from Heathrow, Manchester, Birmingham, Gatwick, Luton and Edinburgh — popular routes, flight times, cabin comparison and baggage answers.",
+    "Flights from Heathrow, Manchester, Birmingham, Gatwick, Luton and Edinburgh, booked by our team: popular routes, flight times, cabin comparison and baggage answers.",
   alternates: { canonical: "/flights" },
   openGraph: {
     ...OG_BASE,
     url: `${SITE_URL}/flights`,
     title: "Flights from the UK | Wicket Travel",
     description:
-      "Search live fares from UK airports, compare Economy, Premium Economy, Business and First, and get straight answers on baggage, changes and check-in.",
+      "Tell us your route and dates from any UK airport and our team quotes a total price before you pay. Cabins compared, and straight answers on baggage, changes and check-in.",
   },
   twitter: {
     ...TWITTER_BASE,
     title: "Flights from the UK | Wicket Travel",
     description:
-      "Live fares from Heathrow, Manchester, Birmingham, Gatwick, Luton and Edinburgh — with a real UK agent on the phone before you pay.",
+      "Flights from Heathrow, Manchester, Birmingham, Gatwick, Luton and Edinburgh, quoted and booked by our team, with a total price agreed before you pay.",
   },
 };
 
 /* ── Popular routes ──────────────────────────────────────────────────────
-   UK side is drawn from UK_DEPARTURES so this page and the rest of the site
-   name the same six airports. Destinations match the carriers already
-   featured on the homepage (FeaturedAirlineFares). Deliberately no fares or
-   figures — PRODUCT.md principle 4 keeps pricing language soft everywhere.
-   Flight times are scheduled block times, rounded, and the "best season"
-   column is climate/demand guidance, not a promise. */
-type RouteCard = {
-  from: string;
-  to: string;
-  country: string;
-  img: string;
-  duration: string;
-  stops: string;
-  season: string;
-};
-
-const ROUTES: RouteCard[] = [
-  {
-    from: UK_DEPARTURES[0], // London Heathrow
-    to: "Dubai",
-    country: "United Arab Emirates",
-    img: "/cities/dubai.jpg",
-    duration: "About 7 hours",
-    stops: "Direct",
-    season: "November – March",
-  },
-  {
-    from: UK_DEPARTURES[0], // London Heathrow
-    to: "Delhi",
-    country: "India",
-    img: "/cities/delhi.jpg",
-    duration: "About 8h 30m",
-    stops: "Direct",
-    season: "October – March",
-  },
-  {
-    from: UK_DEPARTURES[1], // Manchester
-    to: "Mumbai",
-    country: "India",
-    img: "/cities/mumbai.jpg",
-    duration: "About 10h 30m",
-    stops: "One stop",
-    season: "November – February",
-  },
-  {
-    from: UK_DEPARTURES[3], // London Gatwick
-    to: "New York",
-    country: "United States",
-    img: "/cities/new-york.jpg",
-    duration: "About 8 hours",
-    stops: "Direct",
-    season: "April – June, September – October",
-  },
-  {
-    from: UK_DEPARTURES[0], // London Heathrow
-    to: "Bangkok",
-    country: "Thailand",
-    img: "/cities/bangkok.jpg",
-    duration: "About 11h 30m",
-    stops: "Direct",
-    season: "November – February",
-  },
-  {
-    from: UK_DEPARTURES[2], // Birmingham
-    to: "Cape Town",
-    country: "South Africa",
-    img: "/cities/cape-town.jpg",
-    duration: "About 14h 30m",
-    stops: "One stop",
-    season: "November – March",
-  },
-];
+   Every card is one of the route pages in lib/routes.ts, so the card, the
+   page it opens and the sitemap entry come from one entry. No fares: Wicket
+   Travel quotes each booking, so a card price would be invented. */
 
 /* ── Cabin comparison ────────────────────────────────────────────────────
    Compared by what you get, never by price. `true`/`false` render as a tick
@@ -190,7 +122,7 @@ const FLIGHT_FAQ: FlightFaq[] = [
   {
     question: "How much baggage is included with my flight ticket?",
     answer:
-      "Cabin baggage is included on every ticket we issue; checked baggage depends on the airline, the cabin and the specific fare you book. Economy fares can include anything from no checked bag to one, while Premium Economy, Business and First almost always include one or more. We confirm the exact allowance for your ticket before you pay, and you can tick 'include checked baggage' in the search above so we only show fares that carry it.",
+      "Baggage depends on the airline, the cabin and the specific fare. Most long-haul fares include a cabin bag; Economy fares can include anything from no checked bag to one, while Premium Economy, Business and First almost always include one or more. We confirm the exact allowance for your ticket in your quote, before you pay, and you can tick 'include checked baggage' in the search above so we only quote fares that carry it.",
   },
   {
     question: "Can I change or cancel my flight after booking?",
@@ -219,7 +151,7 @@ const FLIGHT_FAQ: FlightFaq[] = [
   {
     question: "Is a direct flight always the better choice?",
     answer:
-      "Not always. Direct is faster and simpler, and on routes like London to Dubai, Delhi or New York it is widely available. On routes such as Manchester to Mumbai or Birmingham to Cape Town, a one-stop itinerary through a major hub is often the only sensible option and can also be the better-value one. Set 'Direct only' in the search above if it matters to you, or leave it open and we will show you both.",
+      "Not always. Direct is faster and simpler, and on routes like London to Dubai, Delhi or New York it is widely available. On routes such as London to Kochi or Birmingham to Cape Town, a one-stop itinerary through a major hub is often the only sensible option and can also be the better-value one. Set 'Direct only' in the search above if it matters to you, or leave it open and we will quote you both.",
   },
 ];
 
@@ -253,7 +185,7 @@ const jsonLd = {
       serviceType: "Airline ticket booking",
       url: `${SITE_URL}/flights`,
       description:
-        "Wicket Travel compares live airline fares and books tickets for travellers departing UK airports, with a real agent available around the clock before and after booking.",
+        "Wicket Travel Limited books airline tickets on behalf of travellers departing UK airports: a consultant quotes the total price and fare rules, books once the traveller agrees and pays, and the airline issues the e-ticket. Help is available on WhatsApp around the clock.",
       provider: { "@id": ORGANIZATION_ID },
       /* The country, plus the six departure airports named in UK_DEPARTURES
          and on the page itself. `serviceArea` is superseded by `areaServed`,
@@ -293,14 +225,15 @@ const jsonLd = {
   ],
 };
 
-/* Facts already standing elsewhere on the site — the airline count matches
-   the homepage trust bar, and the fee and support promises are the agency's
-   own. The Trustpilot line states the score but no review count (see lib/seo.ts). */
+/* Only facts the business can show: the Trustpilot score the client approved
+   (no review count, see lib/seo.ts), the quote-first booking model, WhatsApp
+   cover and the IATA TIDS registration printed in the footer. No airline
+   counts or "real UK agents" claims: neither is evidenced. */
 const STATS = [
   { value: `${BUSINESS.ratingValue}/5`, label: "Rated Excellent on Trustpilot" },
-  { value: "60+", label: "Trusted airlines compared" },
-  { value: "Zero", label: "Hidden booking fees, ever" },
-  { value: "24/7", label: "Real UK agents on the phone" },
+  { value: "1 price", label: "Total agreed before you pay" },
+  { value: "24/7", label: "Help on WhatsApp, day or night" },
+  { value: "IATA", label: "TIDS-registered agent · 96239010" },
 ];
 
 function CabinCell({ value }: { value: Cell }) {
@@ -393,9 +326,9 @@ export default function FlightsPage() {
                 Flights from the UK, booked by people who answer the phone.
               </h1>
               <p className="t-body-lg mt-4 max-w-xl text-primary-100">
-                Search live fares from Heathrow, Manchester, Birmingham,
-                Gatwick, Luton and Edinburgh — then talk to a real agent
-                before you pay if you want a second opinion.
+                Tell us your route and dates from Heathrow, Manchester,
+                Birmingham, Gatwick, Luton or Edinburgh. A consultant quotes
+                you a total price and books it once you agree.
               </p>
 
               <ul className="mt-6 flex flex-wrap gap-3">
@@ -404,8 +337,8 @@ export default function FlightsPage() {
                     icon: Star,
                     label: `${BUSINESS.ratingValue}/5 rated Excellent on Trustpilot`,
                   },
-                  { icon: ShieldCheck, label: "No hidden booking fees" },
-                  { icon: Headset, label: "Real UK agents, 24/7" },
+                  { icon: ShieldCheck, label: "Total price agreed before you pay" },
+                  { icon: Headset, label: "24/7 on WhatsApp" },
                 ].map(({ icon: Icon, label }) => (
                   <li
                     key={label}
@@ -438,30 +371,30 @@ export default function FlightsPage() {
         </section>
 
         {/* ── Popular routes ─────────────────────────────────────────── */}
-        <section className="section bg-neutral-000">
+        <section id="popular-routes" className="section scroll-mt-24 bg-neutral-000">
           <div className="container-page">
             <div className="section-lead text-center">
               <h2 className="t-h2 text-primary-800">
                 Popular routes from UK airports
               </h2>
               <p className="t-body mt-4 text-text-secondary">
-                Six of the routes our travelers book most, with the flight time,
-                whether it runs direct, and the months the weather and the
-                schedules are usually at their best.
+                Routes our travellers ask us about most. Each page has the
+                flight time, which airlines fly it non-stop, the best months to
+                go and the entry rules.
               </p>
             </div>
 
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {ROUTES.map((r) => (
-                <a
-                  key={`${r.from}-${r.to}`}
-                  href="#search"
+                <Link
+                  key={r.slug}
+                  href={`/flights/${r.slug}`}
                   className="card card-hover group flex h-full flex-col overflow-hidden transition-transform duration-200 ease-out hover:-translate-y-0.5"
                 >
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <Image
                       src={r.img}
-                      alt={`Flights from ${r.from} to ${r.to}, ${r.country}`}
+                      alt={`Flights from ${r.fromCity} to ${r.toCity}, ${r.toCountry}`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover"
@@ -470,8 +403,8 @@ export default function FlightsPage() {
                         the route label always has a dependable base under it. */}
                     <div className="absolute inset-0 bg-gradient-to-t from-primary-900/85 via-primary-900/20 to-transparent" />
                     <div className="absolute inset-x-4 bottom-4">
-                      <p className="t-caption text-primary-100">{r.from} to</p>
-                      <h3 className="t-h3 text-text-on-dark">{r.to}</h3>
+                      <p className="t-caption text-primary-100">{r.fromCity} to</p>
+                      <h3 className="t-h3 text-text-on-dark">{r.toCity}</h3>
                     </div>
                   </div>
 
@@ -484,7 +417,7 @@ export default function FlightsPage() {
                         />
                         <dt className="sr-only">Flight time</dt>
                         <dd className="t-body-sm text-text-secondary">
-                          {r.duration}
+                          {r.flightTime}
                         </dd>
                       </div>
                       <div className="flex items-start gap-3">
@@ -494,7 +427,7 @@ export default function FlightsPage() {
                         />
                         <dt className="sr-only">Stops</dt>
                         <dd className="t-body-sm text-text-secondary">
-                          {r.stops}
+                          {r.stopsLabel}
                         </dd>
                       </div>
                       <div className="flex items-start gap-3">
@@ -504,20 +437,20 @@ export default function FlightsPage() {
                         />
                         <dt className="sr-only">Best months to fly</dt>
                         <dd className="t-body-sm text-text-secondary">
-                          Best {r.season}
+                          Best {r.bestMonths}
                         </dd>
                       </div>
                     </dl>
 
                     <span className="mt-6 inline-flex items-center gap-2 t-label-2 text-accent-600 transition-colors group-hover:text-accent-500">
-                      Search this route
+                      See this route
                       <ArrowRight
                         className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
                         aria-hidden="true"
                       />
                     </span>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
 
@@ -547,16 +480,18 @@ export default function FlightsPage() {
               </h2>
               <div className="t-body mt-6 space-y-4 text-text-on-sand">
                 <p>
-                  Flights are our craft and our sole focus. We compare live
-                  pricing across the world&apos;s leading airlines, show you the
-                  best fare genuinely on offer for your route, and hand you
-                  straight to the airline&apos;s own booking — no reseller
-                  mark-up bolted on at the end.
+                  Flights are our craft and our sole focus. Wicket Travel
+                  Limited books your flight with the airline on your behalf:
+                  a consultant checks the fares for your route, quotes you one
+                  total price, including any service fee, with the fare rules,
+                  and books only once you agree and pay. The airline then
+                  issues your e-ticket.
                 </p>
                 <p>
-                  And when a fare needs a human — a complicated routing, a date
-                  that has to move, a family travelling together — a real UK
-                  agent picks up, at any hour.
+                  And when a trip needs a human, whether that&apos;s a
+                  complicated routing, a date that has to move or a family
+                  travelling together, our team answers on WhatsApp at any
+                  hour.
                 </p>
               </div>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -606,8 +541,10 @@ export default function FlightsPage() {
 
             <div className="card mt-12 overflow-hidden">
               {/* The table is wider than a phone; it scrolls inside this box
-                  rather than pushing the page sideways. */}
-              <div className="overflow-x-auto">
+                  rather than pushing the page sideways. `relative` keeps the
+                  sr-only caption (absolutely positioned) inside the scroll
+                  box; without it the caption widened the page on phones. */}
+              <div className="relative overflow-x-auto">
                 <table className="w-full min-w-[46rem] border-collapse text-left">
                   <caption className="sr-only">
                     Cabin classes compared by baggage, seat, priority services

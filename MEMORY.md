@@ -4,7 +4,7 @@ Things that are true of this project, aren't obvious from reading the code,
 and cost real time to rediscover. The same file lives at the root of both
 repos (Website and Portals), because most of it is about how the two connect.
 
-Last updated: 2026-09-25.
+Last updated: 2026-11-05.
 
 ---
 
@@ -177,21 +177,49 @@ Keyword research uses Google's autocomplete (`suggestqueries.google.com`,
   names and publish.
 - Sitemap `lastModified` is the date the content last really changed, not
   `new Date()`.
-- `/llms.txt` is generated (`app/llms.txt/route.ts`) from the same constants
-  as the pages. It deliberately contains no rating figure and a "Not what we
-  do" section.
+- `/llms.txt` is a static file, `public/llms.txt`. Keep it in step with the
+  pages (route list, policies, "Not what we do") by hand.
 - The portal is noindex by default; only `/join-as-helper` is indexed.
   `/customer/book` stays crawlable because the homepage links to it.
 
-### Two public claims waiting on the client (don't change them yourself)
+### Legal and trust layer (rebuilt 2026-11-05 from the website audit)
 
-1. **Trustpilot:** the client approved showing a 4.5 score ("Rated Excellent
-   on Trustpilot") but asked us never to claim a number of reviews. The site
-   shows `BUSINESS.ratingValue` (4.5) in `lib/seo.ts`, has no review count
-   anywhere, and the homepage schema has no `aggregateRating` (it requires
-   a count). Don't add a count back unless the client asks.
-2. **"ATOL-style financial protection"** in `lib/faq.ts`. The company has an
-   IATA TIDS number, not an ATOL licence.
+- **Wicket Travel is the main business and is NOT the same as Wallet
+  Flights.** Wallet Flights (walletflights.com) is the company's separate
+  comparison/affiliate brand; its legal pages were the *standard* for
+  completeness, never the wording. Wicket is a travel agent: request → a
+  consultant quotes one total price + fare rules → customer pays (card,
+  bank transfer, or deposit) → team books and tickets → e-ticket from the
+  airline. Every page, the footer and the FAQ must say it that way — never
+  "we hand you to the airline" or "connect you straight to".
+- One source for legal facts: `lib/legal.ts` (company line, registered
+  office, incorporation 30 Jan 2026, directors, IATA TIDS, booking
+  disclosure, legal links, WhatsApp note, `LEGAL_UPDATED`). Legal pages use
+  `components/LegalPage.tsx`; there is no "template" banner or placeholder
+  component any more — don't bring one back.
+- Positions stated publicly (change them only with the client): no ATOL
+  licence, flight-only bookings not ATOL protected, section 75 note; total
+  price includes any service charge, no card surcharges; any change/cancel
+  fee told and agreed first; refunds paid within 14 days of receiving them
+  from the airline; tickets usually issued the same day payment clears;
+  complaints acknowledged in 2 working days, answered in 14, final within 8
+  weeks, director review; visa: full refund before submission, nothing after;
+  retention periods in /privacy §8.
+- **Trustpilot:** 4.5 / "Excellent", never a review count (client's
+  instruction), no `aggregateRating`. The official TrustBox renders only
+  with `NEXT_PUBLIC_TRUSTPILOT_BUSINESS_UNIT_ID` set AND reviews consent.
+- **Cookie consent:** `lib/consent.ts` + `components/CookieConsent.tsx`.
+  Nothing optional loads before consent; GA loads only with
+  `NEXT_PUBLIC_GA_ID` + analytics consent. Adding a tool = cookie policy row
+  + consent category + bump `CONSENT_VERSION`. Don't embed Google Maps or
+  any third-party iframe without gating it the same way.
+- Forms post to `/api/contact` (Resend). Explicit-consent checkboxes guard
+  health/mobility (Parent Travel Assist) and the newsletter opt-in starts
+  unticked — keep both.
+- Waiting on the client: ICO registration number (`ICO_REGISTRATION` in
+  `lib/legal.ts`), ABTA number if ever, card payment provider's name, email
+  provider's name, Resend API key, GA ID, Trustpilot business unit ID, and a
+  UK solicitor's sign-off.
 
 ---
 

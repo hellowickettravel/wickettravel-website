@@ -5,6 +5,9 @@ import { Building2, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
 import { BUSINESS } from "@/lib/seo";
 import { FacebookIcon, InstagramIcon, XIcon } from "@/components/SocialIcons";
 import { PHONE_LINK, PORTAL_LOGIN_URL } from "@/lib/links";
+import { BOOKING_DISCLOSURE, COMPANY, COMPANY_LINE, WHATSAPP_NOTE } from "@/lib/legal";
+import CookieSettingsButton from "@/components/CookieSettingsButton";
+import TrustpilotWidget from "@/components/TrustpilotWidget";
 
 /**
  * Registrations and ratings shown as logo badges above the bottom bar
@@ -72,46 +75,56 @@ const ACCREDITATIONS: Accreditation[] = [
   },
 ];
 
-/** Internal routes wired up for the footer's link columns. Flights/Hotels/
- *  Car Rental used to be a "#" stub or an external link out to the holidays
- *  site; all three now have real pages on this site, same as Header.tsx.
- *  "How it works" and "FAQs" point at the real homepage sections
- *  (components/HowItWorks.tsx, components/Faq.tsx) rather than a stub —
- *  those sections already exist, they just weren't linked from here.
- *  "Manage booking" is the same returning-customer portal link Header.tsx
- *  uses for "Login" (lib/links.ts PORTAL_LOGIN_URL) — an external absolute
- *  URL, so it's rendered as a plain <a>, not a Next.js <Link>, same as
- *  Header's treatment of it. */
+/** Every footer link. "Manage booking" is the portal login (an external
+ *  URL, so a plain <a>); everything else is a page on this site. Add a link
+ *  here only once the page it names exists — a dead link is worse than none. */
 const ROUTES: Record<string, string> = {
   Flights: "/flights",
+  "Dubai visa": "/visa",
+  "Parent Travel Assist": "/parents-tickets",
   Hotels: "/hotels",
-  "Car Rental": "/car-rentals",
-  Deals: "/#deals",
-  "About us":"/about",
+  "Car hire": "/car-rentals",
+  "About us": "/about",
   "How it works": "/#how-it-works",
-  "Contact us":"/contact",
+  "Editorial policy": "/editorial-policy",
+  "Photo credits": "/photo-credits",
+  "Help centre": "/help",
+  "Contact us": "/contact",
+  "Get a quote": "/quote",
   "Manage booking": PORTAL_LOGIN_URL,
-  Refunds:"/refunds",
-  FAQs: "/#faq",
+  Complaints: "/complaints",
+  "Terms & conditions": "/terms",
+  "Privacy policy": "/privacy",
+  "Cookie policy": "/cookie-policy",
+  "Refund policy": "/refunds",
+  "Visa service terms": "/visa-terms",
+  "Parent Travel Assist terms": "/parent-travel-assist-terms",
 };
 
-/* Travel guides, Partners, Careers, Press and Help center were dropped from
-   COLUMNS below rather than left as "#" stubs: no guides, partners, careers,
-   press or help-center content exists anywhere on the site, so a link to
-   them would go nowhere. A dead link is worse than no link — remove it here
-   and add it back once the page it names actually exists. */
-const COLUMNS = [
+const COLUMNS: { title: string; links: string[]; cookieSettings?: boolean }[] = [
   {
-    title:"Explore",
-    links: ["Flights","Hotels","Car Rental","Deals"],
+    title: "Explore",
+    links: ["Flights", "Dubai visa", "Parent Travel Assist", "Hotels", "Car hire"],
   },
   {
-    title:"Company",
-    links: ["About us","How it works"],
+    title: "Company",
+    links: ["About us", "How it works", "Editorial policy", "Photo credits"],
   },
   {
-    title:"Support",
-    links: ["Contact us","Manage booking","Refunds","FAQs"],
+    title: "Support",
+    links: ["Help centre", "Contact us", "Get a quote", "Manage booking", "Complaints"],
+  },
+  {
+    title: "Legal",
+    links: [
+      "Terms & conditions",
+      "Privacy policy",
+      "Cookie policy",
+      "Refund policy",
+      "Visa service terms",
+      "Parent Travel Assist terms",
+    ],
+    cookieSettings: true,
   },
 ];
 
@@ -133,32 +146,32 @@ export default function Footer() {
   return (
     <footer className="bg-primary-900 text-primary-100">
       <div className="container-page py-12 lg:py-12">
-        <div className="grid grid-cols-2 gap-x-8 gap-y-10 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 lg:grid-cols-6">
           {/* Brand + contact + socials */}
           <div className="col-span-2">
             <Logo className="text-[22px] text-text-on-dark" />
             <p className="mt-4 max-w-sm t-body-sm  text-primary-200">
-              We book trusted airline tickets at the best available fares —
-              connecting you to the world&apos;s leading carriers, with no hidden
-              booking fees.
+              UK travel agent for flights. We book your airline tickets for
+              you, with the total price and fare rules agreed before you pay.
             </p>
             <ul className="mt-6 space-y-3 t-body-sm">
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 shrink-0 text-accent-400" aria-hidden="true" />
-                <a href="mailto:info@wickettravel.com" className="hover:text-text-on-dark">
-                  info@wickettravel.com
+                <a href={`mailto:${COMPANY.email}`} className="hover:text-text-on-dark">
+                  {COMPANY.email}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 shrink-0 text-accent-400" aria-hidden="true" />
                 <a {...PHONE_LINK} className="hover:text-text-on-dark">
-                  +44 7417 564704
+                  {COMPANY.phoneDisplay} <span className="sr-only">(opens WhatsApp)</span>
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 shrink-0 text-accent-400" aria-hidden="true" />
-                <span>Lampton Avenue, Hounslow, London, TW3 4EW, UK.</span>
+                <span>{COMPANY.registeredOffice}</span>
               </li>
+              <li className="t-caption text-primary-200/90">{WHATSAPP_NOTE}</li>
             </ul>
 
             {/* Socials sit with the brand block rather than on their own row —
@@ -205,6 +218,11 @@ export default function Footer() {
                     </li>
                   );
                 })}
+                {col.cookieSettings ? (
+                  <li>
+                    <CookieSettingsButton className="text-left text-primary-200 underline decoration-primary-200/40 underline-offset-2 transition-colors hover:text-text-on-dark focus-visible:outline-none focus-visible:text-text-on-dark" />
+                  </li>
+                ) : null}
               </ul>
             </div>
           ))}
@@ -218,7 +236,7 @@ export default function Footer() {
           className="mt-10 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-stretch [&>li:last-child:nth-child(odd)]:col-span-2"
         >
           {ACCREDITATIONS.map((a) => {
-            const body = (
+            const staticBody = (
               <>
                 <span className="flex h-11 items-center justify-center">
                   {a.logo ? (
@@ -242,6 +260,12 @@ export default function Footer() {
                 </span>
               </>
             );
+            const body =
+              a.name === "Trustpilot" ? (
+                <TrustpilotWidget theme="light" fallback={staticBody} />
+              ) : (
+                staticBody
+              );
             const box =
               "flex h-full w-full flex-col items-center justify-center rounded-md bg-neutral-000 px-4 py-3 shadow-e1 sm:min-w-[176px]";
             return (
@@ -264,30 +288,39 @@ export default function Footer() {
           })}
         </ul>
 
-        {/* One bottom bar: legal identity on the left, policy links on the right.
-            Stacks and centres on mobile. */}
-        <div className="mt-8 flex flex-col items-center gap-4 border-t border-neutral-000/10 pt-6 t-caption text-primary-200 sm:flex-row sm:justify-between">
+        {/* How bookings work, who sells what, and who we are — the same
+            words as Terms §3 (lib/legal.ts BOOKING_DISCLOSURE). */}
+        <div className="mt-10 space-y-3 border-t border-neutral-000/10 pt-6 t-caption text-primary-200">
+          {BOOKING_DISCLOSURE.map((para) => (
+            <p key={para}>{para}</p>
+          ))}
+          <p>
+            {COMPANY_LINE} IATA TIDS registration {COMPANY.iataTids}.
+          </p>
+        </div>
+
+        <div className="mt-6 flex flex-col items-center gap-4 border-t border-neutral-000/10 pt-6 t-caption text-primary-200 sm:flex-row sm:justify-between">
           <p className="text-center sm:text-left">
-            © {new Date().getFullYear()} Wicket Travel Ltd. All rights reserved.
-            <span className="mx-2 hidden text-text-on-dark/20 sm:inline">|</span>
-            <span className="mt-1 block text-primary-200 sm:mt-0 sm:inline">
-              Wicket Travel Limited Reg: 17001759, UK
-            </span>
-            <span className="mx-2 hidden text-text-on-dark/20 sm:inline">|</span>
-            <span className="mt-1 block font-bold text-accent-400 sm:mt-0 sm:inline">
-              IATA TIDS Reg: 96239010
-            </span>
+            © {new Date().getFullYear()} {COMPANY.legalName}. All rights reserved.
           </p>
           <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <li>
-              <Link href="/privacy" className="transition-colors hover:text-text-on-dark">
-                Privacy Policy
+              <Link href="/terms" className="transition-colors hover:text-text-on-dark">
+                Terms
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="transition-colors hover:text-text-on-dark">
-                Terms of Service
+              <Link href="/privacy" className="transition-colors hover:text-text-on-dark">
+                Privacy
               </Link>
+            </li>
+            <li>
+              <Link href="/cookie-policy" className="transition-colors hover:text-text-on-dark">
+                Cookies
+              </Link>
+            </li>
+            <li>
+              <CookieSettingsButton className="transition-colors hover:text-text-on-dark" />
             </li>
           </ul>
         </div>

@@ -86,12 +86,19 @@ export default function AssistFamilyRail() {
               We review every post by hand — but this is our own check, not a
               DBS or criminal-records check, and we say so plainly in the{" "}
               <Link
-                href="/parents-tickets#faq"
+                href="/parent-travel-assist-terms"
                 className="t-label-3 text-primary-800 underline decoration-accent-400 underline-offset-2 hover:text-accent-600"
               >
-                FAQ
+                Parent Travel Assist terms
               </Link>
-              .
+              . To report a concern, see{" "}
+              <Link
+                href="/parents-tickets#post-to-the-board"
+                className="t-label-3 text-primary-800 underline decoration-accent-400 underline-offset-2 hover:text-accent-600"
+              >
+                Report a safety concern
+              </Link>
+              ; in an emergency, call 999.
             </p>
           </div>
 

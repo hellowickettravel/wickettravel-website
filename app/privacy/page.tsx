@@ -1,306 +1,404 @@
-import { WHATSAPP_URL } from "@/lib/links";
-import type { Metadata } from "next";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageHero from "@/components/PageHero";
-import LegalLayout, { LegalLink, P, Placeholder, Ul, type LegalSection } from "@/components/LegalLayout";
-import { BUSINESS, OG_BASE, SITE_URL, TWITTER_BASE } from "@/lib/seo";
+import LegalPage, { legalMetadata, Term } from "@/components/LegalPage";
+import { LegalLink, P, Ul, type LegalSection } from "@/components/LegalLayout";
+import { COMPANY, ICO_REGISTRATION } from "@/lib/legal";
+import { PORTAL_LOGIN_URL } from "@/lib/links";
 
-export const metadata: Metadata = {
+export const metadata = legalMetadata({
   title: "Privacy Policy",
   description:
-    "How Wicket Travel Limited collects, uses and protects your personal data when you enquire about or book a flight, under UK GDPR.",
-  alternates: { canonical: "/privacy" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    ...OG_BASE,
-    url: `${SITE_URL}/privacy`,
-    title: "Privacy Policy | Wicket Travel",
-    description:
-      "How Wicket Travel Limited collects, uses and protects your personal data under UK GDPR.",
-  },
-  twitter: {
-    ...TWITTER_BASE,
-    title: "Privacy Policy | Wicket Travel",
-    description:
-      "How Wicket Travel Limited collects, uses and protects your personal data under UK GDPR.",
-  },
-};
+    "How Wicket Travel Limited collects, uses, shares and keeps your personal data when you book a flight, apply for a Dubai visa or use Parent Travel Assist, and your rights under UK GDPR.",
+  path: "/privacy",
+});
 
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-    { "@type": "ListItem", position: 2, name: "Privacy Policy", item: `${SITE_URL}/privacy` },
-  ],
-};
-
-const LAST_UPDATED = "28 July 2026";
+const mail = <LegalLink href={`mailto:${COMPANY.email}`}>{COMPANY.email}</LegalLink>;
 
 const sections: LegalSection[] = [
   {
-    id: "introduction",
-    heading: "1. Introduction",
+    id: "who-we-are",
+    heading: "1. Who we are",
     content: (
       <>
         <P>
-          This policy explains how {BUSINESS.legalName} (company registration
-          {" "}{BUSINESS.registration}, &ldquo;Wicket Travel&rdquo;,
-          &ldquo;we&rdquo;, &ldquo;us&rdquo;) collects, uses, shares and
-          protects your personal data when you visit wickettravel.com, submit
-          an enquiry, or book a flight through us. We are the data controller
-          for the personal data described in this policy.
+          Wicket Travel is a trading name of {COMPANY.legalName}, a private
+          limited company registered in {COMPANY.jurisdiction} (company number{" "}
+          {COMPANY.number}), registered office {COMPANY.registeredOffice}.
+          We are the controller of the personal data described in this policy.
         </P>
         <P>
-          We are a UK flight ticket booking service — we compare and book
-          airline tickets. Hotels and car rentals shown on our site are
-          provided by our sister brand,{" "}
-          <LegalLink href="https://www.wickettravelholidays.com/" external>
-            Wicket Travel Holidays
-          </LegalLink>
-          , which is a separate business with its own privacy policy — please
-          check that site directly for how it handles your data.
+          Questions about your data, or a request to use any of your rights:
+          email {mail} with &ldquo;Privacy&rdquo; in the subject, or write to
+          us at our registered office.
+          {ICO_REGISTRATION
+            ? ` We are registered with the Information Commissioner's Office under number ${ICO_REGISTRATION}.`
+            : ""}
         </P>
         <P>
-          This is a template privacy policy prepared for Wicket Travel using
-          the business details we were given. It is designed to cover the
-          enquiry and booking flows currently on this site, but it must be
-          reviewed by a qualified legal professional before it is treated as
-          final.
+          Hotels, car hire and holidays linked from our site are sold by our
+          sister company, Wicket Travel Holidays, which has its own privacy
+          policy. This policy covers wickettravel.com and our booking portal
+          (portal.wickettravel.com).
         </P>
       </>
     ),
   },
   {
-    id: "information-we-collect",
-    heading: "2. Information we collect",
+    id: "what-we-collect",
+    heading: "2. What we collect",
     content: (
       <>
-        <P>We collect personal data you give us directly, including:</P>
+        <P>We collect what you give us, and a small amount of technical data needed to run the site:</P>
         <Ul>
           <li>
-            <strong className="text-primary-800">Flight enquiries &amp; bookings</strong> — name,
-            contact details, travel dates and routes, passenger and passport
-            details, and any information you give our team while arranging a
-            booking.
+            <Term>Flight bookings.</Term> The details an airline needs to issue
+            a ticket: each traveller&apos;s name as on their passport, date of
+            birth, gender, nationality, passport number and expiry where the
+            airline or destination requires them, contact details, travel dates
+            and preferences, any special assistance you ask for, the price we
+            quoted, your payment record (method, amount, date — not your full
+            card number), and the messages and documents in your booking.
           </li>
           <li>
-            <strong className="text-primary-800">Contact form submissions</strong> — your name,
-            email address, phone number and the content of your message.
+            <Term>Your portal account.</Term> Name, email address, phone number
+            and sign-in details for{" "}
+            <LegalLink href={PORTAL_LOGIN_URL} external>our booking portal</LegalLink>.
+            Passwords are stored only in hashed form by our authentication provider.
           </li>
           <li>
-            <strong className="text-primary-800">Visa enquiry forms</strong> — the details our Dubai
-            visa enquiry form asks for, which can include passport, nationality,
-            employment and travel history information, plus any documents you
-            upload (e.g. passport scans).
+            <Term>Contact and quote requests.</Term> Your name, email address,
+            phone number (optional), the topic, route and dates you give, and
+            your message.
           </li>
           <li>
-            <strong className="text-primary-800">Parent Travel Assist enquiries</strong> — details you
-            submit when asking us to help find a flight for a visiting parent
-            or family member, and the contact details of the person raising
-            the enquiry.
+            <Term>Dubai visa service.</Term> Your enquiry (visa type, name,
+            email, phone and notes). If you go ahead, the details the UAE
+            application asks for: travel dates and plans, full name, date and
+            place of birth, nationality, gender, marital status, UK address,
+            passport details, UK visa or residence permit details, previous
+            UAE visas, occupation and employer, who pays for the trip, whether
+            you have been refused entry to the UAE or have a criminal
+            conviction, and the documents you upload (such as a passport scan
+            and photograph).
           </li>
           <li>
-            <strong className="text-primary-800">Technical data</strong> — IP address, browser and
-            device type, pages visited and how you use our site, collected
-            automatically via cookies and similar technologies (see{" "}
-            <a href="#cookies" className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600">
-              Cookies
-            </a>{" "}
-            below).
+            <Term>Parent Travel Assist.</Term> If you post a request or offer:
+            your name and contact details, the route, date and airline,
+            languages spoken, your notes and amount, and, for a family request,
+            your relative&apos;s name, age, your relationship and the help or
+            mobility support they need. If you verify your identity: your legal
+            name, date of birth, phone number and a photo ID document. If you
+            report a safety concern: what you tell us.
+          </li>
+          <li>
+            <Term>Deal emails.</Term> Your email address and a record of when
+            and how you agreed to receive them.
+          </li>
+          <li>
+            <Term>WhatsApp and phone.</Term> Your number, name as shown on
+            WhatsApp, and our conversation with you.
+          </li>
+          <li>
+            <Term>Technical data.</Term> Our hosting provider records your IP
+            address, browser type and the pages requested, to deliver and
+            secure the site. We store your cookie choice and your language
+            choice on your device. With your consent only, analytics tools
+            record how the site is used (see our{" "}
+            <LegalLink href="/cookie-policy">Cookie Policy</LegalLink>).
           </li>
         </Ul>
         <P>
-          We do not directly collect or store full card payment details —
-          payments are handled by our payment processor and/or the booking
-          portal, which have their own security and privacy safeguards.
+          If you give us details about other travellers (for example family
+          members, or a parent for Parent Travel Assist), please make sure they
+          know you are sharing them with us and point them to this policy.
         </P>
       </>
     ),
   },
   {
-    id: "how-we-use-your-information",
-    heading: "3. How and why we use your information",
+    id: "sensitive-data",
+    heading: "3. Health, mobility and criminal-record information",
     content: (
       <>
-        <P>We use your personal data to:</P>
+        <P>
+          Some of what you may tell us is special category or criminal offence
+          data under UK GDPR:
+        </P>
         <Ul>
-          <li>Find fares, process enquiries and complete flight bookings on your behalf.</li>
-          <li>Respond to contact form, visa and Parent Travel Assist enquiries.</li>
-          <li>Communicate with you about your booking, including changes made by an airline.</li>
-          <li>Provide customer support by phone, WhatsApp and email.</li>
-          <li>Improve our website and services, and keep our systems secure.</li>
-          <li>Meet our legal, accounting and regulatory obligations.</li>
           <li>
-            With your consent, send you offers or updates — you can opt out
-            at any time.
+            Health and mobility needs, such as a wheelchair request for a
+            flight or the support a relative needs on Parent Travel Assist.
+          </li>
+          <li>
+            Whether you have a criminal conviction, which the UAE visa
+            application asks.
           </li>
         </Ul>
-        <P>Our lawful bases for these uses, under UK GDPR, are typically:</P>
-        <Ul>
-          <li><strong className="text-primary-800">Contract</strong> — to take the steps you ask for before, and to perform, a booking.</li>
-          <li><strong className="text-primary-800">Legitimate interests</strong> — to run, secure and improve our business and respond to enquiries.</li>
-          <li><strong className="text-primary-800">Consent</strong> — for optional marketing communications, which you can withdraw at any time.</li>
-          <li><strong className="text-primary-800">Legal obligation</strong> — where we must keep or share records, e.g. for tax purposes.</li>
-        </Ul>
-      </>
-    ),
-  },
-  {
-    id: "cookies",
-    heading: "4. Cookies",
-    content: (
-      <>
         <P>
-          We use cookies and similar technologies (including your browser&apos;s
-          local storage) for essential site functions — such as remembering
-          your cookie choice and your preferred language — and to understand
-          how our site is used so we can improve it.
-        </P>
-        <P>
-          You&apos;ll see a cookie banner on your first visit where you can
-          accept or reject non-essential cookies. If we introduce analytics or
-          advertising cookies in future, this policy and that banner will be
-          updated so you can make an informed choice.
+          We only collect this when you choose to give it, and only with your
+          explicit consent, which we ask for separately before you give it (UK GDPR Article
+          9(2)(a), and for criminal offence data the consent condition in
+          Schedule 1 of the Data Protection Act 2018). We use it only to arrange
+          the help or application you asked for, share it only with the airline,
+          the UAE visa authorities or the matched helper who needs it, and you
+          can withdraw your consent at any time by emailing {mail}. If you do,
+          we may not be able to continue with that request.
         </P>
       </>
     ),
   },
   {
-    id: "sharing-your-information",
-    heading: "5. Who we share your information with",
+    id: "how-we-use-it",
+    heading: "4. How and why we use it",
     content: (
       <>
-        <P>We share personal data only where it&apos;s needed to deliver our service:</P>
+        <P>Under UK GDPR we need a lawful basis for each use:</P>
         <Ul>
-          <li><strong className="text-primary-800">Airlines &amp; travel partners</strong> — to issue and manage your ticket.</li>
-          <li><strong className="text-primary-800">Our booking portal</strong> — the secure system we and our team use to process bookings and enquiries.</li>
-          <li><strong className="text-primary-800">Payment processors</strong> — to take payment securely; we do not store full card details ourselves.</li>
-          <li><strong className="text-primary-800">IT, hosting and support providers</strong> — who process data on our behalf, under contract.</li>
-          <li><strong className="text-primary-800">Regulators or authorities</strong> — where we are legally required to.</li>
+          <li>
+            <Term>To quote for, book and look after your flights</Term> —
+            including changes, cancellations, refunds and airline
+            notifications (performing our contract with you, or steps you ask
+            for before it).
+          </li>
+          <li>
+            <Term>To prepare and submit your visa application</Term> and keep
+            you updated (contract; explicit consent for criminal-record
+            answers).
+          </li>
+          <li>
+            <Term>To run Parent Travel Assist</Term> — reviewing posts,
+            publishing the shortened listing you asked for, introducing
+            matches and handling safety reports (contract; explicit consent
+            for health and mobility details; our legitimate interest in
+            keeping members safe).
+          </li>
+          <li>
+            <Term>To answer your messages and quote requests</Term> (our
+            legitimate interest in replying to enquiries, or steps before a
+            contract).
+          </li>
+          <li>
+            <Term>To keep booking, payment and accounting records</Term> (legal
+            obligation).
+          </li>
+          <li>
+            <Term>To send deal emails</Term> (your consent, which you can
+            withdraw at any time).
+          </li>
+          <li>
+            <Term>To keep the site and portal secure</Term>, prevent fraud and
+            fix problems (legitimate interests).
+          </li>
+          <li>
+            <Term>To measure how the site is used</Term>, only if you allow
+            analytics cookies (consent).
+          </li>
+          <li>
+            <Term>To handle complaints and legal claims</Term> (legitimate
+            interests; legal obligation).
+          </li>
         </Ul>
         <P>
-          We do not sell your personal data. If you enquire about a hotel or
-          car rental, that enquiry is passed to our sister brand, Wicket
-          Travel Holidays, to action.
+          We do not make decisions about you by purely automated means, and we
+          do not use your data for profiling or targeted advertising.
         </P>
+      </>
+    ),
+  },
+  {
+    id: "marketing",
+    heading: "5. Deal emails and marketing",
+    content: (
+      <P>
+        We only send deal emails if you ticked the opt-in box when you signed
+        up. Every email has an unsubscribe link, or you can email {mail}. We
+        never send marketing by WhatsApp or text unless you ask us to, and we
+        never sell or rent our mailing list. Booking messages (confirmations,
+        schedule changes) are not marketing and are sent whether or not you
+        have opted in.
+      </P>
+    ),
+  },
+  {
+    id: "sharing",
+    heading: "6. Who we share it with",
+    content: (
+      <>
+        <P>We share personal data only where needed to provide what you asked for:</P>
+        <Ul>
+          <li>
+            <Term>Airlines and their ticketing systems</Term>, to book and issue
+            your ticket. Airlines may pass passenger details to border and
+            immigration authorities, as the law requires.
+          </li>
+          <li>
+            <Term>UAE immigration authorities</Term>, and any authorised
+            application channel we must use, to submit your visa application.
+          </li>
+          <li>
+            <Term>Other Parent Travel Assist members</Term>: only the shortened
+            listing you agreed to publish (first name and last initial, route,
+            date, airline and amount), and to a matched member only the details
+            needed for the introduction you both agreed to.
+          </li>
+          <li>
+            <Term>Our service providers</Term>, who process data for us under
+            contract: Vercel (hosting the website and portal), Supabase (the
+            portal&apos;s database, sign-in and private document storage),
+            Resend (delivering emails sent from our website forms), our
+            business email provider, WhatsApp (Meta) for chats you start with
+            us, our card payment provider and bank for payments, and — only
+            with your consent — Google Analytics and Trustpilot&apos;s review
+            widget.
+          </li>
+          <li>
+            <Term>Professional advisers, insurers, and authorities</Term> such
+            as HMRC or the police, where the law requires it or to protect
+            someone&apos;s safety.
+          </li>
+          <li>
+            <Term>Wicket Travel Holidays</Term>, only if you ask us to pass on a
+            hotel, car hire or holiday enquiry.
+          </li>
+        </Ul>
+        <P>We do not sell your personal data.</P>
       </>
     ),
   },
   {
     id: "international-transfers",
-    heading: "6. International transfers",
+    heading: "7. International transfers",
     content: (
       <P>
-        Some airlines and partners we share data with are based outside the
-        UK or European Economic Area. Where this happens, we take steps to
-        ensure your data is protected to a standard consistent with UK GDPR,
-        such as relying on the receiving party&apos;s own regulatory
-        obligations or standard contractual clauses.
+        Some providers (such as Vercel, Supabase, Resend, Meta and Google)
+        may store or access data outside the UK, for example in the United
+        States. We rely on UK adequacy regulations (including the UK–US data
+        bridge) or the UK International Data Transfer Agreement or Addendum.
+        When you book with an airline based abroad, or apply for a UAE visa,
+        your details must go to that country to provide the service you asked
+        for.
       </P>
     ),
   },
   {
-    id: "data-retention",
-    heading: "7. Data retention",
+    id: "retention",
+    heading: "8. How long we keep it",
     content: (
-      <>
-        <P>
-          We keep personal data for as long as needed to provide our service,
-          meet legal and accounting obligations, and resolve any disputes.
-          Exact retention periods depend on the type of data and are{" "}
-          <Placeholder>to be confirmed by Wicket Travel Limited</Placeholder>{" "}
-          — for example, booking records may need to be kept for a set number
-          of years for tax purposes, while an unactioned enquiry may be
-          deleted much sooner.
-        </P>
-        <P>
-          When data is no longer needed, we delete or anonymize it in line
-          with our internal data-retention schedule.
-        </P>
-      </>
+      <Ul>
+        <li>
+          <Term>Bookings</Term> (traveller details, quotes, payment records,
+          messages): 6 years after the end of the financial year in which you
+          travelled, to meet tax and accounting rules and deal with claims;
+          then deleted.
+        </li>
+        <li>
+          <Term>Passport scans and other documents</Term> uploaded for a
+          booking: deleted 3 months after your return date (or travel date for
+          a one-way trip), unless a claim or dispute is open.
+        </li>
+        <li>
+          <Term>Visa applications</Term> and their documents: deleted 6 months
+          after the UAE authorities&apos; decision; payment records are kept
+          as booking records.
+        </li>
+        <li>
+          <Term>Parent Travel Assist</Term>: listings come off the board once
+          the travel date has passed or you withdraw them; posts and messages
+          are deleted 12 months after the travel date. Photo ID documents are
+          deleted within 30 days of our verification decision (we keep only the
+          result). Safety reports are kept for up to 6 years.
+        </li>
+        <li>
+          <Term>Contact and quote messages</Term> that don&apos;t lead to a
+          booking: up to 24 months, then deleted.
+        </li>
+        <li>
+          <Term>Portal accounts</Term>: until you ask us to close yours, or
+          after 3 years without a sign-in or booking (bookings themselves are
+          kept as above).
+        </li>
+        <li>
+          <Term>Deal emails</Term>: until you unsubscribe. We then keep only
+          your email address on a do-not-contact list, so we don&apos;t email
+          you again.
+        </li>
+        <li>
+          <Term>Your cookie choice</Term>: 6 months, then we ask again.
+          Analytics data, if you allowed it: no more than 14 months.
+        </li>
+      </Ul>
+    ),
+  },
+  {
+    id: "security",
+    heading: "9. Keeping it secure",
+    content: (
+      <P>
+        The website and portal use encrypted connections (HTTPS). Documents
+        you upload are kept in private storage that only you and our team can
+        open, through links that expire. Staff access is limited to what each
+        person needs. We never ask for your full card details by WhatsApp or
+        email. If a personal data breach is likely to put you at risk, we will
+        tell you and the ICO as the law requires.
+      </P>
     ),
   },
   {
     id: "your-rights",
-    heading: "8. Your rights under UK GDPR",
+    heading: "10. Your rights",
     content: (
       <>
-        <P>You have the right to:</P>
+        <P>Under UK data protection law you can ask us to:</P>
         <Ul>
-          <li>Ask what personal data we hold about you and receive a copy (access).</li>
-          <li>Have inaccurate data corrected (rectification).</li>
-          <li>Ask us to delete your data in certain circumstances (erasure).</li>
-          <li>Ask us to restrict how we use your data (restriction).</li>
-          <li>Receive certain data in a portable format (portability).</li>
-          <li>Object to processing based on legitimate interests or for marketing (objection).</li>
-          <li>Withdraw consent at any time, where we rely on it.</li>
+          <li>give you a copy of the personal data we hold about you (access);</li>
+          <li>correct anything inaccurate (rectification);</li>
+          <li>delete your data where we no longer need it (erasure);</li>
+          <li>restrict how we use it, or object to a use based on our legitimate interests;</li>
+          <li>give you your data in a portable format;</li>
+          <li>stop marketing at any time, and withdraw any consent you gave.</li>
         </Ul>
         <P>
-          To exercise any of these rights, contact us using the details
-          below. We may need to verify your identity before acting on a
-          request.
+          Email {mail}. It&apos;s free, and we reply within one month (we may
+          ask for proof of identity first). Some data we must keep by law, for
+          example booking and payment records, and we&apos;ll tell you if that
+          applies.
         </P>
       </>
     ),
   },
   {
     id: "children",
-    heading: "9. Children's information",
+    heading: "11. Children",
     content: (
       <P>
-        Our services are intended for adults arranging travel. Our Parents
-        Tickets form collects details from the adult submitting the enquiry
-        about their parent or family member&apos;s travel — it is not aimed
-        at, and should not be used to collect data directly from, children.
+        Bookings must be made by an adult (18 or over). We process children&apos;s
+        details only as travellers on a booking made by their parent or
+        guardian. Our deal emails, portal accounts and Parent Travel Assist
+        posts are for adults only.
       </P>
     ),
   },
   {
-    id: "how-to-complain",
-    heading: "10. How to contact us or complain",
+    id: "complaints",
+    heading: "12. Complaints",
     content: (
-      <>
-        <P>
-          If you have a concern about how we&apos;ve handled your personal
-          data, please contact us first at{" "}
-          <LegalLink href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</LegalLink>{" "}
-          so we can try to put it right.
-        </P>
-        <P>
-          You also have the right to complain to the UK&apos;s data
-          protection regulator, the{" "}
-          <LegalLink href="https://ico.org.uk/make-a-complaint/" external>
-            Information Commissioner&apos;s Office (ICO)
-          </LegalLink>
-          , at ico.org.uk or by calling 0303 123 1113.
-        </P>
-      </>
+      <P>
+        If you are unhappy with how we have handled your data, please tell us
+        first at {mail} so we can put it right. You can also complain to the
+        Information Commissioner&apos;s Office:{" "}
+        <LegalLink href="https://ico.org.uk/make-a-complaint/" external>
+          ico.org.uk/make-a-complaint
+        </LegalLink>{" "}
+        or 0303 123 1113.
+      </P>
     ),
   },
   {
     id: "changes",
-    heading: "11. Changes to this policy",
+    heading: "13. Changes to this policy",
     content: (
       <P>
-        We may update this policy from time to time, for example as our
-        services change. The &ldquo;last updated&rdquo; date at the top of
-        this page shows when it was last revised. We encourage you to review
-        it periodically.
-      </P>
-    ),
-  },
-  {
-    id: "contact-us",
-    heading: "12. Contact us",
-    content: (
-      <P>
-        {BUSINESS.legalName}, {BUSINESS.streetAddress}, {BUSINESS.addressLocality},{" "}
-        {BUSINESS.addressRegion}, {BUSINESS.postalCode}, UK.{" "}
-        <br className="hidden sm:block" />
-        Email: <LegalLink href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</LegalLink> ·
-        {" "}Phone/WhatsApp: <LegalLink href={WHATSAPP_URL} external>{BUSINESS.phoneDisplay}</LegalLink>
+        We update this policy when what we do changes, and show the date at
+        the top. If a change affects how we use data you have already given
+        us, we will tell you before it applies.
       </P>
     ),
   },
@@ -308,23 +406,26 @@ const sections: LegalSection[] = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
-      <Header />
-      <main className="flex-1">
-        <PageHero
-          title="Privacy Policy"
-          lead="How we collect, use and protect your personal data — in plain English, under UK GDPR."
-          breadcrumbs={[{ label: "Home", href: "/" }, { label: "Privacy Policy" }]}
-        />
-        <LegalLayout sections={sections} lastUpdated={LAST_UPDATED} />
-      </main>
-      <Footer />
-    </>
+    <LegalPage
+      title="Privacy Policy"
+      lead="What personal data we collect when you book with Wicket Travel, why, who we share it with, how long we keep it, and your rights."
+      path="/privacy"
+      sections={sections}
+      intro={
+        <>
+          <p>
+            <strong>In short:</strong> we collect what we need to book your
+            flights, visas and Parent Travel Assist matches, share it only with
+            the airlines, authorities and providers that make that possible,
+            never sell it, and delete it on a fixed schedule.
+          </p>
+          <p>
+            Optional cookies stay off unless you allow them. Health,
+            mobility and criminal-record details are only taken with your
+            explicit consent.
+          </p>
+        </>
+      }
+    />
   );
 }

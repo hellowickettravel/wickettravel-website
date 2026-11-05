@@ -20,6 +20,15 @@ export const VISA_TYPES = [
 /** Trust promises shown beside the form on both surfaces. */
 export const PERKS = [
   "Eligibility checked before you pay",
-  "Documents reviewed by a UAE visa expert",
-  "A real person calls you back within 2 hours",
+  "Documents checked by our visa team before submission",
+  "We aim to call you back the same day",
 ];
+
+/** Shown wherever the visa service is offered (website audit, 5 Nov 2026):
+ *  we are a private company, not the UAE government, and can't promise an
+ *  outcome. Full terms live at /visa-terms. */
+export const VISA_DISCLAIMER =
+  "Wicket Travel is a private company, not the UAE government or an official visa website. We help you apply; the UAE authorities decide every application and we can't guarantee approval.";
+
+export const VISA_FEE_NOTE =
+  "Our service fee and the UAE government fee are quoted to you in writing before you pay.";

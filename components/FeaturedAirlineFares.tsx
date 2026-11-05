@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { ArrowRight, Plane } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { PORTAL_BOOKING_URL } from "@/lib/links";
+import { portalRouteUrl } from "@/lib/routeLinks";
 
 /**
  * Featured airlines grid. Each card pairs an aspirational aviation photo with
@@ -17,11 +19,18 @@ type Airline = {
   title: string;
   routes: string[];
   img: string;
+  /** Where the card goes: the route page for the airline's first route when
+   *  one exists (lib/routes.ts), otherwise the booking portal with that
+   *  destination filled in, as the search widget does. */
+  href: string;
 };
+
+const portalTo = (to: string) => portalRouteUrl(PORTAL_BOOKING_URL, { to });
 
 const AIRLINES: Airline[] = [
   {
     code:"EK",
+    href: "/flights/london-to-dubai",
     name:"Emirates",
     title:"Fly with Emirates",
     routes: ["Dubai — best available fares","Bangkok — starting from low fares"],
@@ -29,6 +38,7 @@ const AIRLINES: Airline[] = [
   },
   {
     code:"QR",
+    href: portalTo("DOH"),
     name:"Qatar Airways",
     title:"Discover with Qatar Airways",
     routes: ["Doha — best available fares","Maldives — starting from low fares"],
@@ -36,6 +46,7 @@ const AIRLINES: Airline[] = [
   },
   {
     code:"BA",
+    href: portalTo("NYC"),
     name:"British Airways",
     title:"Travel with British Airways",
     routes: ["New York — best available fares","Cape Town — starting from low fares"],
@@ -43,6 +54,7 @@ const AIRLINES: Airline[] = [
   },
   {
     code:"AI",
+    href: "/flights/london-to-delhi",
     name:"Air India",
     title:"Journey with Air India",
     routes: ["Delhi — best available fares","Mumbai — starting from low fares"],
@@ -50,6 +62,7 @@ const AIRLINES: Airline[] = [
   },
   {
     code:"VS",
+    href: portalTo("MCO"),
     name:"Virgin Atlantic",
     title:"Soar with Virgin Atlantic",
     routes: ["Orlando — best available fares","Las Vegas — starting from low fares"],
@@ -57,6 +70,7 @@ const AIRLINES: Airline[] = [
   },
   {
     code:"EY",
+    href: "/flights/london-to-abu-dhabi",
     name:"Etihad Airways",
     title:"Explore with Etihad",
     routes: ["Abu Dhabi — best available fares","Sydney — starting from low fares"],
@@ -64,6 +78,7 @@ const AIRLINES: Airline[] = [
   },
   {
     code:"GF",
+    href: portalTo("BAH"),
     name:"Gulf Air",
     title:"Connect with Gulf Air",
     routes: ["Bahrain — best available fares","Manila — starting from low fares"],
@@ -71,6 +86,7 @@ const AIRLINES: Airline[] = [
   },
   {
     code:"LH",
+    href: portalTo("FRA"),
     name:"Lufthansa",
     title:"Fly with Lufthansa",
     routes: ["Frankfurt — best available fares","Munich — starting from low fares"],
@@ -111,7 +127,7 @@ function FareCard({ a }: { a: Airline }) {
        cards at once reads as a toy. Transform-only, so it stays cheap on mid-range
        Android, and the global reduced-motion rule flattens the duration to ~0. */
     <a
-      href="#top"
+      href={a.href}
       className="card card-hover group flex h-full flex-col overflow-hidden transition-transform duration-200 ease-out hover:-translate-y-0.5"
     >
       <div className="relative aspect-[16/10] overflow-hidden">

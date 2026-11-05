@@ -5,6 +5,7 @@ import { SITE_URL, BUSINESS } from "@/lib/seo";
 import { I18nProvider } from "@/lib/i18n";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import BackToTop from "@/components/BackToTop";
+import CookieConsent from "@/components/CookieConsent";
 
 /* Brand Foundations v1.0 sets three typeface roles. All are self-hosted by
    next/font (no render-blocking Google request); `swap` paints immediately in
@@ -143,6 +144,7 @@ export default function RootLayout({
           {children}
           <BackToTop />
           <WhatsAppButton />
+          <CookieConsent />
         </I18nProvider>
       </body>
     </html>

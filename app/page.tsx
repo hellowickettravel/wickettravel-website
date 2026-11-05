@@ -89,17 +89,6 @@ const jsonLd = {
         "Book cheap flights from the UK at the best airline ticket fares.",
       publisher: { "@id": `${SITE_URL}/#organization` },
       inLanguage: "en-GB",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: {
-          "@type": "EntryPoint",
-          urlTemplate: `${SITE_URL}/?from={origin}&to={destination}`,
-        },
-        "query-input": [
-          "required name=origin",
-          "required name=destination",
-        ],
-      },
     },
     {
       "@type": "WebPage",

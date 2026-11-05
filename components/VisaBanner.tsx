@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, CheckCircle2, Clock, X } from "lucide-react";
 import VisaEnquiryForm from "@/components/VisaEnquiryForm";
-import { PERKS } from "@/lib/visa";
+import Link from "next/link";
+import { PERKS, VISA_DISCLAIMER, VISA_FEE_NOTE } from "@/lib/visa";
 
 /**
  * Dubai Visa — marketing banner only. The full application wizard is retired;
@@ -52,9 +53,10 @@ export default function VisaBanner() {
                 Dubai visa help, handled end to end
               </h2>
               <p className="t-body-lg mx-auto mt-4 max-w-xl text-primary-200 lg:mx-0">
-                Expert support for your UAE tourist or visit visa — from the
-                eligibility check right through to submission. Quick, reliable,
-                stress-free.
+                Help with your UAE tourist or visit visa — from the eligibility
+                check right through to submission. We&apos;re a private travel
+                agent, not a government website; the UAE authorities decide
+                every application.
               </p>
               <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 t-label-2 text-primary-100 lg:justify-start">
                 {PERKS.map((perk) => (
@@ -124,7 +126,7 @@ export default function VisaBanner() {
                   </h3>
                   <p className="mt-2 flex items-center gap-2 t-body-sm text-primary-100/85">
                     <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                    Our expert contacts you within 2 hours.
+                    We aim to call you back the same day.
                   </p>
                 </div>
                 <button
@@ -139,6 +141,18 @@ export default function VisaBanner() {
               </div>
 
               <div className="overflow-y-auto overscroll-contain px-6 py-6 sm:px-8">
+                <p
+                  role="note"
+                  className="mb-6 rounded-md border border-neutral-300 bg-neutral-050 p-4 t-body-sm text-text-secondary"
+                >
+                  {VISA_DISCLAIMER} {VISA_FEE_NOTE}{" "}
+                  <Link
+                    href="/visa-terms"
+                    className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+                  >
+                    Visa service terms
+                  </Link>
+                </p>
                 <VisaEnquiryForm
                   idPrefix="vb"
                   onDone={() => setOpen(false)}

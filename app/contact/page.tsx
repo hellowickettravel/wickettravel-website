@@ -14,6 +14,7 @@ import {
   TWITTER_BASE,
 } from "@/lib/seo";
 import { PHONE_LINK, WHATSAPP_URL } from "@/lib/links";
+import { WHATSAPP_NOTE } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -161,6 +162,15 @@ export default function ContactPage() {
                   <span>
                     <span className="block t-label-2 text-primary-800">Our office</span>
                     <span className="mt-1 block t-body-sm text-text-secondary">{FULL_ADDRESS}</span>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(FULL_ADDRESS)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block t-label-3 text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+                    >
+                      Open in Google Maps
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </a>
                   </span>
                 </div>
               </div>
@@ -173,33 +183,14 @@ export default function ContactPage() {
                   <span className="block t-label-2 text-primary-800">Support hours</span>
                   <span className="mt-1 block t-body-sm text-text-secondary">
                     Phone &amp; WhatsApp: available 24/7. Email and enquiry
-                    forms: answered within 1 business day.
+                    forms: answered within 1 business day. {WHATSAPP_NOTE}
                   </span>
                 </span>
               </div>
 
-              {/* Map */}
-              <div className="mt-8">
-                <div className="overflow-hidden rounded-lg border border-neutral-300/80 shadow-e1">
-                  <iframe
-                    title="Map showing the Wicket Travel Limited office area in Hounslow, London"
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                      FULL_ADDRESS
-                    )}&z=15&output=embed`}
-                    className="h-72 w-full sm:h-80"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                </div>
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(FULL_ADDRESS)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2 inline-block t-label-2 text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
-                >
-                  Open in Google Maps
-                </a>
-              </div>
+              {/* No embedded Google Map: the iframe loaded Google's cookies
+                  on page load, before any consent (cookie audit, 5 Nov 2026).
+                  The office card above links out to Google Maps instead. */}
 
               {/* Socials */}
               <div className="mt-8">
@@ -228,8 +219,8 @@ export default function ContactPage() {
                   heading rendered at body weight. One class, one style. */}
               <h2 className="t-h3 text-primary-800">Send us a message</h2>
               <p className="t-body-sm mt-2 text-text-secondary">
-                Fill in the form and it&apos;ll open in your email app,
-                ready to send straight to our team.
+                Send us a message and our team will reply within 1 business
+                day.
               </p>
               <div className="mt-6">
                 <ContactForm />

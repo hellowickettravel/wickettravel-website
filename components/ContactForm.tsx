@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { PHONE_LINK } from "@/lib/links";
+import { FORM_PRIVACY_NOTE, submitEnquiry } from "@/lib/submitEnquiry";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { AlertCircle, CheckCircle2, ChevronDown, Send } from "lucide-react";
@@ -11,10 +13,14 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 const SUBJECTS = [
   "General enquiry",
-  "Booking support",
-  "Visa enquiry",
+  "Flight quote",
+  "A booking I made",
+  "Change or cancellation",
   "Refund request",
-  "Feedback",
+  "Visa enquiry",
+  "Parent Travel Assist",
+  "Complaint",
+  "Feedback on the site",
   "Other",
 ];
 
@@ -86,17 +92,19 @@ function ErrorText({ id, children }: { id: string; children: ReactNode }) {
 }
 
 /**
- * On-brand contact form. There is no backend behind this yet — submitting
- * hands off to the visitor's email client via a pre-filled `mailto:` link and
- * then shows an on-brand success state. Swap this for a POST to a real
- * inbox/CRM endpoint (e.g. `/api/contact`) once one exists, following the
- * same pattern as `/api/visa-enquiry`.
+ * Contact form. Posts to /api/contact, which emails the team's inbox. If
+ * sending isn't available, the visitor gets WhatsApp and a pre-filled email
+ * link instead, so nothing they typed is lost.
  */
 export default function ContactForm() {
   const reduce = useReducedMotion();
   const [data, setData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<Errors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot
 
   const set = (field: Field) => (value: string) => {
     setData((d) => ({ ...d, [field]: value }));
@@ -108,7 +116,15 @@ export default function ContactForm() {
     if (msg) setErrors((e) => ({ ...e, [field]: msg }));
   };
 
-  const onSubmit = (e: FormEvent) => {
+  const mailtoHref = () => {
+    const subjectLine = data.subject
+      ? `${data.subject} — message from ${data.name}`
+      : `Website enquiry from ${data.name}`;
+    const body = [`Name: ${data.name}`, `Email: ${data.email}`, `Phone: ${data.phone || "—"}`, "", data.message].join("\n");
+    return `mailto:${BUSINESS.email}?subject=${encodeURIComponent(subjectLine)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const fields: Field[] = ["name", "email", "message"];
     const next: Errors = {};
@@ -123,30 +139,20 @@ export default function ContactForm() {
       return;
     }
 
-    // No backend yet — real endpoint would go here (POST to /api/contact).
-    // For now, hand off to the visitor's default email client with the form
-    // pre-filled so nothing typed is lost.
-    const subjectLine = data.subject
-      ? `${data.subject} — message from ${data.name}`
-      : `Website enquiry from ${data.name}`;
-    const body = [
-      `Name: ${data.name}`,
-      `Email: ${data.email}`,
-      `Phone: ${data.phone || "—"}`,
-      "",
-      data.message,
-    ].join("\n");
-    window.location.href = `mailto:${BUSINESS.email}?subject=${encodeURIComponent(
-      subjectLine
-    )}&body=${encodeURIComponent(body)}`;
-
-    setSubmitted(true);
+    setSending(true);
+    setFormError("");
+    const result = await submitEnquiry({ kind: "contact", ...data, website });
+    setSending(false);
+    if (result.status === "sent") setSubmitted(true);
+    else if (result.status === "unavailable") setUnavailable(true);
+    else setFormError(result.message);
   };
 
   const startOver = () => {
     setData(EMPTY_FORM);
     setErrors({});
     setSubmitted(false);
+    setUnavailable(false);
   };
 
   if (submitted) {
@@ -163,10 +169,10 @@ export default function ContactForm() {
         </span>
         {/* Was `t-h3 … t-body-lg` — two type-scale classes on one element, so
             whichever globals.css defines later silently won. One class. */}
-        <h3 className="t-h3 mt-6 text-primary-800">Almost there, {data.name.split(" ")[0] || "traveler"}!</h3>
+        <h3 className="t-h3 mt-6 text-primary-800">Thanks, {data.name.split(" ")[0] || "traveller"} — message sent</h3>
         <p className="t-body-sm mx-auto mt-3 max-w-sm text-text-secondary">
-          Your email app should have opened with your message pre-filled — just
-          hit send. Prefer not to wait? WhatsApp us on{" "}
+          We&apos;ve received your message and will reply to {data.email} within
+          one business day. Need us sooner? WhatsApp us on{" "}
           <a
             {...PHONE_LINK}
             className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
@@ -182,8 +188,36 @@ export default function ContactForm() {
     );
   }
 
+  if (unavailable) {
+    return (
+      <div className="py-8 text-center" role="status">
+        <h3 className="t-h3 text-primary-800">We couldn&apos;t send that just now</h3>
+        <p className="t-body-sm mx-auto mt-3 max-w-sm text-text-secondary">
+          Our form isn&apos;t able to send messages at the moment. Your message
+          is still here — send it by email, or message us on WhatsApp.
+        </p>
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <a href={mailtoHref()} className="btn btn-secondary h-12 px-6">
+            Send by email
+          </a>
+          <a {...PHONE_LINK} className="btn btn-outline h-12 px-6">
+            WhatsApp {BUSINESS.phoneDisplay}
+          </a>
+        </div>
+        <button type="button" onClick={() => setUnavailable(false)} className="mt-6 t-label-2 text-primary-800 underline underline-offset-2">
+          Back to the form
+        </button>
+      </div>
+    );
+  }
+
   return (
     <form noValidate onSubmit={onSubmit} className="space-y-6">
+      {/* Honeypot — hidden from people and screen readers; bots fill it. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label htmlFor="contact-website">Website</label>
+        <input id="contact-website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+      </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div>
           <Label htmlFor="contact-name" required>
@@ -281,10 +315,30 @@ export default function ContactForm() {
         {errors.message && <ErrorText id="contact-message-error">{errors.message}</ErrorText>}
       </div>
 
-      <button type="submit" className="btn btn-primary h-12 w-full px-8 sm:w-auto">
-        Send message
-        <Send className="h-4 w-4" aria-hidden="true" />
-      </button>
+      {formError ? (
+        <p role="alert" className="flex items-start gap-2 t-body-sm text-error">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          {formError}
+        </p>
+      ) : null}
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <button type="submit" disabled={sending} className="btn btn-primary h-12 w-full shrink-0 px-8 sm:w-auto">
+          {sending ? "Sending…" : "Send message"}
+          <Send className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <p className="t-caption text-text-secondary">
+          {FORM_PRIVACY_NOTE} See our{" "}
+          <Link href="/privacy" className="font-bold text-primary-800 underline underline-offset-2">
+            Privacy Policy
+          </Link>
+          . Making a complaint? See our{" "}
+          <Link href="/complaints" className="font-bold text-primary-800 underline underline-offset-2">
+            complaints procedure
+          </Link>
+          .
+        </p>
+      </div>
     </form>
   );
 }

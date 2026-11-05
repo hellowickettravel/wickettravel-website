@@ -25,12 +25,24 @@ import {
   UK_DEPARTURES,
   starBackground,
 } from "@/lib/seo";
-import { PORTAL_LOGIN_URL } from "@/lib/links";
+import { COMPANY } from "@/lib/legal";
+
+/* Who runs the company, from the public register (Companies House, company
+   17001759, checked 5 November 2026). Website audit, 5 Nov 2026: "add who
+   runs the company and when it was founded". */
+const COMPANY_FACTS = [
+  { label: "Company", value: `${COMPANY.legalName}, a private limited company` },
+  { label: "Registered in", value: `${COMPANY.jurisdiction}, company number ${COMPANY.number}` },
+  { label: "Incorporated", value: COMPANY.incorporated },
+  { label: "Directors", value: "Nagaraju Vadranam and Bala Shobha Rani Maramreddy" },
+  { label: "Registered office", value: COMPANY.registeredOffice },
+  { label: "IATA", value: `TIDS registered, code ${COMPANY.iataTids}` },
+];
 
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Wicket Travel Limited compares and books trusted airline tickets at the best available fares from the UK. Who we are, what we stand for and how we work.",
+    "Wicket Travel Limited is a UK travel agent that books airline tickets on your behalf at the best available fares. Who runs us, what we stand for and how we work.",
   alternates: { canonical: "/about" },
   openGraph: {
     ...OG_BASE,
@@ -93,7 +105,7 @@ const VALUES = [
   {
     icon: Sparkles,
     title: "Reliability you can plan around",
-    body: "Real-time fares from licensed carriers, clear confirmations and a team that answers when a schedule changes.",
+    body: "Fares checked with the airlines, clear written confirmations and a team that answers when a schedule changes.",
   },
   {
     icon: Lightbulb,
@@ -106,22 +118,22 @@ const WHY_CHOOSE = [
   {
     icon: PiggyBank,
     title: "Best available fares",
-    body: "We compare live pricing across the world's leading airlines so you see the best fare genuinely on offer for your route.",
+    body: "We check pricing across leading airlines and quote you the best fare we can find for your route and dates.",
   },
   {
     icon: ShieldCheck,
-    title: "Trusted carriers only",
-    body: "Every ticket is issued on a fully-licensed, recognized airline — British Airways, Emirates, Qatar Airways and more.",
+    title: "Booked with the airline",
+    body: "We book your seat with the airline on your behalf, and the airline issues your e-ticket — British Airways, Emirates, Qatar Airways and more.",
   },
   {
     icon: Users,
     title: "No hidden fees",
-    body: "No surprise booking fees sprung on you at checkout. What you're quoted is what you pay.",
+    body: "The total price we quote includes any service fee, and you agree it before you pay. Nothing is added at checkout.",
   },
   {
     icon: Headset,
-    title: "24/7 human support",
-    body: "A real person picks up — by phone, WhatsApp or email — whenever your plans need a hand, day or night.",
+    title: "24/7 on WhatsApp",
+    body: "Call or message us on WhatsApp at any hour, or email us — whenever your plans need a hand.",
   },
 ];
 
@@ -138,7 +150,7 @@ export default function AboutPage() {
       <main className="flex-1">
         <PageHero
           title="Trusted airline tickets, honest fares."
-          lead="We compare fares across the world's leading airlines and connect you straight to the best deal from the UK — no reseller mark-ups, no hidden fees, just a straightforward way to book your next flight."
+          lead="We find the best available fares across leading airlines and book your flight for you from the UK — one total price, agreed before you pay, and no hidden fees."
           breadcrumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
         />
 
@@ -154,20 +166,19 @@ export default function AboutPage() {
                   <strong className="font-bold text-primary-800">
                     {BUSINESS.legalName}
                   </strong>{" "}
-                  (company registration {BUSINESS.registration}) is a UK-based
-                  airline ticket booking service. We compare fares across
-                  trusted, fully-licensed carriers and help travelers from
+                  (company registration {BUSINESS.registration}) is a UK
+                  travel agent. We find fares across leading airlines and book
+                  flights on our customers&apos; behalf, for travellers from
                   across the UK — from {UK_DEPARTURES[0]} to {UK_DEPARTURES[2]}{" "}
-                  and beyond — find and book the best available price for
-                  their route.
+                  and beyond.
                 </p>
                 <p>
                   Flights are our craft and our sole focus at Wicket Travel.
                   Whether you&apos;re flying home to see family, booking a
                   once-a-year holiday or arranging last-minute business
-                  travel, our team compares live pricing, checks availability
-                  and takes you straight through to book — with a real person
-                  on hand if you need one.
+                  travel, our team checks pricing and availability, quotes you
+                  a total price with the fare rules, and books with the airline
+                  once you agree — with a real person on hand if you need one.
                 </p>
               </div>
             </div>
@@ -181,6 +192,39 @@ export default function AboutPage() {
                 className="object-cover"
               />
             </div>
+          </div>
+        </section>
+
+        {/* Who runs Wicket Travel — facts from the public register */}
+        <section className="section bg-neutral-050" aria-labelledby="who-runs-heading">
+          <div className="container-page grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
+            <div>
+              <h2 id="who-runs-heading" className="t-h2 text-balance text-primary-800">
+                Who runs Wicket Travel
+              </h2>
+              <p className="t-body mt-4 text-text-secondary">
+                Wicket Travel is run by {COMPANY.legalName}, a UK travel agency
+                incorporated on {COMPANY.incorporated} and led by its two
+                directors. Every detail here can be checked on the public
+                register at Companies House.
+              </p>
+              <a
+                href={COMPANY.companiesHouseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-block t-label-2 text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+              >
+                View us on Companies House
+              </a>
+            </div>
+            <dl className="card divide-y divide-neutral-300">
+              {COMPANY_FACTS.map((f) => (
+                <div key={f.label} className="grid gap-1 px-6 py-4 sm:grid-cols-[160px_1fr] sm:gap-4">
+                  <dt className="t-label-2 text-text-secondary">{f.label}</dt>
+                  <dd className="t-body-sm text-primary-800">{f.value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </section>
 
@@ -299,12 +343,19 @@ export default function AboutPage() {
                 </span>
                 <h3 className="t-h3 mt-6 text-primary-800">Booking protection, made clear</h3>
                 <p className="t-body-sm mt-2 text-text-secondary">
-                  Many flight bookings include industry-standard financial
-                  protections, such as ATOL-style cover, depending on the
-                  airline and how you pay. We&apos;ll always tell you plainly
-                  what protection applies to your booking before you part
-                  with any money.
+                  {COMPANY.legalName} does not hold an ATOL licence, and
+                  flight-only bookings are not ATOL protected. Your ticket is
+                  issued by the airline under its own conditions of carriage.
+                  If you pay by credit card, Section 75 of the Consumer Credit
+                  Act may cover bookings over £100; debit card payments may be
+                  covered by your bank&apos;s chargeback scheme.
                 </p>
+                <Link
+                  href="/terms"
+                  className="mt-4 inline-block t-label-2 text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+                >
+                  How bookings work: our terms
+                </Link>
               </div>
             </div>
           </div>
@@ -322,20 +373,19 @@ export default function AboutPage() {
               <div className="mx-auto max-w-xl">
                 <h2 className="t-h2 text-balance text-text-on-dark">Ready to find your fare?</h2>
                 <p className="t-body mt-4 text-pretty text-primary-100">
-                  Search live prices from the UK&apos;s most trusted airlines, or
-                  tell us your dates and let our team find the best deal for
-                  you.
+                  Search fares from the UK, or tell us your dates and let our
+                  team find the best deal for you.
                 </p>
                 <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                   <Link href="/" className="btn btn-primary h-12 w-full px-8 focus-visible:ring-offset-primary-800 sm:w-auto">
                     Search flights
                   </Link>
-                  <a
-                    href={PORTAL_LOGIN_URL}
+                  <Link
+                    href="/quote"
                     className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-neutral-000/20 bg-neutral-000/5 px-8 t-label-2 text-text-on-dark transition-colors duration-200 hover:bg-neutral-000/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-000/60 focus-visible:ring-offset-2 focus-visible:ring-offset-primary-800 sm:w-auto"
                   >
                     Get a quote
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

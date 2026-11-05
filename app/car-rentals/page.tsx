@@ -57,14 +57,14 @@ import { HOLIDAYS_URL, PHONE_LINK, externalLinkProps } from "@/lib/links";
 export const metadata: Metadata = {
   title: "Car Rentals",
   description:
-    "Car hire arranged with Wicket Travel Holidays — economy hatchbacks to SUVs, luxury saloons and 7-seat people carriers, collected at the airport desk.",
+    "Car hire booked with and sold by our sister company, Wicket Travel Holidays — economy hatchbacks to SUVs, luxury saloons and 7-seat people carriers, collected at the airport desk.",
   alternates: { canonical: "/car-rentals" },
   openGraph: {
     ...OG_BASE,
     url: `${SITE_URL}/car-rentals`,
     title: "Car Rentals | Wicket Travel",
     description:
-      "Airport pickup, clear terms and a real UK team on the phone. Car hire arranged with Wicket Travel Holidays alongside the flight we book for you.",
+      "Airport pickup and the rental terms in writing. Car hire booked with our sister company, Wicket Travel Holidays, alongside the flight we book for you.",
   },
   twitter: {
     ...TWITTER_BASE,
@@ -164,13 +164,13 @@ const VEHICLES: VehicleClass[] = [
 const STEPS = [
   {
     n: "01",
-    title: "Tell us the dates",
-    body: "Add the car when you book the flight, or call us later — the pick-up desk, the drop-off and the times are all we need to start. Nothing is charged at this stage.",
+    title: "Share the dates",
+    body: "Ask when you book the flight, or check cars on Wicket Travel Holidays — the pick-up desk, the drop-off and the times are all it needs to start. Nothing is charged at this stage.",
   },
   {
     n: "02",
-    title: "We pass it to Holidays",
-    body: "Our sister brand's rental desk confirms the vehicle class, the driver requirements and the full terms in writing before anything is agreed. No card details over the phone, ever.",
+    title: "Holidays confirms the terms",
+    body: "Our sister company, Wicket Travel Holidays, confirms the vehicle class, the driver requirements and the full rental terms in writing before anything is agreed. The car hire is sold by Wicket Travel Holidays, under its own terms.",
   },
   {
     n: "03",
@@ -200,27 +200,27 @@ const CAR_FAQ = [
   {
     question: "How old do I need to be to hire a car?",
     answer:
-      "Most partners rent to drivers aged 21 and over, and some classes — luxury saloons and larger vans in particular — are restricted to 25 and over. Drivers under 25 are usually subject to a young-driver surcharge, which the rental desk states in full on the terms before you agree to anything. Tell us the driver's age when you enquire and we will only show you classes they can actually be given.",
+      "Most partners rent to drivers aged 21 and over, and some classes — luxury saloons and larger vans in particular — are restricted to 25 and over. Drivers under 25 are usually subject to a young-driver surcharge, which the rental desk states in full on the terms before you agree to anything. Give the driver's age when you enquire so you only see classes they can actually be given.",
   },
   {
     question: "Which driving licence do I need, and do I need an IDP?",
     answer:
-      "A full UK photocard licence held for at least a year covers most destinations, and you must bring the physical card — a photo of it is not accepted at the desk. Some countries also want an International Driving Permit alongside it; the UAE accepts a UK licence for tourists, while several other destinations do not. IDPs are issued over the counter at UK Post Offices. We will confirm which applies to your destination in writing before you travel.",
+      "A full UK photocard licence held for at least a year covers most destinations, and you must bring the physical card — a photo of it is not accepted at the desk. Some countries also want an International Driving Permit alongside it; the UAE accepts a UK licence for tourists, while several other destinations do not. IDPs are issued over the counter at UK Post Offices. Check the rental terms and the destination's rules before you travel.",
   },
   {
     question: "What insurance is included, and what is the excess?",
     answer:
-      "Rentals arrived through our partners include collision damage waiver and theft protection as standard, with a damage excess you remain liable for. That excess amount, and the deposit held on your card at the desk, are both shown in full on the rental terms before the booking is confirmed — never sprung on you at pick-up. Excess-reduction cover can be added at the desk or bought separately from a UK insurer; either is fine, and we will not push you towards one.",
+      "Most rentals include collision damage waiver and theft protection, with a damage excess you remain liable for — but what is included depends on the rental company and rate. The excess amount and the deposit held on your card at the desk are set out in the rental terms, so read them before you confirm. Excess-reduction cover can be added at the desk or bought separately from a UK insurer.",
   },
   {
     question: "Can I drive the car across a border?",
     answer:
-      "Sometimes, but never assume it. Cross-border travel has to be declared before you collect the car so the right documentation and insurance extension travel with it, and some partners exclude certain neighbouring countries outright. Tell us the route when you enquire — if the crossing is not permitted on that booking, it is far better to find out from us than at a frontier post.",
+      "Sometimes, but never assume it. Cross-border travel has to be declared before you collect the car so the right documentation and insurance extension travel with it, and some partners exclude certain neighbouring countries outright. Give the route when you enquire — if the crossing is not permitted on that booking, it is far better to find out before you travel than at a frontier post.",
   },
   {
     question: "How does the fuel policy work?",
     answer:
-      "The usual arrangement is like-for-like: you collect the car with a full tank and return it full, refuelling near the drop-off point and keeping the receipt. If it comes back short, the desk refuels it and charges for doing so. A few locations only offer a pre-purchased tank instead, in which case unused fuel is not refunded — we will tell you which policy applies to your booking before you confirm it.",
+      "The usual arrangement is like-for-like: you collect the car with a full tank and return it full, refuelling near the drop-off point and keeping the receipt. If it comes back short, the desk refuels it and charges for doing so. A few locations only offer a pre-purchased tank instead, in which case unused fuel is not refunded — the rental terms say which policy applies before you confirm.",
   },
 ];
 
@@ -351,17 +351,17 @@ export default function CarRentalsPage() {
               </h1>
 
               <p className="t-body-lg mt-4 max-w-xl text-primary-100">
-                We book the flight. Our holidays brand arranges the car waiting
-                for you at the other end — economy hatchbacks to seven-seat
-                people carriers, with the terms written down before you agree to
-                anything.
+                We book the flight. Our sister company, {SISTER_BRAND.name},
+                sells the car waiting for you at the other end — economy
+                hatchbacks to seven-seat people carriers, with the terms written
+                down before you agree to anything.
               </p>
 
               <ul className="mt-8 flex flex-wrap gap-3">
                 {[
                   { icon: KeyRound, label: "Airport desk pick-up" },
                   { icon: ShieldCheck, label: "Insurance terms in writing" },
-                  { icon: Headset, label: "Real UK agents, 24/7" },
+                  { icon: Headset, label: "24/7 on WhatsApp" },
                 ].map(({ icon: Icon, label }) => (
                   <li
                     key={label}
@@ -414,9 +414,9 @@ export default function CarRentalsPage() {
 
               <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <p className="t-body-sm max-w-xl text-text-secondary">
-                  Car hire is completed on {SISTER_BRAND.name}, our sister brand
-                  — this panel shows what you&apos;ll fill in there. Flights
-                  stay here with us, and you can book both in one phone call.
+                  Car hire is booked with and sold by {SISTER_BRAND.name}, our
+                  sister company, under its own terms — this panel shows what
+                  you&apos;ll fill in there. Flights stay here with us.
                 </p>
                 {/* min-h rather than a fixed h throughout this page's CTAs: the
                     sister brand's full name makes these labels long enough to
@@ -528,11 +528,11 @@ export default function CarRentalsPage() {
             <div className="max-w-2xl">
               <span className="t-overline text-accent-700">How it works</span>
               <h2 id="how-heading" className="t-h2 mt-3 text-primary-800">
-                Three steps, one phone call
+                Three steps, terms first
               </h2>
               <p className="t-body mt-4 text-text-on-sand">
-                Booking a car through us is not a separate transaction you have
-                to manage. It hangs off the flight we are already handling.
+                The car is booked with {SISTER_BRAND.name}, our sister company,
+                and lined up with the flight we book for you.
               </p>
             </div>
 
@@ -575,12 +575,12 @@ export default function CarRentalsPage() {
           <div className="container-page">
             <div className="section-lead text-center">
               <h2 className="t-h2 text-primary-800">
-                The desks you&apos;ll be collecting from
+                Rental desks you may collect from
               </h2>
               <p className="t-body mt-4 text-text-secondary">
-                {SISTER_BRAND.name} books through the established international
-                rental networks, so the counter you walk up to in arrivals is one
-                you already recognise.
+                Examples of the international rental companies with desks at
+                most major airports. Which company supplies your car depends on
+                the destination and the rate {SISTER_BRAND.name} offers you.
               </p>
             </div>
 
@@ -612,8 +612,8 @@ export default function CarRentalsPage() {
 
             <p className="mt-8 flex items-center justify-center gap-2 t-label-2 text-text-secondary">
               <BadgeCheck className="h-4 w-4 text-accent-500" aria-hidden="true" />
-              Booked and supported by {BUSINESS.legalName}, company registration{" "}
-              {BUSINESS.registration}
+              Car hire sold by {SISTER_BRAND.name}. Flights booked by{" "}
+              {BUSINESS.legalName}, company {BUSINESS.registration}
             </p>
           </div>
         </section>

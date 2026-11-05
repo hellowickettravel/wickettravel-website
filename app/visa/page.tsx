@@ -8,6 +8,7 @@ import {
   ChevronRight,
   ClipboardCheck,
   Clock,
+  Info,
   MessageCircle,
   PhoneCall,
   Plus,
@@ -16,7 +17,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import VisaEnquiryForm from "@/components/VisaEnquiryForm";
-import { PERKS } from "@/lib/visa";
+import { PERKS, VISA_DISCLAIMER, VISA_FEE_NOTE } from "@/lib/visa";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion-primitives";
 import {
   AREA_SERVED_UAE,
@@ -51,33 +52,43 @@ import { PHONE_LINK, WHATSAPP_URL } from "@/lib/links";
 export const metadata: Metadata = {
   title: "Dubai Visa Help",
   description:
-    "UAE tourist and visit visa help from the UK. Eligibility checked first, documents reviewed by a visa expert, and a real person calls you back within 2 hours.",
+    "UAE tourist and visit visa help from the UK from a private travel agent. Eligibility checked first, documents checked by our visa team, and the fee quoted in writing before you pay.",
   alternates: { canonical: "/visa" },
   openGraph: {
     ...OG_BASE,
     url: `${SITE_URL}/visa`,
     title: "Dubai Visa Help | UAE Tourist & Visit Visas — Wicket Travel",
     description:
-      "Applying for a UAE tourist or visit visa from the UK? Wicket Travel checks your eligibility, reviews your documents and calls you back within 2 hours.",
+      "Applying for a UAE tourist or visit visa from the UK? Wicket Travel, a private travel agent, checks your eligibility, reviews your documents and helps you apply.",
   },
   twitter: {
     ...TWITTER_BASE,
     title: "Dubai Visa Help | UAE Tourist & Visit Visas",
     description:
-      "UAE tourist and visit visas handled end to end from the UK — no embassy appointment, and a callback within 2 hours.",
+      "Help with UAE tourist and visit visa applications from the UK — no embassy appointment. Not a government website.",
   },
 };
 
 const VISA_FAQ = [
   {
+    question: "Is this an official UAE government visa website?",
+    answer:
+      "No. Wicket Travel Limited is a private UK travel agent. We help you prepare and submit your application for a fee; the UAE authorities decide every application, and we can't guarantee approval. Our full visa service terms explain what we do and don't do.",
+  },
+  {
+    question: "How much does it cost, and what if my visa is refused?",
+    answer:
+      "Our service fee and the UAE government fee are quoted to you in writing before you pay. If we haven't submitted your application yet, you can cancel for a full refund. Once it has been submitted, the government fee isn't refundable, and our service fee isn't refunded if the application is refused, because the work has been done. Our visa service terms set this out in full.",
+  },
+  {
     question: "How long does a Dubai visa take to process?",
     answer:
-      "Most UAE tourist and visit visa applications are processed within a few working days once your documents have passed our review. Processing times are set by the UAE authorities rather than by us, so instead of quoting a headline number your visa expert gives you a realistic window for your specific case on the callback — and keeps you updated until the visa is issued.",
+      "Most UAE tourist and visit visa applications are processed within a few working days once your documents have passed our review. Processing times are set by the UAE authorities rather than by us, so instead of quoting a headline number our visa team gives you a realistic window for your specific case on the callback — and keeps you updated until a decision is made.",
   },
   {
     question: "What documents do I need for a UAE tourist visa?",
     answer:
-      "Typically a passport valid for at least six months from your travel date, a clear passport-style photograph, proof of your UK status if you are not a British passport holder (for example a BRP or share code), and your travel and accommodation details. You do not send anything through this form — your expert confirms the exact list for your case on the callback, then reviews each document before anything is submitted.",
+      "Typically a passport valid for at least six months from your travel date, a clear passport-style photograph, proof of your UK status if you are not a British passport holder (for example a BRP or share code), and your travel and accommodation details. You do not send anything through this form — our visa team confirms the exact list for your case on the callback, then checks each document before anything is submitted.",
   },
   {
     question: "What is the difference between a tourist visa and a visit visa?",
@@ -92,12 +103,12 @@ const VISA_FAQ = [
   {
     question: "Do I have to apply in person or visit an embassy?",
     answer:
-      "No. UAE tourist and visit visas are handled electronically, so there is no embassy appointment and no travelling to an office. Everything is done remotely with your Wicket Travel visa expert by phone, WhatsApp and email, and the approved visa arrives by email.",
+      "No. UAE tourist and visit visas are handled electronically, so there is no embassy appointment and no travelling to an office. Everything is done remotely with the Wicket Travel visa team by phone, WhatsApp and email, and if the visa is approved it arrives by email.",
   },
   {
     question: "Can you arrange visas for my family or a group?",
     answer:
-      "Yes. Mention how many travellers you are applying for in the notes on the enquiry form and your expert will handle the whole group together on a single callback, so you are not repeating the same details application by application.",
+      "Yes. Mention how many travellers you are applying for in the notes on the enquiry form and our visa team will handle the whole group together on a single callback, so you are not repeating the same details application by application.",
   },
 ];
 
@@ -112,19 +123,19 @@ const STEPS = [
     icon: ClipboardCheck,
     step: "02",
     title: "Eligibility & document review",
-    body: "A UAE visa expert checks whether your case qualifies and reviews every document before anything is submitted.",
+    body: "Our visa team checks whether your case looks eligible and reviews every document before anything is submitted.",
   },
   {
     icon: PhoneCall,
     step: "03",
     title: "A real person calls you back",
-    body: "Within 2 hours. They confirm your details, answer your questions and tell you exactly what to send next.",
+    body: "We aim to call the same day. We confirm your details, quote the fee in writing and tell you exactly what to send next.",
   },
   {
     icon: BadgeCheck,
     step: "04",
     title: "Your visa is processed",
-    body: "We prepare and submit the application, keep you posted on progress, and send the approved visa straight to your inbox.",
+    body: "Once you agree and pay, we submit the application and keep you posted. The UAE authorities decide it; if approved, the visa comes straight to your inbox.",
   },
 ];
 
@@ -227,13 +238,13 @@ export default function VisaPage() {
             <div className="mt-8 grid items-center gap-10 lg:grid-cols-[1fr_auto] lg:gap-16">
               <Reveal>
                 <h1 className="t-h1 max-w-2xl text-text-on-dark">
-                  Your UAE tourist or visit visa, handled by real people.
+                  Help with your UAE tourist or visit visa, from real people.
                 </h1>
                 <p className="t-body-lg mt-4 max-w-xl text-primary-100">
-                  Wicket Travel prepares and submits Dubai and UAE visa
-                  applications for travellers in the UK — eligibility checked
-                  first, documents reviewed by a specialist, and a real person
-                  on the phone from start to finish.
+                  Wicket Travel helps travellers in the UK prepare and submit
+                  Dubai and UAE visa applications — eligibility checked first,
+                  documents checked by our visa team, and a real person on the
+                  phone from start to finish.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -256,6 +267,25 @@ export default function VisaPage() {
                 <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-neutral-000/5 px-4 py-2 t-label-3 text-primary-100 ring-1 ring-neutral-000/10">
                   <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   We handle UAE visas today — more destinations coming soon.
+                </p>
+
+                {/* Not-a-government-site disclaimer (website audit, 5 Nov
+                    2026), above the fold so nobody mistakes this for an
+                    official visa portal. */}
+                <p
+                  role="note"
+                  className="mt-4 flex max-w-xl items-start gap-2 rounded-md bg-neutral-000/10 px-4 py-3 t-body-sm text-primary-100 ring-1 ring-neutral-000/15"
+                >
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent-400" aria-hidden="true" />
+                  <span>
+                    {VISA_DISCLAIMER}{" "}
+                    <Link
+                      href="/visa-terms"
+                      className="font-bold text-text-on-dark underline decoration-accent-400 decoration-2 underline-offset-2"
+                    >
+                      Visa service terms
+                    </Link>
+                  </span>
                 </p>
               </Reveal>
 
@@ -322,7 +352,7 @@ export default function VisaPage() {
                 How your visa application works
               </h2>
               <p className="t-body mt-4 text-text-on-sand">
-                Four steps, one expert, no forms to chase. You never send a
+                Four steps, one team, no forms to chase. You never send a
                 document into a void — a person reviews every one.
               </p>
             </Reveal>
@@ -364,10 +394,26 @@ export default function VisaPage() {
                   </h2>
                   <p className="mt-2 flex items-center gap-2 t-body-sm text-primary-100">
                     <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                    Our expert contacts you within 2 hours.
+                    We aim to call you back the same day.
                   </p>
                 </div>
                 <div className="px-6 py-6 sm:px-8 sm:py-8">
+                  <div
+                    role="note"
+                    className="mb-6 rounded-md border border-neutral-300 bg-neutral-050 p-4 t-body-sm text-text-secondary"
+                  >
+                    <p>{VISA_DISCLAIMER}</p>
+                    <p className="mt-2">
+                      {VISA_FEE_NOTE} See our{" "}
+                      <Link
+                        href="/visa-terms"
+                        className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+                      >
+                        visa service terms
+                      </Link>
+                      .
+                    </p>
+                  </div>
                   <VisaEnquiryForm idPrefix="vp" />
                 </div>
               </div>
@@ -380,8 +426,8 @@ export default function VisaPage() {
                 <ol className="mt-4 space-y-4">
                   {[
                     "We read your enquiry and check the basics against UAE requirements.",
-                    "A visa expert calls you back within 2 hours on the number you give us.",
-                    "They confirm the exact documents for your case — nothing is uploaded here.",
+                    "Our visa team aims to call you back the same day on the number you give us.",
+                    "We confirm the exact documents for your case and quote the fee in writing — nothing is uploaded here.",
                   ].map((line, i) => (
                     <li key={line} className="flex gap-3">
                       <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary-050 t-label-3 text-primary-700">
@@ -400,7 +446,7 @@ export default function VisaPage() {
                   Would rather just talk?
                 </h3>
                 <p className="t-body-sm mt-2 text-text-secondary">
-                  Our team answers 24/7 — call or message and we can take your
+                  Call or message us on WhatsApp, 24/7, and we can take your
                   visa enquiry over the phone instead.
                 </p>
                 <div className="mt-5 flex flex-col gap-3">

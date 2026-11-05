@@ -13,22 +13,22 @@ const FEATURES = [
   {
     icon: Tags,
     title: "Transparent pricing",
-    copy: "The fare you see is the fare you pay. No surprise booking fees at checkout — ever.",
+    copy: "We quote one total price, including any service fee, and you agree it before you pay. No card surcharges.",
   },
   {
     icon: Lock,
-    title: "Bank-level security",
-    copy: "Every search is encrypted with 256-bit SSL. We never sell or store your card details.",
+    title: "Secure and private",
+    copy: "The site runs over an encrypted (HTTPS) connection. We never sell your personal data.",
   },
   {
     icon: BadgeCheck,
-    title: "Verified airlines only",
-    copy: "We connect you to vetted, fully-licensed airlines — never an unknown reseller.",
+    title: "Booked with the airline",
+    copy: "We book your seat with the airline on your behalf, and the airline issues your e-ticket.",
   },
   {
     icon: Headset,
-    title: "24/7 human support",
-    copy: "Real people, around the clock, in 12 languages — whenever your plans need a hand.",
+    title: "24/7 on WhatsApp",
+    copy: "Message or call us on WhatsApp at any hour — before, during or after your trip.",
   },
 ];
 
@@ -43,9 +43,9 @@ export default function BestPriceGuarantee() {
             <div>
               <h2 className="t-h2 text-text-on-dark">{t("guar.title")}</h2>
               <p className="t-body-lg mt-4 max-w-md text-primary-100">
-                We&apos;re on your side, not the seller&apos;s. From the first
-                search to the final redirect, every step is built to protect your
-                money and your data.
+                Wicket Travel Limited books your flight for you as a travel
+                agent. You see the price and the fare rules in writing before
+                you pay, and we book only once you agree.
               </p>
 
               <div className="mt-8 inline-flex items-center gap-4 rounded-lg bg-neutral-000/10 p-6 ring-1 ring-neutral-000/15 backdrop-blur-sm">
@@ -55,7 +55,7 @@ export default function BestPriceGuarantee() {
                 <div>
                   <div className="t-h4 text-text-on-dark">{t("guar.badge")}</div>
                   <p className="t-body-sm text-primary-100">
-                    Find it cheaper elsewhere? We&apos;ll help you match it.
+                    The price we quote is the price you pay.
                   </p>
                 </div>
               </div>
