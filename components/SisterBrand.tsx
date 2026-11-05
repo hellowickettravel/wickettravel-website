@@ -126,7 +126,7 @@ export default function SisterBrand() {
                 >
                   <Image
                     src="/hotels/maldives-overwater.jpg"
-                    alt="Overwater villas in the Maldives from the Wicket Travel Holidays collection"
+                    alt="Overwater villas above a lagoon in the Maldives"
                     fill
                     sizes="(max-width: 1024px) 76vw, 38vw"
                     className="object-cover"
@@ -141,7 +141,7 @@ export default function SisterBrand() {
                   <div className="relative h-full w-full -rotate-2 overflow-hidden rounded-lg shadow-e3 ring-[6px] ring-primary-900">
                     <Image
                       src="/hotels/santorini-suites.jpg"
-                      alt="Cliffside suites in Santorini from the Wicket Travel Holidays collection"
+                      alt="Whitewashed cliffside buildings in Santorini"
                       fill
                       sizes="(max-width: 1024px) 46vw, 23vw"
                       className="object-cover"

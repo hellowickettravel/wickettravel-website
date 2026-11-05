@@ -144,7 +144,7 @@ const COLLECTIONS = [
     region: "Dubai, Doha & Istanbul",
     body: "Characterful city hotels within walking distance of the old quarters, souks and transport links — good for a stopover or a long weekend.",
     img: "/hotels/city-hotel-room.jpg",
-    alt: "A classic city hotel suite with a made bed, sofa and reading lamps",
+    alt: "A hotel room with a made double bed and bedside lamps",
   },
   {
     title: "Island & cliffside hotels",
@@ -158,21 +158,21 @@ const COLLECTIONS = [
     region: "Bali & Lombok",
     body: "Infinity pools, open-air living space and a driver on call — the format Indonesia does better than anywhere else.",
     img: "/hotels/clifftop-pool.jpg",
-    alt: "An infinity pool on a clifftop above the sea",
+    alt: "An infinity pool on a clifftop above the sea at dusk",
   },
   {
     title: "Family beach resorts",
     region: "Thailand & Malaysia",
     body: "Lagoon pools, connecting rooms and kids' clubs, on stretches of coast that stay calm through the school holidays.",
     img: "/hotels/tropical-villas.jpg",
-    alt: "Private tropical villas beside a lagoon pool",
+    alt: "A tropical resort pool lined with sun loungers",
   },
   {
     title: "Mountain & wellness retreats",
     region: "Europe & the Americas",
     body: "Quiet, low-rise properties built around a spa, a valley view and a very early night. Wellness rates run year-round.",
     img: "/hotels/hillside-retreat.jpg",
-    alt: "Sun loungers on a hillside retreat terrace looking out over a mountain valley",
+    alt: "Hotel buildings on a misty green hillside",
   },
 ] as const;
 

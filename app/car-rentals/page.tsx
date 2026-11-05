@@ -105,7 +105,7 @@ const VEHICLES: VehicleClass[] = [
     tagline: "City runs & short hops",
     body: "A compact hatchback for two, easy to park in an old town and the cheapest class to fuel. The default choice for a long weekend.",
     img: "/cars/economy-hatchback.jpg",
-    alt: "A compact blue hatchback parked on open ground under an overcast sky",
+    alt: "A compact red hatchback parked beside a stone building",
     specs: [
       { icon: Users, label: "Seats", value: "4 adults" },
       { icon: Luggage, label: "Luggage", value: "1 large · 1 cabin" },
@@ -118,7 +118,7 @@ const VEHICLES: VehicleClass[] = [
     tagline: "Families & rough roads",
     body: "Higher ride, proper boot space and a spare row of legroom. What most families end up in for a fortnight with cases and a pushchair.",
     img: "/cars/suv.jpg",
-    alt: "A white SUV parked on a desert track beside red rock formations",
+    alt: "A white SUV parked on a gravel track below a hill",
     specs: [
       { icon: Users, label: "Seats", value: "5 adults" },
       { icon: Luggage, label: "Luggage", value: "3 large · 2 cabin" },
@@ -131,7 +131,7 @@ const VEHICLES: VehicleClass[] = [
     tagline: "Business trips & arrivals",
     body: "A full-size saloon with a quiet cabin and a boot that swallows two suitcases without argument. Chauffeur can be added at some desks.",
     img: "/cars/luxury-sedan.jpg",
-    alt: "A dark grey luxury saloon parked on a city street",
+    alt: "A black luxury saloon parked on a city street",
     specs: [
       { icon: Users, label: "Seats", value: "5 adults" },
       { icon: Luggage, label: "Luggage", value: "2 large · 2 cabin" },
@@ -144,7 +144,7 @@ const VEHICLES: VehicleClass[] = [
     tagline: "Groups & extended family",
     body: "Seven or eight seats with the back row up, or five seats and everyone's luggage with it folded. The one to book when the whole family flies together.",
     img: "/cars/people-carrier.jpg",
-    alt: "A white seven-seat people carrier parked in an empty car park",
+    alt: "A white and teal people carrier parked in a car park",
     specs: [
       { icon: Users, label: "Seats", value: "7 to 8" },
       { icon: Luggage, label: "Luggage", value: "4 large · 3 cabin" },
