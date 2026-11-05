@@ -12,7 +12,6 @@ import {
   Hotel,
   MapPin,
   Sparkles,
-  Star,
   Users,
 } from "lucide-react";
 import Header from "@/components/Header";
@@ -53,7 +52,7 @@ import { HOLIDAYS_URL, externalLinkProps } from "@/lib/links";
 export const metadata: Metadata = {
   title: "Hotels & Resorts",
   description:
-    "Handpicked hotels, resorts and pool villas arranged with Wicket Travel Holidays — free cancellation on many stays and 24/7 support from the same UK team.",
+    "Hotels, resorts and pool villas booked with and sold by our sister company, Wicket Travel Holidays, under its own terms. Flights stay with Wicket Travel.",
   alternates: { canonical: "/hotels" },
   openGraph: {
     ...OG_BASE,
@@ -66,7 +65,7 @@ export const metadata: Metadata = {
     ...TWITTER_BASE,
     title: "Hotels & Resorts | Wicket Travel",
     description:
-      "Beachfront resorts, boutique city hotels and pool villas, arranged by the same UK team that books your flight.",
+      "Beachfront resorts, boutique city hotels and pool villas, booked with our sister company Wicket Travel Holidays.",
   },
 };
 
@@ -99,7 +98,7 @@ const jsonLd = {
       name: "Hotel and resort booking",
       serviceType: "Accommodation booking",
       url: `${SITE_URL}/hotels`,
-      description: `Wicket Travel arranges hotels, resorts and villas alongside the flights it books for UK travellers. Stays are contracted and confirmed by its sister brand, ${SISTER_BRAND.name}, and supported by the same UK team around the clock.`,
+      description: `Wicket Travel arranges hotels, resorts and villas alongside the flights it books for UK travellers. Stays are sold, contracted and confirmed by its sister company, ${SISTER_BRAND.name}, under its own terms.`,
       provider: { "@id": ORGANIZATION_ID },
       areaServed: AREA_SERVED_UK,
       audience: {
@@ -145,7 +144,7 @@ const COLLECTIONS = [
     region: "Dubai, Doha & Istanbul",
     body: "Characterful city hotels within walking distance of the old quarters, souks and transport links — good for a stopover or a long weekend.",
     img: "/hotels/city-hotel-room.jpg",
-    alt: "A classic city hotel suite with a made bed, sofa and reading lamps",
+    alt: "A hotel room with a made double bed and bedside lamps",
   },
   {
     title: "Island & cliffside hotels",
@@ -159,45 +158,49 @@ const COLLECTIONS = [
     region: "Bali & Lombok",
     body: "Infinity pools, open-air living space and a driver on call — the format Indonesia does better than anywhere else.",
     img: "/hotels/clifftop-pool.jpg",
-    alt: "An infinity pool on a clifftop above the sea",
+    alt: "An infinity pool on a clifftop above the sea at dusk",
   },
   {
     title: "Family beach resorts",
     region: "Thailand & Malaysia",
     body: "Lagoon pools, connecting rooms and kids' clubs, on stretches of coast that stay calm through the school holidays.",
     img: "/hotels/tropical-villas.jpg",
-    alt: "Private tropical villas beside a lagoon pool",
+    alt: "A tropical resort pool lined with sun loungers",
   },
   {
     title: "Mountain & wellness retreats",
     region: "Europe & the Americas",
     body: "Quiet, low-rise properties built around a spa, a valley view and a very early night. Wellness rates run year-round.",
     img: "/hotels/hillside-retreat.jpg",
-    alt: "Sun loungers on a hillside retreat terrace looking out over a mountain valley",
+    alt: "Hotel buildings on a misty green hillside",
   },
 ] as const;
 
-/* ── Why book through the sister brand ──────────────────────────────────── */
+/* ── Why book through the sister brand ──────────────────────────────────
+   Only things that are true of every booking. The old list promised "free
+   cancellation on a large share of stays", "reviews from guests who actually
+   stayed" and "member extras" — none of which Wicket Travel can check from
+   this side of the brand (website audit, 5 Nov 2026). */
 const REASONS = [
   {
     icon: CalendarCheck,
-    title: "Free cancellation on a large share of stays",
-    body: "Plans move. Most properties in the collection hold a free-cancellation rate, and each one's deadline is shown in full before anything is confirmed — never after.",
+    title: "Cancellation terms shown before you book",
+    body: "Whether a stay can be cancelled free, and until when, depends on the hotel and the rate. Wicket Travel Holidays shows the terms for your room before you confirm.",
   },
   {
     icon: BadgeCheck,
-    title: "Reviews from guests who actually stayed",
-    body: `Ratings come from completed bookings only, alongside the ${BUSINESS.ratingValue}/5 Excellent Trustpilot rating the wider Wicket team already holds.`,
+    title: "A separate company, clearly named",
+    body: `Stays are booked with and sold by ${SISTER_BRAND.name}, under its own terms and privacy policy — not by Wicket Travel Limited.`,
   },
   {
     icon: Sparkles,
-    title: "Member extras on selected stays",
-    body: "A room upgrade, a late checkout or breakfast included, depending on the property. Whatever applies to your stay is spelled out on the booking page.",
+    title: "Extras spelled out per property",
+    body: "Breakfast, transfers or a late checkout depend on the property and rate. Whatever is included is listed on the booking page.",
   },
   {
     icon: Headset,
-    title: "One team, day or night",
-    body: `Flights here, stays there — but the same UK office answers both. Call or WhatsApp ${BUSINESS.phoneDisplay} at any hour, before or during your trip.`,
+    title: "Flight help from us, day or night",
+    body: `For the flight side of your trip, call or WhatsApp us on ${BUSINESS.phoneDisplay} at any hour.`,
   },
 ] as const;
 
@@ -211,58 +214,8 @@ const DESTINATIONS = [
   { city: "Delhi", note: "Aerocity & city centre", img: "/cities/delhi.jpg" },
   { city: "Mumbai", note: "Colaba & Bandra", img: "/cities/mumbai.jpg" },
   { city: "Abu Dhabi", note: "Corniche & the islands", img: "/cities/abu-dhabi.jpg" },
-  { city: "Istanbul-bound? Try Doha", note: "Stopover stays", img: "/cities/hong-kong.jpg" },
+  { city: "Hong Kong", note: "Central & Tsim Sha Tsui", img: "/cities/hong-kong.jpg" },
 ] as const;
-
-/* ── Guest reviews ──────────────────────────────────────────────────────── */
-const REVIEWS = [
-  {
-    rating: "5.0",
-    quote:
-      "Booked flights with Wicket and they sorted the hotel through their holidays side in the same phone call. One team, one set of dates, nothing lost between the two.",
-    name: "Hannah R.",
-    city: "Hounslow",
-    trip: "Dubai, 6 nights",
-  },
-  {
-    rating: "5.0",
-    quote:
-      "The free-cancellation deadline was written on the confirmation in plain English, which mattered when my father's visa came through late. Moved the stay, no argument.",
-    name: "Daniel O.",
-    city: "Manchester",
-    trip: "Maldives, 8 nights",
-  },
-  {
-    rating: "4.0",
-    quote:
-      "Resort was exactly as described and the upgrade came through at check-in. Took a couple of emails to confirm the airport transfer, but someone answered every time.",
-    name: "Sarah S.",
-    city: "Birmingham",
-    trip: "Krabi, 10 nights",
-  },
-] as const;
-
-/** Star row + numeral. Stars never appear without their number. */
-function Rating({ value }: { value: string }) {
-  const filled = Math.round(Number(value));
-  return (
-    <p className="flex items-center gap-2">
-      <span className="flex gap-0.5" aria-hidden="true">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            className={
-              i < filled
-                ? "h-4 w-4 fill-accent-500 text-accent-500"
-                : "h-4 w-4 text-neutral-300"
-            }
-          />
-        ))}
-      </span>
-      <span className="t-label-2 text-primary-800">{value} out of 5</span>
-    </p>
-  );
-}
 
 export default function HotelsPage() {
   return (
@@ -325,17 +278,17 @@ export default function HotelsPage() {
                 </h1>
 
                 <p className="t-body-lg mt-4 max-w-xl text-primary-100">
-                  Flights are what we do. Stays are what our holidays brand
-                  does — beachfront resorts, boutique city hotels and pool
-                  villas, handpicked and booked by the same UK team, with free
-                  cancellation on a large share of them.
+                  Flights are what we do. Stays are what our sister company,
+                  {SISTER_BRAND.name}, does — beachfront resorts, boutique city
+                  hotels and pool villas, booked with and sold by{" "}
+                  {SISTER_BRAND.name} under its own terms.
                 </p>
 
                 <ul className="mt-8 flex flex-wrap gap-3">
                   {[
                     { icon: Hotel, label: "Handpicked stays" },
-                    { icon: CalendarCheck, label: "Free cancellation on many rates" },
-                    { icon: Headset, label: "Real UK agents, 24/7" },
+                    { icon: CalendarCheck, label: "Cancellation terms shown upfront" },
+                    { icon: Headset, label: "24/7 on WhatsApp" },
                   ].map(({ icon: Icon, label }) => (
                     <li
                       key={label}
@@ -383,9 +336,9 @@ export default function HotelsPage() {
                   </a>
 
                   <p className="t-body-sm mt-3 text-text-secondary">
-                    Hotel bookings are completed on {SISTER_BRAND.name}, our
-                    sister brand — this panel shows what you&apos;ll fill in
-                    there. Flights stay here with us.
+                    Hotel bookings are made with and sold by {SISTER_BRAND.name},
+                    our sister company, under its own terms — this panel shows
+                    what you&apos;ll fill in there. Flights stay here with us.
                   </p>
                 </div>
               </div>
@@ -467,9 +420,8 @@ export default function HotelsPage() {
                 </h2>
                 <p className="t-body mt-4 text-primary-100">
                   Wicket Travel books the flight. Everything on the ground —
-                  hotels, resorts, packages and car rental — belongs to our
-                  holidays brand, run by the same people out of the same UK
-                  office.
+                  hotels, resorts, packages and car rental — is sold by our
+                  sister company, {SISTER_BRAND.name}, under its own terms.
                 </p>
                 <a
                   {...externalLinkProps}
@@ -481,7 +433,7 @@ export default function HotelsPage() {
                 </a>
                 <p className="mt-6 inline-flex items-center gap-2 t-body-sm text-primary-200">
                   <BadgeCheck className="h-4 w-4 shrink-0 text-accent-400" aria-hidden="true" />
-                  {BUSINESS.legalName}, company registration {BUSINESS.registration}.
+                  Flights: {BUSINESS.legalName} (company {BUSINESS.registration}). Stays: {SISTER_BRAND.name}.
                 </p>
               </div>
             </div>
@@ -579,38 +531,6 @@ export default function HotelsPage() {
           </div>
         </section>
 
-        {/* ── Guest reviews ────────────────────────────────────────────── */}
-        <section className="section bg-sand-500">
-          <div className="container-page">
-            <div className="section-lead text-center">
-              <h2 className="t-h2 text-primary-800">What guests tell us</h2>
-              <p className="t-body mt-4 text-text-on-sand">
-                Feedback from travelers who booked a flight with Wicket Travel
-                and a stay through {SISTER_BRAND.name}.
-              </p>
-            </div>
-
-            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-              {REVIEWS.map((r) => (
-                <figure key={r.name} className="card flex h-full flex-col p-8">
-                  <Rating value={r.rating} />
-                  <blockquote className="t-body mt-4 flex-1 text-text-secondary">
-                    &ldquo;{r.quote}&rdquo;
-                  </blockquote>
-                  <figcaption className="mt-6 border-t border-neutral-300 pt-4">
-                    <span className="t-label-2 block text-primary-800">
-                      {r.name} · {r.city}
-                    </span>
-                    <span className="t-body-sm mt-0.5 block text-text-secondary">
-                      {r.trip}
-                    </span>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* ── Closing CTA ──────────────────────────────────────────────── */}
         <section className="section bg-neutral-000">
           <div className="container-page">
@@ -624,8 +544,8 @@ export default function HotelsPage() {
                 <h2 className="t-h2 text-text-on-dark">Flight here, stay there.</h2>
                 <p className="t-body mt-4 text-primary-100">
                   Book the fare with us, then pick the room with{" "}
-                  {SISTER_BRAND.name} — one team either side, so the dates never
-                  fall out of step.
+                  {SISTER_BRAND.name}, our sister company — it sells the stay
+                  under its own terms.
                 </p>
                 <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                   <a

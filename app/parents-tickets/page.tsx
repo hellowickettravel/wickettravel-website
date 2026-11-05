@@ -8,6 +8,7 @@ import {
   MessageCircle,
   PhoneCall,
   Plus,
+  ShieldAlert,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -24,6 +25,12 @@ import {
   TWITTER_BASE,
 } from "@/lib/seo";
 import { PHONE_LINK, WHATSAPP_URL } from "@/lib/links";
+
+/** Safety-report route (website audit, 5 Nov 2026): a pre-addressed email
+ *  plus WhatsApp, and 999 for an emergency. */
+const SAFETY_MAILTO = `mailto:${BUSINESS.email}?subject=${encodeURIComponent(
+  "Parent Travel Assist: safety concern"
+)}`;
 
 /**
  * /parents-tickets — the dedicated home for Parent Travel Assist.
@@ -115,6 +122,11 @@ const FAQ = [
     question: "Why not just use a WhatsApp group?",
     answer:
       "Plenty of people do, and this board exists because those groups work — it is the same idea with the parts that go wrong taken out. In a group, a request scrolls out of sight within an hour, only the people already in that one group ever see it, everybody's phone number is visible to everybody else by default, and nobody checks that the person replying is really on the flight. Here a post stays searchable by route and date until it is matched or withdrawn, it is visible to every family and traveller on the board rather than one chat, no contact detail is ever published, and a coordinator confirms the traveller's booking before an introduction is made. If your group already works for you, keep it — post here as well and you are simply in front of more people.",
+  },
+  {
+    question: "How do I report a safety concern?",
+    answer:
+      "Email info@wickettravel.com with \"Parent Travel Assist: safety concern\" in the subject, or message us on WhatsApp on the number on this page. Tell us the listing reference if you have it. We pause the listing while we look into it, and we can remove a member from the board. If anyone is in immediate danger, call 999 first. Parent Travel Assist is an introduction service: members travel independently, and the full rules are in the Parent Travel Assist terms.",
   },
   {
     question: "How do I change or remove my post?",
@@ -222,6 +234,16 @@ export default function ParentsTicketsPage() {
                     One form, either side. A coordinator reads every post by
                     hand.
                   </p>
+                  <p className="mt-2 t-body-sm text-primary-100">
+                    By posting you agree to the{" "}
+                    <Link
+                      href="/parent-travel-assist-terms"
+                      className="font-bold text-text-on-dark underline decoration-accent-400 decoration-2 underline-offset-2"
+                    >
+                      Parent Travel Assist terms
+                    </Link>
+                    .
+                  </p>
                 </div>
                 <div className="px-6 py-6 sm:px-8 sm:py-8">
                   <ParentsEnquiryForm />
@@ -289,13 +311,67 @@ export default function ParentsTicketsPage() {
                 </p>
               </div>
 
+              {/* The service's limits and a safety-report route, beside the
+                  form (website audit, 5 Nov 2026). */}
+              <div className="card mt-4 p-6 sm:p-8">
+                <h3 className="t-h4 text-primary-800">
+                  How this service works
+                </h3>
+                <ul className="mt-3 list-disc space-y-2 pl-5 t-body-sm text-text-secondary marker:text-accent-500">
+                  <li>We make introductions only. Members travel independently.</li>
+                  <li>
+                    A coordinator reviews every post, but this is not a
+                    criminal-records or DBS check.
+                  </li>
+                  <li>
+                    Any amount is agreed and paid directly between members.
+                    Wicket Travel doesn&apos;t handle or take a share of it.
+                  </li>
+                </ul>
+                <Link
+                  href="/parent-travel-assist-terms"
+                  className="mt-4 inline-block t-label-2 text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+                >
+                  Read the Parent Travel Assist terms
+                </Link>
+
+                <div className="mt-6 border-t border-neutral-200 pt-4">
+                  <p className="flex items-center gap-2 t-label-2 text-primary-800">
+                    <ShieldAlert className="h-4 w-4 shrink-0 text-accent-600" aria-hidden="true" />
+                    Report a safety concern
+                  </p>
+                  <p className="mt-2 t-body-sm text-text-secondary">
+                    Worried about a listing, a member or a trip? Email{" "}
+                    <a
+                      href={SAFETY_MAILTO}
+                      className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+                    >
+                      {BUSINESS.email}
+                    </a>{" "}
+                    or message us on{" "}
+                    <a
+                      href={WHATSAPP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-primary-800 underline decoration-accent-400 decoration-2 underline-offset-2 hover:text-accent-600"
+                    >
+                      WhatsApp
+                    </a>
+                    . We&apos;ll pause the listing while we look into it.
+                  </p>
+                  <p className="mt-2 t-body-sm font-bold text-primary-800">
+                    If anyone is in immediate danger, call 999.
+                  </p>
+                </div>
+              </div>
+
               <div className="card mt-4 p-6 sm:p-8">
                 <h3 className="t-h4 text-primary-800">
                   Would rather just talk it through?
                 </h3>
                 <p className="t-body-sm mt-2 text-text-secondary">
-                  Our team answers 24/7 and can take the whole thing over the
-                  phone — no form, no account.
+                  Call or message us on WhatsApp, 24/7, and we can take the
+                  whole thing over the phone — no form, no account.
                 </p>
                 <div className="mt-5 flex flex-col gap-3">
                   <a

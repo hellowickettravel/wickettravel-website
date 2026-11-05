@@ -22,7 +22,7 @@ export default function Faq() {
           <p className="t-body mt-4 text-text-secondary">
             Everything you need to know about finding the best airline ticket
             deals with Wicket Travel — trusted carriers, honest fares and 24/7
-            support.
+            support on WhatsApp.
           </p>
         </div>
 

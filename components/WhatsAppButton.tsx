@@ -39,11 +39,14 @@ export default function WhatsAppButton() {
             role="tooltip"
             id="whatsapp-tooltip"
             className={cn(
-              "pointer-events-none absolute bottom-full mb-2 whitespace-nowrap rounded-sm bg-primary-800 px-3 py-2 t-label-3 text-text-on-dark shadow-e2",
+              "pointer-events-none absolute bottom-full mb-2 w-max max-w-[260px] rounded-sm bg-primary-800 px-3 py-2 t-label-3 text-text-on-dark shadow-e2",
               dir === "rtl" ? "left-0" : "right-0"
             )}
           >
             {t("wa.tooltip")}
+            <span className="mt-1 block t-caption text-primary-100">
+              Chats are handled by WhatsApp (Meta) under its terms.
+            </span>
           </motion.div>
         )}
       </AnimatePresence>

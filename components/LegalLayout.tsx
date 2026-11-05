@@ -1,4 +1,4 @@
-import { AlertTriangle, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 
 export type LegalSection = {
@@ -6,40 +6,6 @@ export type LegalSection = {
   heading: string;
   content: ReactNode;
 };
-
-/**
- * TEMPLATE DISCLAIMER (shown to every visitor, not just developers): Privacy,
- * Terms and Refunds are drafted as a well-structured starting point using the
- * business facts we were given. They are NOT legal advice and have NOT been
- * reviewed by a qualified solicitor. Wicket Travel Limited must have a
- * qualified legal professional review and approve this content — and confirm
- * placeholder figures (retention periods, fee amounts, processing times) —
- * before it is relied on in production.
- */
-function LegalNotice() {
-  return (
-    <div
-      role="note"
-      className="mb-10 flex items-start gap-3 rounded-lg border border-warning bg-warning-surface p-6 sm:p-6"
-    >
-      <span
-        className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-md bg-warning-surface text-warning"
-        aria-hidden="true"
-      >
-        <AlertTriangle className="h-5 w-5" />
-      </span>
-      <div className="t-body-sm text-warning">
-        <p className="font-bold">Template — pending legal review</p>
-        <p className="mt-1">
-          This page is a professionally structured starting point, not legal
-          advice. It has not been reviewed by a qualified lawyer. Please have
-          a solicitor review and approve it — and confirm every placeholder
-          figure below — before relying on it.
-        </p>
-      </div>
-    </div>
-  );
-}
 
 /** Paragraph with the shared legal-copy tone. */
 export function P({ children }: { children: ReactNode }) {
@@ -52,15 +18,6 @@ export function Ul({ children }: { children: ReactNode }) {
     <ul className="t-body-sm list-disc space-y-2 pl-6 text-text-secondary marker:text-accent-500">
       {children}
     </ul>
-  );
-}
-
-/** Inline emphasis for a placeholder the client must confirm before launch. */
-export function Placeholder({ children }: { children: ReactNode }) {
-  return (
-    <span className="rounded-xs bg-warning-surface px-2 py-1 font-bold text-warning">
-      {children}
-    </span>
   );
 }
 
@@ -86,25 +43,32 @@ export function LegalLink({
 }
 
 /**
- * Shared shell for the three legal pages: disclaimer banner,"last updated"
- * date, a jump-to-section table of contents (sticky sidebar on desktop,
+ * Shared shell for the legal and policy pages: the "last updated" date,
+ * an optional intro, a jump-to-section table of contents (sticky sidebar on desktop,
  * native <details> dropdown on mobile — both zero-JS), and the sections
  * themselves.
  */
 export default function LegalLayout({
   sections,
   lastUpdated,
+  intro,
 }: {
   sections: LegalSection[];
   lastUpdated: string;
+  /** Plain-English summary shown above the sections. */
+  intro?: ReactNode;
 }) {
   return (
     <div className="section bg-neutral-000">
       <div className="container-page">
-        <LegalNotice />
         <p className="mb-8 t-label-3 uppercase text-text-secondary">
           Last updated: {lastUpdated}
         </p>
+        {intro ? (
+          <div className="mb-10 max-w-3xl space-y-3 rounded-lg border border-primary-100 bg-primary-050 p-6 t-body text-primary-800">
+            {intro}
+          </div>
+        ) : null}
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[240px_1fr] lg:gap-12">
           {/* Desktop table of contents — sticky sidebar */}

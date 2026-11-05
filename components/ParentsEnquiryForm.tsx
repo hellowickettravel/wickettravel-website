@@ -249,6 +249,9 @@ export default function ParentsEnquiryForm() {
   const boardOptions = useBoardOptions();
   const [data, setData] = useState<FormState>(EMPTY);
   const [consent, setConsent] = useState(false);
+  // Required: agreement to the terms and, for a family, explicit consent to
+  // process the relative's age, health and mobility details (UK GDPR Art. 9).
+  const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -306,6 +309,13 @@ export default function ParentsEnquiryForm() {
       return;
     }
     setErrors({});
+    if (!agreed) {
+      setSubmitError(
+        "Please tick the box to agree to the Parent Travel Assist terms before posting."
+      );
+      document.getElementById(id("agree"))?.focus();
+      return;
+    }
     setSubmitting(true);
 
     try {
@@ -1019,6 +1029,39 @@ export default function ParentsEnquiryForm() {
                 contact you off a listing. Leave it unticked and nothing appears
                 publicly at all — your post goes only to our team, which is the
                 only way anyone is ever introduced either way.
+              </span>
+            </span>
+          </label>
+        </div>
+        {/* Required agreement + explicit consent for health/mobility data. */}
+        <div className="rounded-md border border-neutral-300 p-4 sm:p-5">
+          <label htmlFor={id("agree")} className="flex cursor-pointer gap-3">
+            <input
+              type="checkbox"
+              id={id("agree")}
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              required
+              aria-required="true"
+              className="mt-1 h-4 w-4 shrink-0 accent-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+            />
+            <span className="t-body-sm text-text-secondary">
+              <span className="t-label-1 text-primary-800">
+                I agree to the{" "}
+                <a href="/parent-travel-assist-terms" target="_blank" className="underline underline-offset-2">
+                  Parent Travel Assist terms
+                </a>{" "}
+                <span className="text-error" aria-hidden="true">*</span>
+              </span>
+              <span className="mt-2 block">
+                {isTraveller
+                  ? "I understand this is an introduction service with no DBS checks, that I travel independently, and that any amount is agreed and paid directly between members."
+                  : "I give my explicit consent for Wicket Travel to use my relative's age and any health or mobility needs I've described to arrange this introduction, and to share them with a matched helper. I have my relative's agreement to share their details. I understand there are no DBS checks and that any amount is agreed and paid directly between members."}{" "}
+                You can withdraw consent at any time — see our{" "}
+                <a href="/privacy" target="_blank" className="font-bold text-primary-800 underline underline-offset-2">
+                  Privacy Policy
+                </a>
+                .
               </span>
             </span>
           </label>

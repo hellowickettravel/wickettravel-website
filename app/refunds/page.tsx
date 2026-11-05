@@ -1,174 +1,170 @@
+import LegalPage, { legalMetadata, Term } from "@/components/LegalPage";
+import { LegalLink, P, Ul, type LegalSection } from "@/components/LegalLayout";
+import { COMPANY } from "@/lib/legal";
 import { WHATSAPP_URL } from "@/lib/links";
-import type { Metadata } from "next";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageHero from "@/components/PageHero";
-import LegalLayout, { LegalLink, P, Placeholder, Ul, type LegalSection } from "@/components/LegalLayout";
-import { BUSINESS, OG_BASE, SITE_URL, TWITTER_BASE } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = legalMetadata({
   title: "Refund Policy",
   description:
-    "How refunds and cancellations work when you book an airline ticket through Wicket Travel — fare rules, fees, timeframes and how to request one.",
-  alternates: { canonical: "/refunds" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    ...OG_BASE,
-    url: `${SITE_URL}/refunds`,
-    title: "Refund Policy | Wicket Travel",
-    description:
-      "How refunds and cancellations work when you book a flight through Wicket Travel.",
-  },
-  twitter: {
-    ...TWITTER_BASE,
-    title: "Refund Policy | Wicket Travel",
-    description:
-      "How refunds and cancellations work when you book a flight through Wicket Travel.",
-  },
-};
+    "How cancellations and refunds work when Wicket Travel books your flight: fare rules, fees, airline-cancelled flights, and when you get your money back.",
+  path: "/refunds",
+});
 
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-    { "@type": "ListItem", position: 2, name: "Refund Policy", item: `${SITE_URL}/refunds` },
-  ],
-};
-
-const LAST_UPDATED = "28 July 2026";
+const mail = <LegalLink href={`mailto:${COMPANY.email}`}>{COMPANY.email}</LegalLink>;
 
 const sections: LegalSection[] = [
   {
     id: "overview",
-    heading: "1. Overview",
+    heading: "1. How refunds work",
     content: (
       <P>
-        Wicket Travel books flights as an intermediary between you and the
-        operating airline. Refunds are governed first and foremost by the
-        fare rules the airline attached to your ticket at the time of
-        booking — we help you claim what you&apos;re entitled to, but we
-        cannot override an airline&apos;s own fare conditions.
+        We book your flights with the airline on your behalf, so any refund
+        comes from the airline under the fare rules of your ticket. We claim
+        it for you, and pay it on to you once the airline pays us. The fare
+        rules are in your quote; ask us if you want them explained before you
+        book.
       </P>
     ),
   },
   {
-    id: "how-refunds-work",
-    heading: "2. How refunds work",
+    id: "fare-types",
+    heading: "2. What you can get back",
     content: (
       <>
-        <P>Whether a ticket is refundable depends on the fare type you booked:</P>
         <Ul>
-          <li><strong className="text-primary-800">Fully refundable fares</strong> — can be cancelled for a refund, sometimes minus a service or admin fee.</li>
-          <li><strong className="text-primary-800">Partially refundable fares</strong> — the airline refunds taxes and part of the fare; the rest is retained per its fare rules.</li>
-          <li><strong className="text-primary-800">Non-refundable fares</strong> — typically only unused government taxes and airport charges can be recovered, if anything.</li>
+          <li>
+            <Term>Refundable fares</Term>: the fare and taxes, less any
+            cancellation charge in the fare rules.
+          </li>
+          <li>
+            <Term>Non-refundable fares</Term>: usually only the government taxes
+            and airport charges that the airline did not have to pay because
+            you didn&apos;t fly. Some airlines charge to process even this.
+          </li>
+          <li>
+            <Term>Partly used tickets</Term>: depends on the fare rules; often
+            little or nothing is refundable once a journey has started.
+          </li>
         </Ul>
         <P>
-          Your fare type is confirmed at the time of booking. If you&apos;re
-          unsure which applies to you, contact us with your booking reference
-          and we&apos;ll check the fare rules for you.
+          Our own service charge covers work already done to book your
+          flights, so it is not refunded when you choose to cancel, unless the
+          booking was never ticketed.
         </P>
       </>
     ),
   },
   {
-    id: "cancellation-process",
-    heading: "3. Cancellation process",
+    id: "cancel-by-you",
+    heading: "3. If you cancel",
     content: (
       <>
-        <P>To cancel a booking or ask about a refund:</P>
+        <P>
+          Contact us as soon as you know, and before the flight departs:
+          WhatsApp{" "}
+          <LegalLink href={WHATSAPP_URL} external>{COMPANY.phoneDisplay}</LegalLink>,
+          email {mail}, or message us in your booking on the portal. Give your
+          booking reference and the names of the travellers cancelling.
+        </P>
         <Ul>
-          <li>Contact us by phone, WhatsApp or email with your booking reference and passenger name.</li>
-          <li>We&apos;ll check the airline&apos;s fare rules and confirm what refund, if any, applies.</li>
-          <li>Where a refund is due, we submit the cancellation to the airline or booking portal on your behalf.</li>
+          <li>We check the fare rules and tell you, in writing, what you will get back before we cancel anything.</li>
+          <li>If we charge a fee to process the cancellation, we tell you the amount first and only charge it if you agree. It is deducted from the refund, never charged separately.</li>
+          <li>We cancel with the airline only after you confirm.</li>
         </Ul>
         <P>
-          See our <LegalLink href="/contact">Contact page</LegalLink> for
-          every way to reach us.
+          If you simply don&apos;t turn up for a flight (a &ldquo;no-show&rdquo;),
+          most fares lose any refund except, sometimes, unused taxes.
         </P>
       </>
     ),
   },
   {
-    id: "fees",
-    heading: "4. Service & admin fees",
+    id: "cancel-by-airline",
+    heading: "4. If the airline cancels or changes your flight",
     content: (
-      <P>
-        We may charge a service or administration fee to process a
-        cancellation or refund request, separate from anything the airline
-        withholds under its own fare rules. Any such fee is{" "}
-        <Placeholder>to be confirmed by Wicket Travel Limited</Placeholder>{" "}
-        and will always be disclosed to you before you agree to proceed.
-      </P>
+      <>
+        <P>
+          You are entitled to a full refund of the unused ticket if the airline
+          cancels your flight or makes a significant schedule change you
+          don&apos;t accept. We tell you as soon as the airline tells us, explain
+          your options (rebooking, a refund, or a voucher if you prefer one),
+          and claim the refund for you.
+        </P>
+        <Ul>
+          <li>We do not charge a service fee for refunds caused by an airline cancellation or schedule change.</li>
+          <li>
+            Compensation and expenses under UK261/EU261 (for example for long
+            delays) are paid by the airline. We will point you to its claim
+            process and help where we can.
+          </li>
+        </Ul>
+      </>
     ),
   },
   {
     id: "timeframes",
-    heading: "5. Timeframes",
-    content: (
-      <P>
-        Once an airline approves a refund, it&apos;s paid back to your
-        original payment method. Processing times are set by the airline and
-        your card issuer or bank, and typically take{" "}
-        <Placeholder>a number of weeks — exact range to be confirmed by Wicket Travel Limited</Placeholder>
-        . We&apos;ll keep you updated while a refund is in progress.
-      </P>
-    ),
-  },
-  {
-    id: "non-refundable-cases",
-    heading: "6. Cases that are typically non-refundable",
+    heading: "5. When you get your money",
     content: (
       <>
-        <P>The following are generally not refundable, in line with standard airline policy:</P>
-        <Ul>
-          <li>No-shows — not cancelling before departure and simply not travelling.</li>
-          <li>Missing check-in or boarding deadlines set by the airline.</li>
-          <li>Visa refusal or travel document issues that are not the airline&apos;s or our fault.</li>
-          <li>Promotional or &ldquo;basic&rdquo; fares explicitly marked as non-refundable at the time of booking.</li>
-          <li>Any service or admin fee we&apos;ve already charged for work carried out on your booking.</li>
-        </Ul>
+        <P>
+          <Term>Our promise:</Term> we pay you within 14 days of receiving the
+          refund from the airline, to the original payment method (or, for
+          bank transfer payments, to the account you paid from).
+        </P>
+        <P>
+          Airlines set their own processing times, which can be anywhere from a
+          few weeks to several months, and longer during widespread
+          disruption. We chase the airline for you and keep you updated, and
+          you can ask us for a progress update at any time.
+        </P>
       </>
     ),
   },
   {
-    id: "airline-initiated-changes",
-    heading: "7. When the airline cancels or reschedules your flight",
+    id: "not-refundable",
+    heading: "6. What is not refundable",
+    content: (
+      <Ul>
+        <li>Fares marked non-refundable, apart from any taxes the airline refunds.</li>
+        <li>Missed flights, missed check-in and no-shows.</li>
+        <li>Refused boarding or entry because of passports, visas, health requirements or conduct.</li>
+        <li>Visa fees — see our <LegalLink href="/visa-terms">Visa Service Terms</LegalLink>.</li>
+        <li>Our service charge once a booking has been ticketed, when you choose to cancel.</li>
+      </Ul>
+    ),
+  },
+  {
+    id: "our-mistakes",
+    heading: "7. If we made a mistake",
     content: (
       <P>
-        If an airline cancels or significantly reschedules your flight, you
-        are usually entitled to a choice of a refund, rebooking or credit
-        under that airline&apos;s own policy — and, for some UK/EU flights,
-        under applicable air passenger rights regulations. We&apos;ll help
-        you exercise whichever option the airline offers and, where
-        regulations entitle you to more, point you to the airline&apos;s
-        process for claiming it.
+        If we booked something different from what you agreed, we will fix it
+        at no cost to you, or refund you in full if it can&apos;t be fixed.
       </P>
     ),
   },
   {
-    id: "how-to-request",
-    heading: "8. How to request a refund",
+    id: "card-protection",
+    heading: "8. Card protection and chargebacks",
     content: (
-      <>
-        <P>Contact us with the following so we can act quickly:</P>
-        <Ul>
-          <li>Your booking reference / PNR.</li>
-          <li>The full name(s) of the passenger(s).</li>
-          <li>The reason for cancellation, if relevant.</li>
-        </Ul>
-      </>
+      <P>
+        Please contact us before raising a chargeback so we can help; a
+        chargeback on a ticket the airline has already refunded to us can delay
+        your money. Card payments may be protected by section 75 of the Consumer
+        Credit Act 1974 (credit cards, over £100) or your card provider&apos;s
+        chargeback scheme. Flight-only bookings are not ATOL protected.
+      </P>
     ),
   },
   {
-    id: "contact-us",
-    heading: "9. Contact us for refund queries",
+    id: "contact",
+    heading: "9. Questions and complaints",
     content: (
       <P>
-        Email: <LegalLink href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</LegalLink> ·{" "}
-        Phone/WhatsApp: <LegalLink href={WHATSAPP_URL} external>{BUSINESS.phoneDisplay}</LegalLink>.
-        {" "}{BUSINESS.legalName}, {BUSINESS.streetAddress}, {BUSINESS.addressLocality},{" "}
-        {BUSINESS.addressRegion}, {BUSINESS.postalCode}, UK.
+        Email {mail} or WhatsApp{" "}
+        <LegalLink href={WHATSAPP_URL} external>{COMPANY.phoneDisplay}</LegalLink>.
+        Not happy with how a refund has been handled? Follow our{" "}
+        <LegalLink href="/complaints">complaints procedure</LegalLink>.
       </P>
     ),
   },
@@ -176,23 +172,19 @@ const sections: LegalSection[] = [
 
 export default function RefundPolicyPage() {
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
-      <Header />
-      <main className="flex-1">
-        <PageHero
-          title="Refund Policy"
-          lead="How refunds and cancellations work when your flight is booked through Wicket Travel."
-          breadcrumbs={[{ label: "Home", href: "/" }, { label: "Refund Policy" }]}
-        />
-        <LegalLayout sections={sections} lastUpdated={LAST_UPDATED} />
-      </main>
-      <Footer />
-    </>
+    <LegalPage
+      title="Refund Policy"
+      lead="How cancellations and refunds work when Wicket Travel books your flight."
+      path="/refunds"
+      sections={sections}
+      intro={
+        <p>
+          <strong>In short:</strong> refunds follow your ticket&apos;s fare
+          rules. We tell you what you&apos;ll get back before we cancel, never
+          charge a fee you haven&apos;t agreed to, and pay you within 14 days of
+          the airline paying us.
+        </p>
+      }
+    />
   );
 }

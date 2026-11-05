@@ -100,7 +100,12 @@ function initials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function ReviewCard({ review }: { review: Review }) {
+/** Each card names its source and links to it (website audit, 5 Nov 2026:
+ *  "keep those and link each to its source"). Trustpilot gives no stable
+ *  per-review URL we can cite, so the link goes to the public profile where
+ *  every one of these reviews is published. Links in the aria-hidden marquee
+ *  duplicate are taken out of the tab order. */
+function ReviewCard({ review, hidden }: { review: Review; hidden?: boolean }) {
   return (
     <figure className="flex h-full w-[280px] shrink-0 flex-col rounded-lg bg-neutral-000 p-5 shadow-e1 ring-1 ring-primary-900/[0.06] sm:w-[340px] sm:p-6">
       <Stars rating={review.rating} />
@@ -117,9 +122,16 @@ function ReviewCard({ review }: { review: Review }) {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate t-label-2 text-primary-800">{review.name}</span>
-          <span className="block t-caption text-text-secondary">
-            Review on <TrustpilotWord className="text-[12px]" />
-          </span>
+          <a
+            href={TRUSTPILOT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            tabIndex={hidden ? -1 : undefined}
+            className="block t-caption text-text-secondary underline decoration-neutral-300 underline-offset-2 hover:text-primary-800"
+          >
+            Read on <TrustpilotWord className="text-[12px]" />
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
         </span>
       </figcaption>
     </figure>
@@ -149,7 +161,7 @@ function Row({
     >
       {reviews.map((r) => (
         <li key={r.name} className="flex">
-          <ReviewCard review={r} />
+          <ReviewCard review={r} hidden={hidden || decorative} />
         </li>
       ))}
     </ul>

@@ -28,7 +28,7 @@ import { HOLIDAYS_URL } from "@/lib/links";
 
 const TRUST_CUES = [
   { icon: Sparkles, label:"Handpicked stays" },
-  { icon: ShieldCheck, label:"Best-price promise" },
+  { icon: ShieldCheck, label:"Sold under its own terms" },
   { icon: Headphones, label:"24/7 support" },
 ] as const;
 
@@ -71,9 +71,9 @@ export default function SisterBrand() {
 
             <p className="t-body-lg mt-6 max-w-xl text-primary-100">
               Flights are our craft — everything around them belongs to our
-              dedicated holidays brand. Handpicked hotels and resorts, tailored
-              packages and car rentals, with the same best-price promise you
-              already trust.
+              sister company, Wicket Travel Holidays. Hotels and resorts,
+              tailored packages and car rentals are booked with and sold by
+              Wicket Travel Holidays, under its own terms.
             </p>
 
             <ul className="mt-8 flex flex-wrap gap-3">
@@ -126,7 +126,7 @@ export default function SisterBrand() {
                 >
                   <Image
                     src="/hotels/maldives-overwater.jpg"
-                    alt="Overwater villas in the Maldives from the Wicket Travel Holidays collection"
+                    alt="Overwater villas above a lagoon in the Maldives"
                     fill
                     sizes="(max-width: 1024px) 76vw, 38vw"
                     className="object-cover"
@@ -141,7 +141,7 @@ export default function SisterBrand() {
                   <div className="relative h-full w-full -rotate-2 overflow-hidden rounded-lg shadow-e3 ring-[6px] ring-primary-900">
                     <Image
                       src="/hotels/santorini-suites.jpg"
-                      alt="Cliffside suites in Santorini from the Wicket Travel Holidays collection"
+                      alt="Whitewashed cliffside buildings in Santorini"
                       fill
                       sizes="(max-width: 1024px) 46vw, 23vw"
                       className="object-cover"

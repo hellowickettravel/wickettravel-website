@@ -334,7 +334,15 @@ export default function VisaEnquiryForm({
         )}
       </button>
       <p className="text-center t-caption text-text-secondary">
-        We only use your details to answer this enquiry.
+        We only use your details to answer this enquiry. See our{" "}
+        <a href="/privacy" className="font-bold text-primary-800 underline underline-offset-2">
+          Privacy Policy
+        </a>{" "}
+        and{" "}
+        <a href="/visa-terms" className="font-bold text-primary-800 underline underline-offset-2">
+          Visa Service Terms
+        </a>
+        . We are a private company, not a government website.
       </p>
     </form>
   );

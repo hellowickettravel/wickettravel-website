@@ -6,14 +6,36 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useI18n } from "@/lib/i18n";
+import { PORTAL_BOOKING_URL } from "@/lib/links";
+import { DEST_ROUTE_SLUG, portalRouteUrl } from "@/lib/routeLinks";
 
 /**
  * "Today's best fares" region browser. Tabs switch the region; six destination
  * cards animate in. Fares stay soft and number-free — we surface routes, not
- * prices. Landmark shots without a reliable Unsplash match are stored locally
- * in /public/cities (Wikimedia Commons).
+ * prices. City photos are stored locally in /public/cities; all are Unsplash
+ * photos, credited on /photo-credits.
  */
-type Dest = { city: string; country: string; img: string };
+/* `code` is the airport (or city) code handed to the booking portal; `side`
+   says whether the card is a UK departure ("from") or a destination ("to").
+   Ajman has no airport of its own, so its card starts from Sharjah (SHJ),
+   the nearest one. Destinations with a route page (lib/routes.ts) link
+   there; the rest open the portal's booking request with the city filled in,
+   the same hand-off the search widget makes. */
+type Dest = {
+  city: string;
+  code: string;
+  side: "from" | "to";
+  country: string;
+  img: string;
+};
+
+function destHref(d: Dest): string {
+  if (d.side === "to") {
+    const slug = DEST_ROUTE_SLUG[d.code];
+    if (slug) return `/flights/${slug}`;
+  }
+  return portalRouteUrl(PORTAL_BOOKING_URL, { [d.side]: d.code });
+}
 
 const REGIONS: { name: string; cities: Dest[] }[] = [
   {
@@ -21,31 +43,43 @@ const REGIONS: { name: string; cities: Dest[] }[] = [
     cities: [
       {
         city: "Heathrow",
+        code: "LHR",
+        side: "from",
         country: "London, UK",
         img: "/cities/heathrow.jpg",
       },
       {
         city: "Manchester",
+        code: "MAN",
+        side: "from",
         country: "United Kingdom",
         img: "/cities/manchester.jpg",
       },
       {
         city: "Birmingham",
+        code: "BHX",
+        side: "from",
         country: "United Kingdom",
         img: "/cities/birmingham.jpg",
       },
       {
         city: "Gatwick",
+        code: "LGW",
+        side: "from",
         country: "London, UK",
         img: "/cities/gatwick.jpg",
       },
       {
         city: "Luton",
+        code: "LTN",
+        side: "from",
         country: "London, UK",
         img: "/cities/luton.jpg",
       },
       {
         city: "Edinburgh",
+        code: "EDI",
+        side: "from",
         country: "Scotland, UK",
         img: "/cities/edinburgh.jpg",
       },
@@ -56,31 +90,43 @@ const REGIONS: { name: string; cities: Dest[] }[] = [
     cities: [
       {
         city: "New York",
+        code: "NYC",
+        side: "to",
         country: "United States",
         img: "/cities/new-york.jpg",
       },
       {
         city: "Los Angeles",
+        code: "LAX",
+        side: "to",
         country: "United States",
         img: "/cities/los-angeles.jpg",
       },
       {
         city: "Chicago",
+        code: "ORD",
+        side: "to",
         country: "United States",
         img: "/cities/chicago.jpg",
       },
       {
         city: "Miami",
+        code: "MIA",
+        side: "to",
         country: "United States",
         img: "/cities/miami.jpg",
       },
       {
         city: "San Francisco",
+        code: "SFO",
+        side: "to",
         country: "United States",
         img: "/cities/san-francisco.jpg",
       },
       {
         city: "Washington DC",
+        code: "IAD",
+        side: "to",
         country: "United States",
         img: "/cities/washington-dc.jpg",
       },
@@ -91,31 +137,43 @@ const REGIONS: { name: string; cities: Dest[] }[] = [
     cities: [
       {
         city: "Dubai",
+        code: "DXB",
+        side: "to",
         country: "UAE",
         img: "/cities/dubai.jpg",
       },
       {
         city: "Abu Dhabi",
+        code: "AUH",
+        side: "to",
         country: "UAE",
         img: "/cities/abu-dhabi.jpg",
       },
       {
         city: "Sharjah",
+        code: "SHJ",
+        side: "to",
         country: "UAE",
         img: "/cities/sharjah.jpg",
       },
       {
         city: "Ras Al Khaimah",
+        code: "RKT",
+        side: "to",
         country: "UAE",
         img: "/cities/ras-al-khaimah.jpg",
       },
       {
         city: "Ajman",
+        code: "SHJ",
+        side: "to",
         country: "UAE",
         img: "/cities/ajman.jpg",
       },
       {
         city: "Fujairah",
+        code: "FJR",
+        side: "to",
         country: "UAE",
         img: "/cities/fujairah.jpg",
       },
@@ -126,31 +184,43 @@ const REGIONS: { name: string; cities: Dest[] }[] = [
     cities: [
       {
         city: "Tokyo",
+        code: "TYO",
+        side: "to",
         country: "Japan",
         img: "/cities/tokyo.jpg",
       },
       {
         city: "Singapore",
+        code: "SIN",
+        side: "to",
         country: "Singapore",
         img: "/cities/singapore.jpg",
       },
       {
         city: "Bangkok",
+        code: "BKK",
+        side: "to",
         country: "Thailand",
         img: "/cities/bangkok.jpg",
       },
       {
         city: "Kuala Lumpur",
+        code: "KUL",
+        side: "to",
         country: "Malaysia",
         img: "/cities/kuala-lumpur.jpg",
       },
       {
         city: "Hong Kong",
+        code: "HKG",
+        side: "to",
         country: "Hong Kong SAR",
         img: "/cities/hong-kong.jpg",
       },
       {
         city: "Seoul",
+        code: "ICN",
+        side: "to",
         country: "South Korea",
         img: "/cities/seoul.jpg",
       },
@@ -161,31 +231,43 @@ const REGIONS: { name: string; cities: Dest[] }[] = [
     cities: [
       {
         city: "Delhi",
+        code: "DEL",
+        side: "to",
         country: "India",
         img: "/cities/delhi.jpg",
       },
       {
         city: "Mumbai",
+        code: "BOM",
+        side: "to",
         country: "India",
         img: "/cities/mumbai.jpg",
       },
       {
         city: "Bengaluru",
+        code: "BLR",
+        side: "to",
         country: "India",
         img: "/cities/bangalore.jpg",
       },
       {
         city: "Hyderabad",
+        code: "HYD",
+        side: "to",
         country: "India",
         img: "/cities/hyderabad.jpg",
       },
       {
         city: "Chennai",
+        code: "MAA",
+        side: "to",
         country: "India",
         img: "/cities/chennai.jpg",
       },
       {
         city: "Kochi",
+        code: "COK",
+        side: "to",
         country: "India",
         img: "/cities/kochi.jpg",
       },
@@ -198,13 +280,13 @@ function DestCard({ d }: { d: Dest }) {
   return (
     /* 2px CSS lift instead of a framer spring — see FeaturedAirlineFares. */
     <a
-      href="#top"
+      href={destHref(d)}
       className="card card-hover group flex items-center gap-4 overflow-hidden p-3 transition-transform duration-200 ease-out hover:-translate-y-0.5"
     >
       <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-md">
         <Image
           src={d.img}
-          alt={`Flights to ${d.city}, ${d.country}`}
+          alt={d.side === "from" ? `Flights from ${d.city}, ${d.country}` : `Flights to ${d.city}, ${d.country}`}
           fill
           sizes="96px"
           className="object-cover"

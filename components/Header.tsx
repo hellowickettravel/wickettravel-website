@@ -162,12 +162,12 @@ export default function Header({ transparent = false }: { transparent?: boolean 
             {t("cta.login")}
           </a>
 
-          <a
-            href={PORTAL_LOGIN_URL}
+          <Link
+            href="/quote"
             className="hidden items-center rounded-full bg-accent-500 px-[17px] py-[10.5px] t-label-2 tracking-[0.2px] text-text-on-dark shadow-e1 transition-all duration-300 ease-out hover:bg-accent-600 hover:shadow-e2 active:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 sm:inline-flex sm:px-[21px] lg:px-[25px]"
           >
             {t("cta.getQuote")}
-          </a>
+          </Link>
 
           {/* Mobile toggle */}
           <button
@@ -278,13 +278,13 @@ export default function Header({ transparent = false }: { transparent?: boolean 
                   <LogIn className="h-4 w-4 text-accent-500" aria-hidden="true" />
                   {t("cta.login")}
                 </a>
-                <a
-                  href={PORTAL_LOGIN_URL}
+                <Link
+                  href="/quote"
                   onClick={() => setOpen(false)}
                   className="flex min-h-[48px] items-center justify-center rounded-sm bg-accent-500 px-6 t-label-1 text-text-on-dark transition-colors hover:bg-accent-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2"
                 >
                   {t("cta.getQuote")}
-                </a>
+                </Link>
               </div>
             </motion.div>
           </>

@@ -33,7 +33,7 @@ export default function CallUsBand() {
                 <div className="relative h-44 w-44 overflow-hidden rounded-lg ring-4 ring-neutral-000/15 sm:h-52 sm:w-52">
                   <Image
                     src="/support/agent-on-call.jpg"
-                    alt="A friendly Wicket Travel support agent taking a customer call"
+                    alt="A travel support agent taking a customer call"
                     fill
                     sizes="(max-width: 640px) 176px, 208px"
                     className="object-cover"
