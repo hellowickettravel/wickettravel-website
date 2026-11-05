@@ -46,14 +46,12 @@ const breadcrumbJsonLd = {
  * recorded, so they are credited at group level; the Unsplash License does
  * not require attribution.
  *
- * To be confirmed (UNCONFIRMED): files with no recorded source. Some arrived
- * in the first import (560a7b8); a comment in components/BestFaresByCity.tsx
- * says city shots without an Unsplash match came from Wikimedia Commons,
- * which usually requires attribution under a Creative Commons licence. The
- * rest were added or "re-sourced" in 8cb7ad7 for new pages without a
- * replaced hotlink (category photos, cars, three hotel shots, Cape Town, the
- * airport companion). They are listed with a takedown route. Replace them,
- * or move them to the right group with the author's name, once confirmed.
+ * Credited individually (CREDITED): on 5 Nov 2026 every file that had no
+ * recorded source (city shots from the first import, some believed to be from
+ * Wikimedia Commons; category, hotel and car photos; the airport companion
+ * photo) was replaced in place, at the same path, with an Unsplash photo
+ * downloaded through the Unsplash API. Each one is listed below with its
+ * photographer and photo page. Nothing on the site is of unknown source.
  */
 type Group = { files: { label: string; where: string }[] };
 
@@ -67,15 +65,53 @@ const UNSPLASH: Group = {
   ],
 };
 
-const UNCONFIRMED: Group = {
-  files: [
-    { label: "City photos: Bangalore, Birmingham, Cape Town, Chennai, Edinburgh, Hyderabad, Kochi", where: "Homepage, Flights, Parent Travel Assist" },
-    { label: "Category photos: flights, hotels, car rentals, packages", where: "Homepage" },
-    { label: "Hotel photos: boutique suite, city hotel room, clifftop pool, hillside retreat, lagoon cabanas, Maldives overwater villas, resort pool, Santorini suites, tropical villas", where: "Homepage, Hotels" },
-    { label: "Car hire photos: coast road, economy hatchback, luxury saloon, people carrier, SUV", where: "Car Rentals" },
-    { label: "Airport companion photo", where: "Parent Travel Assist" },
-  ],
-};
+type Credit = { file: string; label: string; where: string; by: string; id: string };
+
+/** Photos replaced on 5 Nov 2026, each credited to its photographer. */
+const CREDITED: Credit[] = [
+  { file: "cities/birmingham.jpg", label: "Birmingham canals near Brindleyplace", where: "Homepage, Flights", by: "Lulu Black", id: "tsTQuqKr4fk" },
+  { file: "cities/edinburgh.jpg", label: "Edinburgh from Calton Hill", where: "Homepage, Parent Travel Assist", by: "Connor Mollison", id: "d7_TtRp1s9s" },
+  { file: "cities/cape-town.jpg", label: "Cape Town and Table Mountain from the sea", where: "Homepage", by: "Peter Burdon", id: "F1po0flco3k" },
+  { file: "cities/bangalore.jpg", label: "Bengaluru skyline", where: "Homepage, Flights, Parent Travel Assist", by: "Mahadev Ittina", id: "sEDewKyq6YM" },
+  { file: "cities/hyderabad.jpg", label: "Hyderabad at night", where: "Homepage, Flights, Parent Travel Assist", by: "Sai Kiran Anagani", id: "C8hVlWs0FtM" },
+  { file: "cities/chennai.jpg", label: "Chennai Central station", where: "Homepage, Flights", by: "Appu Gopi", id: "iUnmvZB5SCk" },
+  { file: "cities/kochi.jpg", label: "Fishing nets on the Kochi waterfront", where: "Homepage, Flights", by: "Imthiyas Iqbal", id: "L-H_TofhfNg" },
+  { file: "categories/flights.jpg", label: "View from an aircraft window", where: "Homepage", by: "@felirbe", id: "uvlvl0XqQl0" },
+  { file: "categories/hotels.jpg", label: "Hotel room", where: "Homepage", by: "Linus Mimietz", id: "p3UWyaujtQo" },
+  { file: "categories/packages.jpg", label: "Tropical beach with palm trees", where: "Homepage", by: "Simon Spring", id: "3ws2fq3VtXk" },
+  { file: "categories/car-rentals.jpg", label: "Car on a road at sunset", where: "Homepage", by: "Tobias Weinhold", id: "lkNl4Vbqo6g" },
+  { file: "hotels/hero-resort-pool.jpg", label: "Hotel swimming pool", where: "Hotels", by: "Zoshua Colah", id: "MtJ4lulTNj8" },
+  { file: "hotels/city-hotel-room.jpg", label: "Hotel bedroom", where: "Hotels", by: "Vojtech Bruzek", id: "Yrxr3bsPdS0" },
+  { file: "hotels/boutique-suite.jpg", label: "Hotel bedroom with a garden view", where: "Homepage", by: "visualsofdana", id: "T5pL6ciEn-I" },
+  { file: "hotels/maldives-overwater.jpg", label: "Overwater villas in the Maldives", where: "Homepage, Hotels", by: "Mike Swigunski", id: "k9Zeq6EH_bk" },
+  { file: "hotels/lagoon-cabanas.jpg", label: "Boardwalk across a lagoon in the Maldives", where: "Homepage", by: "Shai Pal", id: "05p3EF6tNzs" },
+  { file: "hotels/santorini-suites.jpg", label: "Whitewashed buildings in Santorini", where: "Homepage, Hotels", by: "The Paris Photographer", id: "_auSXpaC914" },
+  { file: "hotels/clifftop-pool.jpg", label: "Clifftop infinity pool at dusk", where: "Homepage, Hotels", by: "Wojciech Wyszkowski", id: "i9W7YYotEGw" },
+  { file: "hotels/hillside-retreat.jpg", label: "Buildings on a misty hillside", where: "Hotels", by: "Ayyappan Mk", id: "BmdwlvK1jgw" },
+  { file: "hotels/tropical-villas.jpg", label: "Resort pool with sun loungers", where: "Homepage, Hotels", by: "Zoshua Colah", id: "U7riPss-YD0" },
+  { file: "cars/hero-coast-road.jpg", label: "Car parked by the Pacific coast", where: "Car Rentals", by: "Darpan", id: "rR6fP_rCu5w" },
+  { file: "cars/economy-hatchback.jpg", label: "Red hatchback", where: "Car Rentals", by: "Zoshua Colah", id: "M05m-vSJk2g" },
+  { file: "cars/suv.jpg", label: "White SUV on a gravel track", where: "Car Rentals", by: "Erik Mclean", id: "Qgxd4EuB5oE" },
+  { file: "cars/luxury-sedan.jpg", label: "Black luxury saloon", where: "Car Rentals", by: "Talia", id: "PKdQIG4goQc" },
+  { file: "cars/people-carrier.jpg", label: "People carrier", where: "Car Rentals", by: "Roger Starnes Sr", id: "RRazTfRrBZM" },
+  { file: "support/airport-companion.jpg", label: "Two travellers walking through an airport", where: "Parent Travel Assist", by: "Cameron Cox", id: "KbeiZcW5byM" },
+];
+
+function CreditList() {
+  return (
+    <Ul>
+      {CREDITED.map((c) => (
+        <li key={c.file}>
+          {c.label}: photo by{" "}
+          <LegalLink href={`https://unsplash.com/photos/${c.id}`} external>
+            {c.by} on Unsplash
+          </LegalLink>{" "}
+          <span className="text-text-secondary">· used on {c.where}</span>
+        </li>
+      ))}
+    </Ul>
+  );
+}
 
 function FileList({ group }: { group: Group }) {
   return (
@@ -130,24 +166,18 @@ const sections: LegalSection[] = [
     ),
   },
   {
-    id: "being-confirmed",
-    heading: "Photos whose source we're confirming",
+    id: "credited-photos",
+    heading: "Photos credited to their photographers",
     content: (
       <>
         <P>
-          We&apos;re confirming the original source and photographer of these
-          images so we can credit them properly. Some city photos may come
-          from Wikimedia Commons, where each image has its own licence and
-          author.
+          These photos are also from Unsplash, under the{" "}
+          <LegalLink href="https://unsplash.com/license" external>
+            Unsplash License
+          </LegalLink>
+          , and we credit each photographer by name:
         </P>
-        <FileList group={UNCONFIRMED} />
-        <P>
-          If you took one of these photos, or own the rights to it, and
-          haven&apos;t licensed it to us, please email{" "}
-          <LegalLink href={`mailto:${COMPANY.email}`}>{COMPANY.email}</LegalLink>{" "}
-          with a link to the image. We&apos;ll credit you or remove it
-          straight away.
-        </P>
+        <CreditList />
       </>
     ),
   },
