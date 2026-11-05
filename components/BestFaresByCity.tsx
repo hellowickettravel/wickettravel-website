@@ -12,8 +12,8 @@ import { DEST_ROUTE_SLUG, portalRouteUrl } from "@/lib/routeLinks";
 /**
  * "Today's best fares" region browser. Tabs switch the region; six destination
  * cards animate in. Fares stay soft and number-free — we surface routes, not
- * prices. Landmark shots without a reliable Unsplash match are stored locally
- * in /public/cities (Wikimedia Commons).
+ * prices. City photos are stored locally in /public/cities; all are Unsplash
+ * photos, credited on /photo-credits.
  */
 /* `code` is the airport (or city) code handed to the booking portal; `side`
    says whether the card is a UK departure ("from") or a destination ("to").
