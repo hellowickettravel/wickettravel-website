@@ -4,7 +4,7 @@ Things that are true of this project, aren't obvious from reading the code,
 and cost real time to rediscover. The same file lives at the root of both
 repos (Website and Portals), because most of it is about how the two connect.
 
-Last updated: 2026-11-05.
+Last updated: 2026-11-12.
 
 ---
 
@@ -14,13 +14,16 @@ Last updated: 2026-11-05.
 |---|---|---|
 | What | Public marketing site | Customer / staff / admin app |
 | Live URL | https://www.wickettravel.com | https://portal.wickettravel.com |
-| Repo | `zahid-growthnexus/wickettravel-old` | `hellowickettravel/wickettravel-portals` |
+| Repo | `hellowickettravel/wickettravel-website` | `hellowickettravel/wickettravel-portals` |
 | Local dev | http://localhost:3000 (`npm run dev`) | http://localhost:3200 (`npx next dev -p 3200`) |
 | Stack | Next 16.2.9, React 19.2.4, Tailwind 4 | Same, plus Supabase |
 
-They deploy from **different Vercel accounts** and **different GitHub owners**.
-The Website repo is named `-old`; confirm it is really the repo production
-deploys from before relying on that.
+**Hosting:** the Website moved from Vercel to **Netlify** on 2026-11-12 (the
+Vercel free plan hit its usage limit). Config is in `netlify.toml`; deploy
+steps and the env var list are in `README.md`. The Portal is still on Vercel.
+Netlify env vars must be set in the Netlify UI, they are not in the repo.
+Client IP for rate limiting comes from Netlify's `x-nf-client-connection-ip`
+(`lib/relay.ts`).
 
 **This is not the Next.js you know.** Next 16 has breaking changes; read
 `node_modules/next/dist/docs/` before writing framework code. Examples that

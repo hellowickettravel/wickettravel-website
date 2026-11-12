@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wicket Travel — website
 
-## Getting Started
+Public marketing site for [wickettravel.com](https://www.wickettravel.com).
+Next.js 16 (App Router), React 19, Tailwind 4. Hosted on **Netlify**.
 
-First, run the development server:
+> Next 16 has breaking changes. Read `node_modules/next/dist/docs/` before
+> writing framework code (see `AGENTS.md`).
+
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+npm run dev        # http://localhost:3000
+npm run build      # production build: run this before pushing
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Node 22 (see `.nvmrc`). Copy `.env.example` to `.env.local` if you need to
+override anything; the site runs with no env vars at all.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploying (Netlify)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Every setting lives in `netlify.toml`, so importing the repo is enough:
 
-## Learn More
+1. Netlify → **Add new project → Import an existing project → GitHub** →
+   pick `hellowickettravel/wickettravel-website`, branch `main`.
+2. Leave build settings as detected: build command `npm run build`, publish
+   directory `.next`. Netlify's Next.js runtime (`@netlify/plugin-nextjs`)
+   handles API routes, server rendering and `next/image`.
+3. Add environment variables (below), then **Deploy**.
+4. **Domain management** → add `www.wickettravel.com` as the primary domain
+   (Netlify redirects the apex `wickettravel.com` to it) and update DNS as
+   Netlify instructs. HTTPS is issued automatically.
 
-To learn more about Next.js, take a look at the following resources:
+Pushes to `main` deploy production; pull requests get deploy previews.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Environment variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Set in Netlify → **Site configuration → Environment variables**. All are
+optional; the meaning of each is documented in `.env.example`.
 
-## Deploy on Vercel
+| Variable | Purpose |
+|---|---|
+| `RESEND_API_KEY` | Emails contact/quote/newsletter forms to the team. Unset: forms fall back to WhatsApp / email links. |
+| `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` | Form email recipient / sender (sender domain must be verified in Resend). |
+| `PORTAL_ORIGIN` | Portal origin for the server relays. Default `https://portal.wickettravel.com`. |
+| `WICKET_RELAY_SECRET` | Shared secret with the portal (see `.env.example`). |
+| `NEXT_PUBLIC_GA_ID` | Google Analytics 4 ID (loads only after cookie consent). |
+| `NEXT_PUBLIC_TRUSTPILOT_BUSINESS_UNIT_ID` | Trustpilot TrustBox. |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, `NEXT_PUBLIC_BING_SITE_VERIFICATION` | Search console verification tokens. |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`NEXT_PUBLIC_*` values are baked in at build time: after changing one,
+trigger a new deploy (**Deploys → Trigger deploy → Clear cache and deploy**).

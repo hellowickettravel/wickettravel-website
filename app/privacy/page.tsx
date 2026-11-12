@@ -241,7 +241,8 @@ const sections: LegalSection[] = [
           </li>
           <li>
             <Term>Our service providers</Term>, who process data for us under
-            contract: Vercel (hosting the website and portal), Supabase (the
+            contract: Netlify (hosting the website), Vercel (hosting the
+            portal), Supabase (the
             portal&apos;s database, sign-in and private document storage),
             Resend (delivering emails sent from our website forms), our
             business email provider, WhatsApp (Meta) for chats you start with
@@ -268,7 +269,7 @@ const sections: LegalSection[] = [
     heading: "7. International transfers",
     content: (
       <P>
-        Some providers (such as Vercel, Supabase, Resend, Meta and Google)
+        Some providers (such as Netlify, Vercel, Supabase, Resend, Meta and Google)
         may store or access data outside the UK, for example in the United
         States. We rely on UK adequacy regulations (including the UK–US data
         bridge) or the UK International Data Transfer Agreement or Addendum.

@@ -18,8 +18,16 @@ export const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB per file, matching the p
 export const ALLOWED_FILE_EXT = /\.(pdf|jpe?g|png)$/i;
 export const MAX_PAYLOAD_BYTES = 64 * 1024; // a lead form's JSON is tiny; block abuse
 
-/** Extract the originating client IP from the platform's forwarding headers. */
+/**
+ * Extract the originating client IP from the platform's forwarding headers.
+ *
+ * Netlify sets `x-nf-client-connection-ip` itself from the TCP connection, so
+ * a visitor cannot spoof it — prefer it. `x-forwarded-for` can carry values
+ * the client sent, so it is only the fallback (other hosts, local dev).
+ */
 export function getClientIp(request: Request): string {
+  const nf = request.headers.get("x-nf-client-connection-ip")?.trim();
+  if (nf) return nf;
   const xff = request.headers.get("x-forwarded-for");
   if (xff) return xff.split(",")[0].trim();
   return request.headers.get("x-real-ip")?.trim() || "unknown";
@@ -57,8 +65,9 @@ export function rateLimited(ip: string): boolean {
 export function forwardedIpHeaders(request: Request): Record<string, string> {
   const ip = getClientIp(request);
   if (ip === "unknown") return {};
-  const existing = request.headers.get("x-forwarded-for");
-  return { "x-forwarded-for": existing ?? ip, "x-real-ip": ip };
+  // Lead with the IP we trust so the portal's first-hop parse gets the real
+  // visitor, not a value a client injected into its own x-forwarded-for.
+  return { "x-forwarded-for": ip, "x-real-ip": ip };
 }
 
 /* ── Input sanitisation helpers ────────────────────────────────────────── */
