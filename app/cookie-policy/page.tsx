@@ -51,7 +51,7 @@ const sections: LegalSection[] = [
         </Ul>
         <P>
           This is needed for the site to respect your choice, so it doesn&apos;t
-          need consent. Our hosting provider (Vercel) also processes your IP
+          need consent. Our hosting provider (Netlify) also processes your IP
           address to deliver pages and protect the site, without setting
           cookies.
         </P>

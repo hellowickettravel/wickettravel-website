@@ -1,0 +1,23 @@
+# Netlify build configuration for the Wicket Travel website (Next.js 16).
+#
+# Importing this repo into Netlify picks these values up automatically: leave
+# the UI's build command / publish directory empty, or matching these values.
+# Environment variables are NOT kept here — set them in Netlify:
+# Site configuration > Environment variables (see .env.example for the list).
+
+[build]
+  command = "npm run build"
+  # The Next.js runtime reads Next's build output from .next; it is not a
+  # static export folder. Do not change this to "out".
+  publish = ".next"
+
+[build.environment]
+  # Matches .nvmrc and the version the site is developed and tested on.
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Netlify's official Next.js runtime (OpenNext adapter): turns API routes,
+# server rendering, ISR and next/image into Netlify Functions + Image CDN.
+# Pinned as a devDependency in package.json so every build uses a known version.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
