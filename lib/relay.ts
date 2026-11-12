@@ -4,8 +4,9 @@
  * submissions to the Wicket Travel portal; everything here runs BEFORE anything
  * is forwarded.
  *
- * There is no shared secret involved: the portal endpoints are public and
- * validate server-side. These relays exist only to work around the portal's
+ * The portal endpoints are public and validate server-side; the optional
+ * WICKET_RELAY_SECRET only proves to the portal that a forwarded client IP is
+ * ours (see forwardedIpHeaders). These relays exist only to work around the portal's
  * CORS allowlist (it doesn't cover every domain this site is served on), so the
  * client posts same-origin and we forward. The job of this module is therefore
  * defence-in-depth: rate-limit the relay, forward the real client IP, and give
@@ -67,7 +68,17 @@ export function forwardedIpHeaders(request: Request): Record<string, string> {
   if (ip === "unknown") return {};
   // Lead with the IP we trust so the portal's first-hop parse gets the real
   // visitor, not a value a client injected into its own x-forwarded-for.
-  return { "x-forwarded-for": ip, "x-real-ip": ip };
+  const headers: Record<string, string> = { "x-forwarded-for": ip, "x-real-ip": ip };
+  // The host overwrites x-forwarded-for on the way into the portal, so the
+  // portal only honours a forwarded IP that arrives with the shared secret
+  // (portal: app/api/parent-ticket + app/api/visa-enquiry, resolveClientIp).
+  // Without it, every website visitor shares the relay's rate-limit bucket.
+  const secret = process.env.WICKET_RELAY_SECRET;
+  if (secret) {
+    headers["x-wicket-relay-secret"] = secret;
+    headers["x-wicket-client-ip"] = ip;
+  }
+  return headers;
 }
 
 /* ── Input sanitisation helpers ────────────────────────────────────────── */
