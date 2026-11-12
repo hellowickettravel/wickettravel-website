@@ -18,12 +18,12 @@ Last updated: 2026-11-12.
 | Local dev | http://localhost:3000 (`npm run dev`) | http://localhost:3200 (`npx next dev -p 3200`) |
 | Stack | Next 16.2.9, React 19.2.4, Tailwind 4 | Same, plus Supabase |
 
-**Hosting:** the Website moved from Vercel to **Netlify** on 2026-11-12 (the
-Vercel free plan hit its usage limit). Config is in `netlify.toml`; deploy
-steps and the env var list are in `README.md`. The Portal is still on Vercel.
-Netlify env vars must be set in the Netlify UI, they are not in the repo.
-Client IP for rate limiting comes from Netlify's `x-nf-client-connection-ip`
-(`lib/relay.ts`).
+**Hosting:** both projects moved from Vercel to **Netlify** on 2026-11-12
+(Vercel's free plan hit its usage limit; the portal was answering 402).
+Netlify team `realgrowthnexus`: project `wickettravel` (Website) and
+`wickettravel-portal` (Portal). Build config is in each repo's
+`netlify.toml`; env vars live only in the Netlify UI.
+Client IP comes from Netlify's `x-nf-client-connection-ip`.
 
 **This is not the Next.js you know.** Next 16 has breaking changes; read
 `node_modules/next/dist/docs/` before writing framework code. Examples that
@@ -152,9 +152,9 @@ fallback so the app runs whether or not a migration has been applied.
   from `support@wickettravel.com`.
 - Blocked on: **`SMTP_PASS` is empty**, and **no customer has a date of
   birth yet**.
-- Vercel needs `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`,
+- Netlify needs `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`,
   `EMAIL_FROM`, `SMTP_SECURE`. Paste `EMAIL_FROM` **without quotes** in
-  Vercel — `.env.local` strips them, Vercel doesn't.
+  Netlify — `.env.local` strips them, the dashboard doesn't.
 - The Reply-To is `business_settings.business_email`, currently a Gmail
   address.
 
