@@ -14,16 +14,16 @@ export const externalLinkProps = {
 
 /** Sign in / sign up and quote requests go to the booking portal on its
  *  branded custom domain (opens in the same tab). */
-export const PORTAL_LOGIN_URL = "https://www.portal.wickettravel.com/login";
+export const PORTAL_LOGIN_URL = "https://portal.wickettravel.com/login";
 
 /** New-member registration on the booking portal (same tab). Submitting a
  *  Parents Tickets enquiry funnels here — an account keeps every match private. */
-export const PORTAL_SIGNUP_URL = "https://www.portal.wickettravel.com/signup";
+export const PORTAL_SIGNUP_URL = "https://portal.wickettravel.com/signup";
 
 /** Flight searches hand off to the portal's booking wizard (same tab); the
  *  widget appends the traveler's entries as query params to pre-fill it. */
 export const PORTAL_BOOKING_URL =
-  "https://www.portal.wickettravel.com/customer/book";
+  "https://portal.wickettravel.com/customer/book";
 
 /** WhatsApp deep link — +44 7417 564704 (opens in a new tab). */
 export const WHATSAPP_URL = "https://wa.me/447417564704";
